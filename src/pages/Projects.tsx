@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "../components/ProjectCard";
 
-const projects: ProjectProps[] = [
+const projects = [
   {
     title: "Détection de maladies de plantes",
     description: "Pipeline complet : YOLOv5 (détection) → EfficientNet (classification) → FastAPI (API).",

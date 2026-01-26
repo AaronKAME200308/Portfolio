@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 
 const heroVariants = {
   hidden: { opacity: 0, y: 20 },
