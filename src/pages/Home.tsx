@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { NavLink } from "react-router-dom";
 
 const heroVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -21,21 +22,28 @@ const Home = () => {
           </p>
 
           <div className="flex gap-4">
-            <motion.a
-              whileHover={buttonHover}
-              className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 font-semibold shadow-md text-white"
-              href="/projects"
-            >
-              <p className="text-white">Voir mes projets</p>
-            </motion.a>
 
-            <motion.a
-              whileHover={buttonHover}
-              className="inline-block px-6 py-3 rounded-full border border-white text-white/90 hover:bg-white transition"
-              href="/contact"
+            <NavLink
+              to={"/projects"}
             >
-              Me contacter
-            </motion.a>
+              <motion.a
+                whileHover={buttonHover}
+                className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 font-semibold shadow-md text-white"
+              >
+                <p className="text-white">Voir mes projets</p>
+              </motion.a>
+            </NavLink>
+
+            <NavLink
+              to={"/contact"}
+            >
+              <motion.a
+                whileHover={buttonHover}
+                className="inline-block px-6 py-3 rounded-full border border-white text-white/90 hover:bg-white transition"
+              >
+                Me contacter
+              </motion.a>
+            </NavLink>
           </div>
 
           <div className="mt-8 flex gap-4 text-sm text-white/70">
