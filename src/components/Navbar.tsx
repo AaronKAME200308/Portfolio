@@ -52,9 +52,9 @@ const Navbar = () => {
         {/* MOBILE BUTTON */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden text-white focus:outline-none bg-gradient-to-r from-violet-400 to-blue-300"
         >
-          <span className="text-2xl">
+          <span className="text-2xl ">
             {open ? "✕" : "☰"}
           </span>
         </button>
@@ -68,7 +68,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-black/80 backdrop-blur-md"
+            className="md:hidden bg-gradient-to-r from-violet-400 to-blue-300 backdrop-blur-md"
           >
             <ul className="flex flex-col gap-2 px-6 py-4">
               {links.map((l) => (
