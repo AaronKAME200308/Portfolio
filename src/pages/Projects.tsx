@@ -6,7 +6,7 @@ const projects = [
     title: "Détection de maladies de plantes",
     description: "Pipeline complet : YOLOv5 (détection) → EfficientNet (classification) → FastAPI (API).",
     tech: "Python · PyTorch · FastAPI · React Native",
-    video :"@/public/Soitenance.mp4",
+    video :"/Soitenance.mp4",
     link: "#",
   },
   {

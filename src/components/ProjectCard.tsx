@@ -20,11 +20,15 @@ const ProjectCard = ({ project }: { project: ProjectProps }) => {
         <div className="h-40 rounded-lg overflow-hidden mb-4 flex items-center justify-center bg-gradient-to-br from-indigo-700 to-purple-700">
           {project.video ? (
             <video
-              src={project.video}
               controls
+              muted
+              playsInline
               controlsList="nodownload"
-              className="w-full h-full object-scale-down"
-            />
+              className="w-full h-full object-contain"
+            >
+              <source src={project.video} type="video/mp4" />
+              Votre navigateur ne supporte pas la lecture vidéo.
+            </video>
           ) : project.img ? (
             <img
               src={project.img}
