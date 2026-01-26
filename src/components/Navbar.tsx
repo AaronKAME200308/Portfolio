@@ -52,7 +52,7 @@ const Navbar = () => {
         {/* MOBILE BUTTON */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden text-white focus:outline-none bg-gradient-to-r from-violet-400 to-blue-300"
+          className="md:hidden text-white focus:outline-none bg-gradient-to-r from-purple-600 to-blue-500 p-2 rounded-md"
         >
           <span className="text-2xl ">
             {open ? "✕" : "☰"}
@@ -68,7 +68,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-gradient-to-r from-violet-400 to-blue-300 backdrop-blur-md"
+            className="md:hidden bg-gradient-to-r from-purple-600 to-blue-500 backdrop-blur-md"
           >
             <ul className="flex flex-col gap-2 px-6 py-4">
               {links.map((l) => (
@@ -79,8 +79,8 @@ const Navbar = () => {
                     className={({ isActive }) =>
                       `block px-4 py-3 rounded-md transition-all ${
                         isActive
-                          ? "bg-white/10 text-white"
-                          : "text-white/80 hover:text-white hover:bg-white/5"
+                          ? "bg-white/10 text-black"
+                          : "text-black/80 hover:text-white hover:bg-white/5"
                       }`
                     }
                   >
