@@ -22,16 +22,16 @@ const Contact: React.FC = () => {
 
     emailjs
       .sendForm(
-        "service_g1bupfs",      // 🔧 à remplacer
-        "template_6wnehip",     // 🔧 à remplacer
+        "service_g1bupfs",      
+        "template_6wnehip",     
         form.current,
-        "thwBzJSO7Ntifo4PK"       // 🔧 à remplacer
+        "thwBzJSO7Ntifo4PK"       
       )
       .then(
         () => {
           setSent(true);        
           (form.current as HTMLFormElement).reset();
-           recaptchaRef.current?.reset(); // ✅ Reset le captcha après envoi
+           recaptchaRef.current?.reset(); // Reset le captcha après envoi
         },
         (error) => {
           console.error("Erreur:", error.text);
