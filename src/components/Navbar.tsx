@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
 import { motion} from "framer-motion";
 
@@ -9,7 +8,7 @@ const links = [
   { label: "Contact", to: "/contact" },
 ];
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
 
   return (
     <header className="backdrop-blur-md bg-black/30 sticky top-0 z-50 ">

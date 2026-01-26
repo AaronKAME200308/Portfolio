@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 
 const heroVariants = {
@@ -8,7 +7,7 @@ const heroVariants = {
 
 const buttonHover = { scale: 1.03 };
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
     <main className="max-w-6xl mx-auto px-6 py-20">
       <section className="grid md:grid-cols-2 gap-12 items-center">

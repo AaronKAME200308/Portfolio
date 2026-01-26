@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "../components/ProjectCard";
 
@@ -33,7 +32,7 @@ const container = {
   },
 };
 
-const Projects: React.FC = () => {
+const Projects = () => {
   return (
     <main className="max-w-6xl mx-auto px-6 py-20">
       <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">

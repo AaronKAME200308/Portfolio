@@ -3,7 +3,7 @@ import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const Contact: React.FC = () => {
+const Contact = () => {
   const [sent, setSent] = useState(false);
   const form = useRef<HTMLFormElement>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);

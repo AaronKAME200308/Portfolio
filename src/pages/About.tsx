@@ -1,7 +1,6 @@
-import React from "react";
 import { motion } from "framer-motion";
 
-const About: React.FC = () => {
+const About = () => {
   return (
     <main className="max-w-4xl mx-auto px-6 py-20">
       <motion.h2 initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="text-3xl font-bold mb-4">

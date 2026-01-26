@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -16,7 +15,7 @@ const pageTransition = {
   exit: { opacity: 0, y: -10 },
 };
 
-const App: React.FC = () => {
+const App = () => {
   const location = useLocation();
 
   return (
