@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 const heroVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -9,6 +9,16 @@ const heroVariants = {
 const buttonHover = { scale: 1.03 };
 
 const Home = () => {
+
+    const [active, setActive] = useState("Accueil");
+
+  const scrollToSection = (id: string) => {
+    setActive(id);
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-20">
       <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -23,8 +33,8 @@ const Home = () => {
 
           <div className="flex gap-4">
 
-            <NavLink
-              to={"/projects"}
+            <button
+              onClick={() => scrollToSection("À propos")}
             >
               <motion.div
                 whileHover={buttonHover}
@@ -32,10 +42,10 @@ const Home = () => {
               >
                 <p className="text-white">Voir mes projets</p>
               </motion.div>
-            </NavLink>
+            </button>
 
-            <NavLink
-              to={"/contact"}
+            <button
+              onClick={() => scrollToSection("Contact")}
             >
               <motion.div
                 whileHover={buttonHover}
@@ -43,7 +53,7 @@ const Home = () => {
               >
                 Me contacter
               </motion.div>
-            </NavLink>
+            </button>
           </div>
 
           <div className="mt-8 flex gap-4 text-sm text-white/70">
