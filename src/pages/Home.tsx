@@ -26,23 +26,23 @@ const Home = () => {
             <NavLink
               to={"/projects"}
             >
-              <motion.a
+              <motion.div
                 whileHover={buttonHover}
                 className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 font-semibold shadow-md text-white"
               >
                 <p className="text-white">Voir mes projets</p>
-              </motion.a>
+              </motion.div>
             </NavLink>
 
             <NavLink
               to={"/contact"}
             >
-              <motion.a
+              <motion.div
                 whileHover={buttonHover}
                 className="inline-block px-6 py-3 rounded-full border border-white text-white/90 hover:bg-white transition"
               >
                 Me contacter
-              </motion.a>
+              </motion.div>
             </NavLink>
           </div>
 

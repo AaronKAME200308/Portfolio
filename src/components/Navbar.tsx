@@ -68,7 +68,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-gradient-to-r from-purple-600 to-blue-500 backdrop-blur-md"
+            className="md:hidden bg-gradient-purple-400 "
           >
             <ul className="flex flex-col gap-2 px-6 py-4">
               {links.map((l) => (
