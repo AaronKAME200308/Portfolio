@@ -10,8 +10,8 @@ const buttonHover = { scale: 1.03 };
 
 const Home = () => {
   return (
-    <main className="max-w-6xl mx-auto px-6 py-20">
-      <section className="grid md:grid-cols-2 gap-12 items-center">
+    <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="grid md:grid-cols-2 gap-12 items-center">
         <motion.div initial="hidden" animate="show" variants={heroVariants} transition={{ duration: 0.6 }}>
           <h2 className="text-5xl font-extrabold leading-tight mb-4">
             Je conçois des applications <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-300 to-blue-200">IA</span> & modernes.
@@ -75,9 +75,9 @@ const Home = () => {
             </div>
           </div>
         </motion.div>
-      </section>
+      </div>
 
-      <section className="mt-16">
+      <div className="mt-16">
         <motion.h3 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-2xl font-semibold mb-6">
           Projets récents
         </motion.h3>
@@ -105,8 +105,8 @@ const Home = () => {
             </div>
           </motion.div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 };
 

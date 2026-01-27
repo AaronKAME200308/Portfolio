@@ -40,7 +40,7 @@ const Contact = () => {
   };
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-20">
+    <div className="max-w-3xl mx-auto px-6 py-20">
       <motion.h2 initial={{ y: -6, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-3xl font-bold mb-4">
         Contact
       </motion.h2>
@@ -75,7 +75,7 @@ const Contact = () => {
           </div>
         </div>
       </form>
-    </main>
+    </div>
   );
 };
 

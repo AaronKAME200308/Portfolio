@@ -37,17 +37,26 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
+
+li button {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    box-shadow 300ms ease,
+    transform 200ms ease;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+li button:hover {
+  transform: translateY(-1px);
 }
+
+section {
+  scroll-margin-top: 90px;
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {

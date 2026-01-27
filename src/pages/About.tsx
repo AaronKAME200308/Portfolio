@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const About = () => {
   return (
-    <main className="max-w-4xl mx-auto px-6 py-20">
+    <div className="max-w-4xl mx-auto px-6 py-20">
       <motion.h2 initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="text-3xl font-bold mb-4">
         À propos
       </motion.h2>
@@ -32,7 +32,7 @@ const About = () => {
           </p>
         </motion.div>
       </div>
-    </main>
+    </div>
   );
 };
 
