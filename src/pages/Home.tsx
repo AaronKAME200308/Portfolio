@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 const heroVariants = {
   hidden: { opacity: 0, y: 20 },
