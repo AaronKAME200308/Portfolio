@@ -33,14 +33,14 @@ const Navbar = () => {
 
 
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     setActive(id);
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
     });
   };
 
-  const linkClass = (id) =>
+  const linkClass = (id: string) =>
     `px-3 py-2 rounded-md transition-all ${active === id
       ? "bg-white/10 text-blue-300 shadow-sm hover:text-white"
       : "text-blue-300 hover:text-white hover:bg-white/5"

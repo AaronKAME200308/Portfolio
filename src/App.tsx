@@ -1,5 +1,3 @@
-import { AnimatePresence, motion } from "framer-motion";
-
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Main from "./components/Main";
