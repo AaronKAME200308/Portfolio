@@ -96,7 +96,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden bg-black/30 backdrop-blur-md"
+            className="md:hidden backdrop-blur-md"
           >
             <ul className="flex flex-col gap-2 px-6 py-4">
               {links.map((l) => (
