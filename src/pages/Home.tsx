@@ -10,10 +10,8 @@ const buttonHover = { scale: 1.03 };
 
 const Home = () => {
 
-    const [active, setActive] = useState("Accueil");
-
+  
   const scrollToSection = (id: string) => {
-    setActive(id);
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
     });
