@@ -1,22 +1,14 @@
 import React, { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
-import ReCAPTCHA from "react-google-recaptcha";
 
 const Contact = () => {
   const [sent, setSent] = useState(false);
   const form = useRef<HTMLFormElement>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Vérifie que le reCAPTCHA est validé
-    const token = recaptchaRef.current?.getValue();
-    if (!token) {
-      alert("Veuillez valider le reCAPTCHA avant d’envoyer le message !");
-      return;
-    }
 
     if (!form.current) return;
 
@@ -31,7 +23,6 @@ const Contact = () => {
         () => {
           setSent(true);        
           (form.current as HTMLFormElement).reset();
-           recaptchaRef.current?.reset(); // Reset le captcha après envoi
         },
         (error) => {
           console.error("Erreur:", error.text);
@@ -55,12 +46,6 @@ const Contact = () => {
           <input required name="email" type="email" placeholder="Ton email" className="p-3 rounded-md bg-transparent border border-white/40  outline-none" />
           <input type="hidden" name="reply_to" value="" />
           <textarea required name="message" placeholder="Ton message" rows={6} className="p-3 rounded-md bg-transparent border border-white/40  outline-none"></textarea>
-
-          {/* reCAPTCHA */}
-          <ReCAPTCHA
-            sitekey="6LdBmgUsAAAAALOhCeQEwumYx4FXcUvH94p_UByh" // remplace par ta clé
-            ref={recaptchaRef}
-          />
 
           <div className="flex items-center justify-between">
             <button
