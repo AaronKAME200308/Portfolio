@@ -4,19 +4,19 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 
 const logos = [
-    "../public/docker.svg",
-    "../public/expo-1.svg",
-    "../public/fastapi-1.svg",
-    "../public/github-icon-1.svg",
-    "../public/nodejs-1.svg",
-    "../public/postgresql-inc.svg",
-    "../public/react-native-1.svg",
-    "../public/react-svgrepo-com.svg",
-    "../public/Symfony.svg",
-    "../public/typescript.svg",
-    "../public/vite.svg",
-    "../public/html-1.svg",
-    "../public/css-3.svg",
+    "/docker.svg",
+    "/expo-1.svg",
+    "/fastapi-1.svg",
+    "/github-icon-1.svg",
+    "/nodejs-1.svg",
+    "/postgresql-inc.svg",
+    "/react-native-1.svg",
+    "/react-svgrepo-com.svg",
+    "/Symfony.svg",
+    "/typescript.svg",
+    "/vite.svg",
+    "/html-1.svg",
+    "/css-3.svg",
 
 ];
 
