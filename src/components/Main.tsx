@@ -10,14 +10,16 @@ const Main = () => {
                 <Home />
             </section>
 
-            <section id="Projets">
-                <Projects />
-            </section>
+
 
             <section id="À propos">
                 <About />
             </section>
 
+            <section id="Projets">
+                <Projects />
+            </section>
+            
             <section id="Contact">
                 <Contact />
             </section>

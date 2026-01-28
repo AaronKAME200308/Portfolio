@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import LogoSlider
+  from "../components/LogoSlide";
 
 const About = () => {
   return (
@@ -13,7 +15,11 @@ const About = () => {
         un pipeline YOLOv5 → EfficientNet et une API FastAPI pour la mise en production locale.
       </motion.p>
 
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="h-40 mt-10">
+        <LogoSlider />
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.15 }} className="p-6 bg-white/5 rounded-2xl">
           <h4 className="font-semibold mb-2">Compétences principales</h4>
           <ul className="text-sm text-white/80 space-y-2">
