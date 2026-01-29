@@ -73,9 +73,9 @@ const Home = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="flex items-center justify-center bg-gradient-to-br from-[#00bfff] via-[#4b0082] to-[#00bfff] p-6 rounded-full w-100 h-100 shadow-lg"
+          className="flex items-center justify-center bg-gradient-to-br from-[#00bfff] via-[#4b0082] to-[#00bfff] p-6 rounded-full w-70 h-70 shadow-lg"
         >
-          <div className="h-90 w-90 rounded-full overflow-hidden bg-clip-padding bg-gradient-to-br from-indigo-800 to-indigo-600 flex items-center justify-center">
+          <div className="h-60 w-60 rounded-full overflow-hidden bg-clip-padding bg-gradient-to-br from-indigo-800 to-indigo-600 flex items-center justify-center">
             <div className="text-center">
               <img src="/aaron.JPG" alt="3D Model" className="h-200 w-200 object-contain" />
             </div>
