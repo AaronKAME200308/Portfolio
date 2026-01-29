@@ -7,7 +7,7 @@ const projects = [
     description: "Pipeline complet : YOLOv5 (détection) → EfficientNet (classification) → FastAPI (API).",
     tech: "Python · PyTorch · FastAPI · React Native",
     video :"/Soitenance.mp4",
-    link: "#",
+    link: "https://aaplante.vercel.app/",
   },
   {
     title: "Gestion de Blog",
