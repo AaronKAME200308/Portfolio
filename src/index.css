@@ -93,6 +93,7 @@ section {
   background-color: linear-gradient(135deg, #4b0082, #6a0dad, #007bff);
 }
 
+
 /* Mobile : encore plus d’espace */
 @media (max-width: 768px) {
   .logo-slide {

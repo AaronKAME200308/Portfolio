@@ -12,7 +12,7 @@ const logos = [
     "/postgresql-inc.svg",
     "/react-native-1.svg",
     "/react-svgrepo-com.svg",
-    "/Symfony.svg",
+    "/symfony.svg",
     "/typescript.svg",
     "/vite.svg",
     "/html-1.svg",
@@ -35,11 +35,11 @@ export default function LogoSlider() {
 
   responsive: [
     {
-      breakpoint: 768, // Mobile / tablette
+      breakpoint: 768,
       settings: {
-        slidesToShow: 3,      // 1 logo visible
-        centerPadding: "10px", // PLUS d’espace sur les côtés
-        arrows: false,        // ❌ enlève les flèches
+        slidesToShow: 3,     
+        centerPadding: "10px",
+        arrows: false,       
       },
     },
   ],

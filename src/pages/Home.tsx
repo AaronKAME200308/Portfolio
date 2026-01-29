@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 
+
 const heroVariants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
@@ -18,14 +19,16 @@ const Home = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-20">
-      <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="grid md:grid-cols-2 gap-12 items-center justify-items-center">
         <motion.div initial="hidden" animate="show" variants={heroVariants} transition={{ duration: 0.6 }}>
           <h2 className="text-5xl font-extrabold leading-tight mb-4">
-            Je conçois des applications <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-300 to-blue-200">IA</span> & modernes.
+           Aaron <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-300 to-blue-200">KAME MOUELE</span>
           </h2>
 
           <p className="text-lg text-white/85 mb-6">
-            Étudiant en Génie Logiciel — je réalise des projets fullstack & IA, notamment une application de détection des maladies de plantes (YOLOv5 + EfficientNet + FastAPI).
+            Développeur Web & Mobile, je réalise des projets fullstack & IA.
+            Je travaille aussi bien sur le front-end (React, React Native) que sur le back-end (FastAPI, PHP), 
+            avec une bonne maîtrise des bases de données et des API.   
           </p>
 
           <div className="flex gap-4">
@@ -46,7 +49,7 @@ const Home = () => {
             >
               <motion.div
                 whileHover={buttonHover}
-                className="inline-block px-6 py-3 rounded-full border border-white text-white/90 hover:bg-white transition"
+                className="inline-block px-6 py-3 rounded-full border border-white text-white/90  transition"
               >
                 Me contacter
               </motion.div>
@@ -70,15 +73,11 @@ const Home = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="bg-white/3 p-6 rounded-2xl shadow-lg"
+          className="flex items-center justify-center bg-gradient-to-br from-[#00bfff] via-[#4b0082] to-[#00bfff] p-6 rounded-full w-100 h-100 shadow-lg"
         >
-          <div className="h-80 rounded-xl overflow-hidden bg-clip-padding bg-gradient-to-br from-indigo-800 to-indigo-600 flex items-center justify-center">
+          <div className="h-90 w-90 rounded-full overflow-hidden bg-clip-padding bg-gradient-to-br from-indigo-800 to-indigo-600 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-sm text-white/80">Image placeholder</p>
-              <h4 className="text-2xl font-semibold mt-3">Application de détection</h4>
-              <p className="text-sm text-white/70 mt-2 max-w-sm mx-auto">
-                Aperçu rapide de mon application qui détecte les maladies des plantes à partir de photos.
-              </p>
+              <img src="/aaron.JPG" alt="3D Model" className="h-200 w-200 object-contain" />
             </div>
           </div>
         </motion.div>
