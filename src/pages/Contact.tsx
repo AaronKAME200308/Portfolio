@@ -37,7 +37,7 @@ const Contact = () => {
       </motion.h2>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.08 }} className="text-white/80 mb-6">
-        Envie d'en discuter ? Envoie-moi un message — je réponds rapidement.
+        Arrête de chercher, tu as trouvé le meilleur. Envoie ton message et regarde la magie opérer.
       </motion.p>
 
       <form ref={form} onSubmit={handleSubmit} className="bg-white/5 p-6 rounded-2xl border border-white/40 shadow-md space-y-4">

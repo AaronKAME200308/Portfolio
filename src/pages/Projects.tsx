@@ -37,7 +37,7 @@ const Projects = () => {
     <main className="max-w-6xl mx-auto px-6 py-20">
       <motion.header initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
         <h2 className="text-4xl font-bold">Projets</h2>
-        <p className="text-white/80 mt-2">Sélection de projets techniques et IA — démonstrations & code.</p>
+        <p className="text-white/80 mt-2">Sélection de projets techniques et IA, démonstrations & codes.</p>
       </motion.header>
 
       <motion.section variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-3 gap-6">

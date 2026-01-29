@@ -34,7 +34,7 @@ const Home = () => {
           <div className="flex gap-4">
 
             <button
-              onClick={() => scrollToSection("À propos")}
+              onClick={() => scrollToSection("Projets")}
             >
               <motion.div
                 whileHover={buttonHover}

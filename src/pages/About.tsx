@@ -10,11 +10,11 @@ const About = () => {
       </motion.h2>
 
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-lg text-white/85 leading-relaxed">
-        Je suis un jeune <strong>Développeur Web & Mobile</strong>, passionné par le développement logiciel, 
+        Je suis un <strong>Développeur Web & Mobile</strong>, passionné par le développement logiciel, 
         le web et l’intelligence artificielle, je conçois des applications modernes en combinant performance, 
         design et bonnes pratiques.
         J’ai une approche orientée solution, avec un fort intérêt pour les technologies full-stack et les systèmes 
-        intelligents appliqués à des problématiques réelles.par exemple mon projet de détection de maladies de tomates qui condendse l'essentiel de mes compétences en IA et développement web.   
+        intelligents appliqués à des problématiques réelles.par exemple mon projet de détection de maladies de tomates qui condense l'essentiel de mes compétences en IA et développement web.   
       </motion.p>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="h-40 mt-10">
