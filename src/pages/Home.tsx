@@ -19,7 +19,7 @@ const Home = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-20">
-      <div className="grid md:grid-cols-2 gap-12 items-center justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 place-items-center px-4">
         <motion.div initial="hidden" animate="show" variants={heroVariants} transition={{ duration: 0.6 }}>
           <h2 className="text-5xl font-extrabold leading-tight mb-4">
            Aaron <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-300 to-blue-200">KAME MOUELE</span>
