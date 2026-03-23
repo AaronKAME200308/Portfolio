@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ExternalLink, Github, Globe, Leaf } from "lucide-react";
 
 const projects = [
