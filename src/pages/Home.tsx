@@ -1,118 +1,194 @@
 import { motion } from "framer-motion";
 
-
-const heroVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
-};
-
 const buttonHover = { scale: 1.03 };
 
 const Home = () => {
-
-  
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-    });
+  const mainSection = {
+    portfolio: "Portfolio",
+    title: "Aaron KAME MOUELE",
+    subtitle: "Développeur Web & Mobile",
+    description:
+      "Du code à l’intelligence : je bâtis des apps complètes et smart.",
+    textColor: "#0072FF",
+    bgColor: "#EBF4F6",
+    nextColor: "#7AB2B2",
+    skills: [
+      { name: "AI / ML", color: "#982598" },
+      { name: "Frontend", color: "#E491C9" },
+      { name: "Backend", color: "#15173D" },
+    ],
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 place-items-center px-4">
-        <motion.div initial="hidden" animate="show" variants={heroVariants} transition={{ duration: 0.6 }}>
-          <h2 className="text-5xl font-extrabold leading-tight mb-4">
-           Aaron <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-300 to-blue-200">KAME MOUELE</span>
-          </h2>
-
-          <p className="text-lg text-white/85 mb-6">
-            Développeur Web & Mobile, je réalise des projets fullstack & IA.
-            Je travaille aussi bien sur le front-end (React, React Native) que sur le back-end (FastAPI, PHP), 
-            avec une bonne maîtrise des bases de données et des API.   
-          </p>
-
-          <div className="flex gap-4">
-
-            <button
-              onClick={() => scrollToSection("Projets")}
+    <section
+      id="Accueil"
+      style={{
+        background: mainSection.bgColor,
+      }}
+      className="
+        w-full
+        min-h-screen          /* prend toute la hauteur écran */
+        flex
+        items-center          /* centre vertical */
+        justify-center        /* centre horizontal */
+        px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16
+      "
+    >
+      {/* ===== CONTENEUR PRINCIPAL ===== */}
+      <div
+        className="
+          w-full
+          max-w-5xl            /* largeur lisible */
+          mx-auto
+          flex
+          flex-col
+          items-center
+          text-center
+        "
+      >
+        {/* ===== HEADER ===== */}
+        <div className="space-y-4 md:space-y-8">
+          
+          {/* Portfolio - Animation écriture */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div
+              className="mt-8 font-caveat italic text-3xl md:text-4xl inline-block"
+              style={{
+                color: mainSection.textColor,
+                opacity: 0.75,
+                fontWeight: 600,
+              }}
             >
-              <motion.div
-                whileHover={buttonHover}
-                className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 font-semibold shadow-md text-white"
-              >
-                <p className="text-white">Voir mes projets</p>
-              </motion.div>
-            </button>
-
-            <button
-              onClick={() => scrollToSection("Contact")}
-            >
-              <motion.div
-                whileHover={buttonHover}
-                className="inline-block px-6 py-3 rounded-full border border-white text-white/90  transition"
-              >
-                Me contacter
-              </motion.div>
-            </button>
-          </div>
-
-          <div className="mt-8 flex gap-4 text-sm text-white/70">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-violet-300" /> AI / ML
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-blue-300" /> Frontend
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-indigo-300" /> Backend
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-center bg-gradient-to-br from-[#00bfff] via-[#4b0082] to-[#00bfff] p-6 rounded-full w-70 h-70 shadow-lg"
-        >
-          <div className="h-60 w-60 rounded-full overflow-hidden bg-clip-padding bg-gradient-to-br from-indigo-800 to-indigo-600 flex items-center justify-center">
-            <div className="text-center">
-              <img src="/aaron.JPG" alt="3D Model" className="h-200 w-200 object-contain" />
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      <div className="mt-16">
-        <motion.h3 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-2xl font-semibold mb-6">
-          Projets récents
-        </motion.h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Small project cards */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <div className="p-4 bg-white/5 rounded-xl">
-              <h4 className="font-semibold">Détection de maladies</h4>
-              <p className="text-sm text-white/80 mt-2">YOLOv5 + EfficientNet + FastAPI</p>
+              {mainSection.portfolio.split("").map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{
+                    duration: 0.1,
+                    delay: index * 0.1,
+                  }}
+                  style={{ display: "inline-block" }}
+                >
+                  {char}
+                </motion.span>
+              ))}
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <div className="p-4 bg-white/5 rounded-xl">
-              <h4 className="font-semibold">Gestion de Blog</h4>
-              <p className="text-sm text-white/80 mt-2">ReactJS, Bootstrap, MySQL</p>
-            </div>
-          </motion.div>
+          {/* NOM */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: 0.8,
+              delay: 1.0,
+              ease: [0.43, 0.13, 0.23, 0.96],
+            }}
+            className="
+              text-5xl
+              md:text-7xl
+              font-black
+              leading-tight
+              mb-6 md:mb-8
+            "
+            style={{
+              color: "#0F2854",
+              textShadow: `0 0 40px ${mainSection.textColor}20`,
+            }}
+          >
+            {mainSection.title}
+          </motion.h1>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <div className="p-4 bg-white/5 rounded-xl">
-              <h4 className="font-semibold">Application Mail</h4>
-              <p className="text-sm text-white/80 mt-2">PHPMailer + hMailServer</p>
-            </div>
-          </motion.div>
+          {/* SUBTITLE */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.6 }}
+            className="
+              text-xl
+              md:text-3xl
+              font-bold
+              mb-4 md:mb-6
+            "
+            style={{ color: "#0F2854", opacity: 0.85 }}
+          >
+            {mainSection.subtitle}
+          </motion.h2>
+
+          {/* DESCRIPTION */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.2, duration: 0.6 }}
+            className="
+              font-caveat
+              text-base
+              md:text-2xl
+              italic
+              max-w-3xl
+              mx-auto
+              leading-relaxed
+              mt-2 md:mt-4
+            "
+            style={{ color: "#0F2854" }}
+          >
+            {mainSection.description}
+          </motion.p>
         </div>
+
+        {/* ===== BUTTONS ===== */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.8 }}
+          className="
+            flex
+            flex-wrap
+            justify-center
+            gap-4
+            mt-10 md:mt-12
+          "
+        >
+          {/* BTN 1 */}
+          <motion.button
+            whileHover={buttonHover}
+            className="px-8 py-4 rounded-full font-bold text-lg shadow-xl"
+            style={{
+              background: mainSection.textColor,
+              color: "#fff",
+            }}
+          >
+            Voir mes projets
+          </motion.button>
+
+          {/* BTN 2 */}
+          <motion.button
+            whileHover={buttonHover}
+            className="
+              px-8
+              py-4
+              rounded-full
+              border-2
+              font-bold
+              text-lg
+              backdrop-blur-xl
+            "
+            style={{
+              borderColor: mainSection.textColor,
+              color: mainSection.textColor,
+              background: "rgba(255, 255, 255, 0.3)",
+            }}
+          >
+            Me contacter
+          </motion.button>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
 
