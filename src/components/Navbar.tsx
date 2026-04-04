@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Code2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const links = [
-  { id: "about", label: "À propos" },
-  { id: "skills", label: "Compétences" },
-  { id: "projects", label: "Projets" },
+  { id: "about",    label: "À propos"     },
+  { id: "skills",   label: "Compétences"  },
+  { id: "projects", label: "Projets"      },
 ];
 
 export default function Navbar({ activeSection }: { activeSection: string }) {
-  const [open, setOpen] = useState(false);
+  const [open,     setOpen]     = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -23,263 +26,188 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
   };
 
   return (
-    <>
-      <style>{`
-        .glass-nav {
-          background: rgba(255, 255, 255, 0.55);
-          backdrop-filter: blur(24px) saturate(180%);
-          -webkit-backdrop-filter: blur(24px) saturate(180%);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-          box-shadow: 0 1px 40px rgba(124, 58, 237, 0.06), 0 1px 0 rgba(255,255,255,0.8) inset;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-nav-transparent {
-          background: transparent;
-          backdrop-filter: none;
-          border-bottom: 1px solid transparent;
-          box-shadow: none;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-pill {
-          background: rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(12px) saturate(160%);
-          -webkit-backdrop-filter: blur(12px) saturate(160%);
-          border: 1px solid rgba(255, 255, 255, 0.85);
-          box-shadow:
-            0 2px 16px rgba(124, 58, 237, 0.08),
-            0 1px 0 rgba(255,255,255,0.9) inset,
-            0 -1px 0 rgba(124,58,237,0.05) inset;
-        }
-        .nav-link-active {
-          background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(59,130,246,0.08));
-          color: #7c3aed;
-          border-radius: 10px;
-        }
-        .nav-link-inactive {
-          color: #64748b;
-          border-radius: 10px;
-        }
-        .nav-link-inactive:hover {
-          background: rgba(255,255,255,0.7);
-          color: #7c3aed;
-        }
-        .cta-glass {
-          background: linear-gradient(135deg, #7c3aed, #3b82f6);
-          box-shadow:
-            0 4px 16px rgba(124,58,237,0.32),
-            0 1px 0 rgba(255,255,255,0.25) inset;
-          transition: all 0.25s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        .cta-glass::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 50%;
-          background: rgba(255,255,255,0.15);
-          border-radius: inherit;
-          pointer-events: none;
-        }
-        .cta-glass:hover {
-          box-shadow: 0 6px 24px rgba(124,58,237,0.45), 0 1px 0 rgba(255,255,255,0.3) inset;
-          transform: translateY(-1.5px) scale(1.02);
-        }
-        .burger-glass {
-          background: rgba(255, 255, 255, 0.65);
-          backdrop-filter: blur(16px) saturate(160%);
-          -webkit-backdrop-filter: blur(16px) saturate(160%);
-          border: 1px solid rgba(255, 255, 255, 0.85);
-          box-shadow:
-            0 2px 12px rgba(124,58,237,0.1),
-            0 1px 0 rgba(255,255,255,0.9) inset;
-          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-          border-radius: 12px;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          position: relative;
-          overflow: hidden;
-        }
-        .burger-glass::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 45%;
-          background: rgba(255,255,255,0.55);
-          pointer-events: none;
-        }
-        .burger-glass:hover {
-          background: rgba(255,255,255,0.85);
-          box-shadow: 0 4px 20px rgba(124,58,237,0.2), 0 1px 0 rgba(255,255,255,1) inset;
-          transform: scale(1.08);
-        }
-        .burger-glass:active {
-          transform: scale(0.95);
-        }
-        .mobile-menu-glass {
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(32px) saturate(200%);
-          -webkit-backdrop-filter: blur(32px) saturate(200%);
-          border-top: 1px solid rgba(255, 255, 255, 0.7);
-          box-shadow: 0 12px 40px rgba(124,58,237,0.1);
-        }
-        .mobile-link {
-          padding: 12px 16px;
-          border-radius: 14px;
-          font-size: 15px;
-          font-weight: 500;
-          color: #475569;
-          display: block;
-          width: 100%;
-          text-align: left;
-          background: transparent;
-          border: 1px solid transparent;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .mobile-link:hover {
-          background: rgba(255,255,255,0.8);
-          color: #7c3aed;
-          border-color: rgba(124,58,237,0.15);
-          box-shadow: 0 2px 8px rgba(124,58,237,0.08);
-        }
-        .logo-icon {
-          background: linear-gradient(135deg, #7c3aed, #3b82f6);
-          box-shadow: 0 2px 12px rgba(124,58,237,0.3), 0 1px 0 rgba(255,255,255,0.3) inset;
-        }
-      `}</style>
-
-      <header className={scrolled ? "glass-nav" : "glass-nav-transparent"}
-        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
+    <header
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+      style={{
+        background: scrolled ? "rgba(255,255,255,0.72)" : "transparent",
+        backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.65)" : "1px solid transparent",
+        boxShadow: scrolled ? "0 1px 40px rgba(124,58,237,0.07)" : "none",
+      }}
+    >
+      <nav
+        className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between"
+        style={{ position: "relative" }}
       >
-        <nav
+
+        {/* ── Logo ── */}
+        <button
+          onClick={() => scrollTo("hero")}
+          className="flex items-center gap-2.5 shrink-0"
+          style={{ background: "none", border: "none", cursor: "pointer" }}
+        >
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
+              boxShadow: "0 3px 12px rgba(124,58,237,0.35)",
+            }}
+          >
+            <Code2 size={16} color="white" />
+          </div>
+          <span
+            className="font-black text-lg"
+            style={{ fontFamily: "'Syne', sans-serif", color: "#0f172a", letterSpacing: "-0.02em" }}
+          >
+            Aaron<span style={{ color: "#7c3aed" }}>.</span>
+          </span>
+        </button>
+
+        {/* ── Desktop nav — centered glass pill ── */}
+        <div
+          className="hidden md:block absolute left-1/2 -translate-x-1/2"
           style={{
-            maxWidth: "1152px",
-            margin: "0 auto",
-            padding: "0 24px",
-            height: "64px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            background: scrolled ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.45)",
+            backdropFilter: "blur(16px) saturate(160%)",
+            WebkitBackdropFilter: "blur(16px) saturate(160%)",
+            border: "1px solid rgba(255,255,255,0.85)",
+            borderRadius: 18,
+            padding: "5px 6px",
+            boxShadow: "0 2px 16px rgba(124,58,237,0.08)",
           }}
         >
-          {/* Logo — left */}
-          <button
-            onClick={() => scrollTo("hero")}
-            style={{ display: "flex", alignItems: "center", gap: "10px", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
-          >
-            <div className="logo-icon" style={{ width: 34, height: 34, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Code2 size={16} color="white" />
-            </div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, color: "#1e293b", letterSpacing: "-0.02em" }}>
-              Aaron<span style={{ color: "#7c3aed" }}>.</span>
-            </span>
-          </button>
-
-          {/* Center — glass pill with nav links */}
-          <div
-            className="glass-pill"
-            style={{
-              display: "none",
-              borderRadius: 18,
-              padding: "6px 8px",
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-            id="desktop-nav"
-          >
-            <ul style={{ display: "flex", alignItems: "center", gap: 4, listStyle: "none", margin: 0, padding: 0 }}>
-              {links.map((l) => (
-                <li key={l.id}>
+          <ul className="flex items-center gap-1 list-none m-0 p-0">
+            {links.map((l) => {
+              const isActive = activeSection === l.id;
+              return (
+                <li key={l.id} className="relative">
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-xl"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(59,130,246,0.08))",
+                      }}
+                      transition={{ duration: 0.3, ease: EASE }}
+                    />
+                  )}
                   <button
                     onClick={() => scrollTo(l.id)}
-                    className={activeSection === l.id ? "nav-link-active" : "nav-link-inactive"}
+                    className="relative px-4 py-1.5 rounded-xl text-sm font-medium transition-colors duration-200"
                     style={{
-                      padding: "6px 16px",
-                      fontSize: 14,
-                      fontWeight: 500,
+                      color: isActive ? "#7c3aed" : "#64748b",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      display: "block",
+                      fontWeight: isActive ? 600 : 500,
                     }}
+                    onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#7c3aed"; }}
+                    onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#64748b"; }}
                   >
                     {l.label}
                   </button>
                 </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right — CTA + burger */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-            <button
-              onClick={() => scrollTo("contact")}
-              className="cta-glass"
-              id="contact-cta"
-              style={{
-                display: "none",
-                padding: "8px 20px",
-                borderRadius: 12,
-                color: "white",
-                fontSize: 14,
-                fontWeight: 600,
-                border: "none",
-                cursor: "pointer",
-                letterSpacing: "0.01em",
-              }}
-            >
-              Contact
-            </button>
-
-            <button
-              onClick={() => setOpen(!open)}
-              className="burger-glass"
-              id="burger-btn"
-              aria-label="Menu"
-              style={{ color: "#64748b" }}
-            >
-              {open ? <X size={18} strokeWidth={2} /> : <Menu size={18} strokeWidth={2} />}
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile dropdown */}
-        <div
-          className="mobile-menu-glass"
-          style={{
-            overflow: "hidden",
-            maxHeight: open ? "320px" : "0",
-            opacity: open ? 1 : 0,
-            transition: "max-height 0.35s ease, opacity 0.25s ease",
-          }}
-        >
-          <ul style={{ padding: "12px 20px 16px", display: "flex", flexDirection: "column", gap: 4, listStyle: "none", margin: 0 }}>
-            {[...links, { id: "contact", label: "Contact" }].map((l) => (
-              <li key={l.id}>
-                <button onClick={() => scrollTo(l.id)} className="mobile-link">
-                  {l.label}
-                </button>
-              </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
 
-        {/* Show/hide desktop elements via style tag based on viewport */}
-        <style>{`
-          @media (min-width: 768px) {
-            #desktop-nav { display: block !important; }
-            #contact-cta { display: block !important; }
-            #burger-btn { display: none !important; }
-          }
-        `}</style>
-      </header>
-    </>
+        {/* ── Right — CTA + burger ── */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Contact CTA desktop */}
+          <motion.button
+            onClick={() => scrollTo("contact")}
+            whileHover={{ scale: 1.04, y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            className="hidden md:block px-5 py-2 rounded-xl text-sm font-bold text-white"
+            style={{
+              background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(124,58,237,0.32)",
+            }}
+          >
+            Contact
+          </motion.button>
+
+          {/* Burger mobile */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
+            style={{
+              background: "rgba(255,255,255,0.7)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.85)",
+              boxShadow: "0 2px 10px rgba(124,58,237,0.1)",
+              cursor: "pointer",
+              color: "#64748b",
+            }}
+            aria-label="Menu"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={open ? "x" : "menu"}
+                initial={{ rotate: -45, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 45, opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                {open ? <X size={18} strokeWidth={2} /> : <Menu size={18} strokeWidth={2} />}
+              </motion.div>
+            </AnimatePresence>
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Mobile dropdown ── */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            style={{
+              overflow: "hidden",
+              background: "rgba(255,255,255,0.82)",
+              backdropFilter: "blur(24px) saturate(200%)",
+              WebkitBackdropFilter: "blur(24px) saturate(200%)",
+              borderTop: "1px solid rgba(255,255,255,0.65)",
+            }}
+          >
+            <ul className="flex flex-col gap-1 px-5 py-3 list-none m-0">
+              {[...links, { id: "contact", label: "Contact" }].map((l, i) => (
+                <motion.li
+                  key={l.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.06, ease: EASE }}
+                >
+                  <button
+                    onClick={() => scrollTo(l.id)}
+                    className="w-full text-left px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200"
+                    style={{
+                      background: activeSection === l.id ? "rgba(124,58,237,0.08)" : "transparent",
+                      color: activeSection === l.id ? "#7c3aed" : "#475569",
+                      border: activeSection === l.id ? "1px solid rgba(124,58,237,0.15)" : "1px solid transparent",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.8)"; (e.currentTarget as HTMLElement).style.color = "#7c3aed"; }}
+                    onMouseLeave={e => {
+                      const isAct = activeSection === l.id;
+                      (e.currentTarget as HTMLElement).style.background = isAct ? "rgba(124,58,237,0.08)" : "transparent";
+                      (e.currentTarget as HTMLElement).style.color = isAct ? "#7c3aed" : "#475569";
+                    }}
+                  >
+                    {l.label}
+                  </button>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }
