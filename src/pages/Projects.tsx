@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, Github, Globe, Leaf, LayoutGrid, Monitor, AppWindow, Smartphone, Brain } from "lucide-react";
+import { type LucideIcon, ExternalLink, Github, Globe, Leaf, LayoutGrid, Monitor, AppWindow, Smartphone, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -63,8 +63,8 @@ const projects = [
     title: "Portfolio JP Graphic Design",
     subtitle: "Site vitrine freelance",
     description:
-      "Site portfolio pour un graphiste freelance, mettant en avant ses réalisations avec une galerie d'images, une section de témoignages clients et un formulaire de contact intégré.",
-    tags: ["React JS", "Tailwind CSS"],
+      "Site portfolio pour un graphiste freelance, mettant en avant ses réalisations avec une galerie d'images, une section de réservations clients et un formulaire de contact intégré.",
+    tags: ["React JS", "Tailwind CSS", "Supabase"],
     logo: "https://jpgraphicdesign.net/logoblanc.png",
     logoBg: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",          // fond blanc pour ce logo
     logoSize: 70,            // 70% du bloc
@@ -81,9 +81,9 @@ const projects = [
     title: "Vitrine Pro Yapithe & Partners",
     subtitle: "Site vitrine entreprise",
     description:
-      "Site vitrine pour une entreprise locale, avec présentation des services, témoignages clients et formulaire de contact intégré.",
-    tags: ["React JS", "Tailwind CSS", "PHP", "MySQL"],
-    logo: "https://yapithepartners.com/logoorigin.png",
+      "Site vitrine pour une entreprise locale, avec présentation des services, témoignages clients et formulaire de contact intégré. Vidéo Youtube, Blog et bien plus",
+    tags: ["React JS", "Tailwind CSS", "Node js"],
+    logo: "/images.png",
     logoBg: undefined,
     logoSize: 70,
     logoFit: "cover" as const,
@@ -112,7 +112,7 @@ const ProjectIcon = ({
   logoFit  = "contain",
   sizeLg   = false,
 }: {
-  logo:      typeof projects[0]["logo"];
+  logo:      string | LucideIcon;
   gradient:  string;
   logoBg?:   string;
   logoSize?: number;
@@ -149,7 +149,7 @@ const ProjectIcon = ({
   }
 
   // Composant Lucide — logoBg permet de surcharger le gradient
-  const Icon = logo as React.ElementType;
+  const Icon = logo;
   return (
     <div
       className={`${sizeClass} flex items-center justify-center shadow-xl`}
@@ -174,7 +174,7 @@ const FeaturedCard = ({ project }: { project: typeof projects[0] }) => {
       className="group relative rounded-3xl overflow-hidden cursor-pointer"
       style={{
         background: "#fff",
-        border: "1.5px solid #e2e8f0",
+        border: `1.5px solid ${project.accent}`,
         boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
         minHeight: 280,
       }}
@@ -223,9 +223,9 @@ const FeaturedCard = ({ project }: { project: typeof projects[0] }) => {
           </div>
           <div className="flex gap-3">
             <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
-              style={{ background: "#f8fafc", color: "#64748b", border: "1.5px solid #e2e8f0" }}
+              style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0"; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent  ; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
               <Github size={14} /> Code
             </button>
             {project.link && (
@@ -254,7 +254,7 @@ const SmallCard = ({ project, index }: { project: typeof projects[0]; index: num
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
       className="group relative rounded-3xl overflow-hidden cursor-pointer flex flex-col"
-      style={{ background: "#fff", border: "1.5px solid #e2e8f0", boxShadow: "0 2px 16px rgba(0,0,0,0.05)" }}
+      style={{ background: "#fff", border: `1.5px solid ${project.accent}`, boxShadow: "0 2px 16px rgba(0,0,0,0.05)" }}
       whileHover={{ y: -5, boxShadow: "0 16px 48px rgba(0,0,0,0.11)" } as any}
       onClick={() => project.link && window.open(project.link, "_blank")}
     >
@@ -297,9 +297,9 @@ const SmallCard = ({ project, index }: { project: typeof projects[0]; index: num
 
         <div className="flex gap-2">
           <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
-            style={{ background: "#f8fafc", color: "#64748b", border: "1.5px solid #e2e8f0" }}
+            style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0"; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
             <Github size={12} /> Code
           </button>
           {project.link && (
@@ -364,7 +364,7 @@ export default function Projects() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.15, ease: EASE }}
-          className="flex flex-wrap gap-2 mb-10"
+          className="flex md:flex-wrap flex-row gap-2 mb-10 overflow-x-auto md:overflow-visible pb-2 md:pb-0 "
         >
           {CATEGORIES.map(({ key, icon }) => {
             const isActive = activeTab === key;
@@ -375,7 +375,7 @@ export default function Projects() {
                 key={key}
                 onClick={() => setActiveTab(key)}
                 whileTap={{ scale: 0.96 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200"
+                className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 shrink-0 md:shrink hover:cursor-pointer"
                 style={{
                   background: isActive ? "#0072FF" : "#f8fafc",
                   color: isActive ? "#fff" : "#64748b",

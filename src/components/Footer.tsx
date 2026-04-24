@@ -1,4 +1,4 @@
-import { Code2, Heart, Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
+import { Code2, Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -244,11 +244,11 @@ export default function Footer() {
           <p className="text-xs m-0" style={{ color: "rgba(255,255,255,0.28)" }}>
             © {new Date().getFullYear()} Aaron KAME MOUELE — Tous droits réservés.
           </p>
-          <p className="text-xs m-0 flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
+          {/* <p className="text-xs m-0 flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
             Fait avec
             <Heart size={11} color="#f43f5e" fill="#f43f5e" />
             en React + Tailwind CSS
-          </p>
+          </p> */}
         </div>
       </div>
     </footer>

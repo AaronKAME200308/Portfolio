@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 import Navbar from "./components/Navbar";
@@ -7,22 +8,22 @@ import About from "./pages/About";
 import Skills from "./pages/Skills";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
+import ClientOrderPage from "./pages/ClientOrder";
 import Footer from "./components/Footer";
 
-const WHATSAPP_NUMBER = "237670464488"; // ← numéro sans + ni espaces
+const WHATSAPP_NUMBER  = "237670464488";
 const WHATSAPP_MESSAGE = "Bonjour, je souhaite discuter d'un projet avec vous.";
 
-export default function App() {
+// ── Page principale (portfolio) ───────────────────────────
+function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("hero");
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showTooltip,   setShowTooltip]   = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
         });
       },
       { threshold: 0.4 }
@@ -45,8 +46,6 @@ export default function App() {
 
       {/* ── Bouton WhatsApp flottant ── */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
-
-        {/* Tooltip */}
         <AnimatePresence>
           {showTooltip && (
             <motion.div
@@ -66,7 +65,6 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Bouton */}
         <motion.a
           href={whatsappUrl}
           target="_blank"
@@ -79,15 +77,13 @@ export default function App() {
           whileTap={{ scale: 0.95 }}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="w-14 h-14 rounded-full flex items-center justify-center"
+          className="relative w-14 h-14 rounded-full flex items-center justify-center"
           style={{
             background: "linear-gradient(135deg, #25D366, #128C7E)",
             boxShadow: "0 6px 24px rgba(37,211,102,0.45), 0 2px 8px rgba(0,0,0,0.15)",
           }}
         >
           <FaWhatsapp size={28} color="white" />
-
-          {/* Pulse ring */}
           <span
             className="absolute w-14 h-14 rounded-full animate-ping"
             style={{ background: "rgba(37,211,102,0.3)" }}
@@ -95,5 +91,21 @@ export default function App() {
         </motion.a>
       </div>
     </div>
+  );
+}
+
+// ── App avec routing ──────────────────────────────────────
+export default function App() {
+  return (
+      <Routes>
+        {/* Portfolio principal */}
+        <Route path="/" element={<PortfolioPage />} />
+
+        {/* Page commande client — accessible via lien unique */}
+        <Route path="/order/:token" element={<ClientOrderPage />} />
+
+        {/* 404 fallback */}
+        <Route path="*" element={<PortfolioPage />} />
+      </Routes>
   );
 }

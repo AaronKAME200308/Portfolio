@@ -104,7 +104,7 @@ export default function About() {
                 <p>
                   Je suis <strong className="text-slate-800">Aaron KAME MOUELE</strong>, développeur
                   freelance Web & Mobile basé à Yaoundé. Titulaire d'une Licence en Génie Informatique,
-                  j'ai construit une expertise complète — du pixel au serveur.
+                  j'ai construit une expertise complète :<strong className="text-slate-800"> du pixel au serveur.</strong> 
                 </p>
                 <p>
                   Ma spécialité ? Créer des interfaces React soignées et performantes, tout en

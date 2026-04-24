@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, Linkedin, Github, CheckCircle, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Linkedin, Github, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
 
@@ -389,7 +389,6 @@ export default function Contact() {
                         <>
                           <Send size={14} />
                           Envoyer le message
-                          <ArrowRight size={13} />
                         </>
                       )}
                     </motion.button>

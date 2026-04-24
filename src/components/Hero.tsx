@@ -1,4 +1,6 @@
 import { ArrowDown, Github, Linkedin, Mail, Download } from "lucide-react";
+import { FloatingSymbols3D } from "./FloatingSymbol3D"
+
 import { motion } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -9,11 +11,11 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: EASE },
 });
 
-const skills = [
-  { name: "React Native", color: "#7c3aed", dot: "#8b5cf6", angle: -10, x: "80%", y: "12%" },
-  { name: "FastAPI + IA",  color: "#059669", dot: "#10b981", angle:   7, x: "82%", y: "68%" },
-  { name: "Tailwind CSS",  color: "#2563eb", dot: "#3b82f6", angle:  -5, x: "62%", y: "90%" },
-];
+// const skills = [
+//   { name: "React Native", color: "#7c3aed", dot: "#8b5cf6", angle: -10, x: "80%", y: "12%" },
+//   { name: "FastAPI + IA",  color: "#059669", dot: "#10b981", angle:   7, x: "82%", y: "68%" },
+//   { name: "Tailwind CSS",  color: "#2563eb", dot: "#3b82f6", angle:  -5, x: "62%", y: "90%" },
+// ];
 
 export default function Hero() {
   const scrollTo = (id: string) =>
@@ -110,7 +112,7 @@ export default function Hero() {
                 top: -8,
               }}
             />
-            <p className="text-slate-500 font-medium text-base mb-2">Bonjour, je suis</p>
+            <p className="text-slate-500 font-medium text-base mb-2">Es tu prêt(e) à innover ? Bonjour, je suis</p>
             <h1
               className="font-black leading-[0.9] tracking-tight"
               style={{
@@ -144,7 +146,7 @@ export default function Hero() {
             <motion.button
               onClick={() => scrollTo("projects")}
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-              className="px-6 py-3.5 rounded-2xl font-bold text-sm text-white"
+              className="px-6 py-3.5 rounded-2xl font-bold text-sm text-white hover:cursor-pointer"
               style={{
                 background: "linear-gradient(135deg, #7c3aed, #2563eb)",
                 boxShadow: "0 6px 20px rgba(124,58,237,0.3)",
@@ -227,28 +229,7 @@ export default function Hero() {
         <div className="md:col-span-2 relative flex items-center justify-center md:justify-end">
 
           {/* Floating skill tags */}
-          {skills.map(({ name, color, dot, angle, x, y }, i) => (
-            <motion.div
-              key={name}
-              initial={{ opacity: 0, scale: 0.75 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.1 + i * 0.15, duration: 0.4, ease: "backOut" }}
-              className="absolute z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
-              style={{
-                left: x,
-                top: y,
-                transform: `rotate(${angle}deg) translateX(-50%)`,
-                background: "#fff",
-                color,
-                border: `1.5px solid ${color}22`,
-                boxShadow: `0 4px 16px ${color}18`,
-                whiteSpace: "nowrap",
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
-              {name}
-            </motion.div>
-          ))}
+          <FloatingSymbols3D />
 
           {/* Photo frame */}
           <motion.div
@@ -290,7 +271,7 @@ export default function Hero() {
               }}
             >
               <img
-                src="/photo.jpg"
+                src="/aaron.jpeg"
                 alt="Aaron KAME MOUELE"
                 style={{
                   width: "100%",
@@ -304,7 +285,7 @@ export default function Hero() {
                 }}
               />
               {/* Fallback initials */}
-              <div
+              {/* <div
                 className="absolute inset-0 flex items-center justify-center font-black text-7xl select-none"
                 style={{
                   color: "#7c3aed",
@@ -313,7 +294,7 @@ export default function Hero() {
                 }}
               >
                 AK
-              </div>
+              </div> */}
             </div>
           </motion.div>
 
