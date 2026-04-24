@@ -1,4 +1,4 @@
-import { Code2, Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -62,14 +62,24 @@ export default function Footer() {
           >
             <div className="flex items-center gap-3 mb-4">
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
-                  boxShadow: "0 3px 16px rgba(124,58,237,0.5)",
-                }}
-              >
-                <Code2 size={18} color="white" />
-              </div>
+  className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
+  style={{
+    background: "linear-gradient(135deg, #ede9fe, #dbeafe)",
+    boxShadow: "0 3px 12px rgba(124,58,237,0.15)",
+  }}
+>
+            <img
+              src="/logo_name.png"
+              alt="Logo"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
+              }}
+            />
+          </div>
               <div>
                 <p className="font-bold text-base text-white m-0" style={{ fontFamily: "'Syne', sans-serif", lineHeight: 1.2 }}>
                   Aaron KAME

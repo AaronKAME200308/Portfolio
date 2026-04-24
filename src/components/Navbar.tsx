@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Code2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const links = [
-  { id: "about",    label: "À propos"     },
-  { id: "skills",   label: "Compétences"  },
-  { id: "projects", label: "Projets"      },
+  { id: "about", label: "À propos" },
+  { id: "skills", label: "Compétences" },
+  { id: "projects", label: "Projets" },
 ];
 
 export default function Navbar({ activeSection }: { activeSection: string }) {
-  const [open,     setOpen]     = useState(false);
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -48,19 +48,29 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
           style={{ background: "none", border: "none", cursor: "pointer" }}
         >
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
-              boxShadow: "0 3px 12px rgba(124,58,237,0.35)",
-            }}
-          >
-            <Code2 size={16} color="white" />
+  className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
+  style={{
+    background: "linear-gradient(135deg, #ede9fe, #dbeafe)",
+    boxShadow: "0 3px 12px rgba(124,58,237,0.15)",
+  }}
+>
+            <img
+              src="/logo_name.png"
+              alt="Logo"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
+              }}
+            />
           </div>
           <span
             className="font-black text-lg"
             style={{ fontFamily: "'Syne', sans-serif", color: "#0f172a", letterSpacing: "-0.02em" }}
           >
-            Aaron<span style={{ color: "#7c3aed" }}>.</span>
+            Aaron Devs<span style={{ color: "#7c3aed" }}>.</span>
           </span>
         </button>
 
