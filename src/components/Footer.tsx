@@ -252,7 +252,7 @@ export default function Footer() {
         {/* ── Bottom bar ── */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs m-0" style={{ color: "rgba(255,255,255,0.28)" }}>
-            © {new Date().getFullYear()} Aaron KAME MOUELE — Tous droits réservés.
+            © {new Date().getFullYear()} Aaron KAME MOUELE - Tous droits réservés.
           </p>
           {/* <p className="text-xs m-0 flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
             Fait avec

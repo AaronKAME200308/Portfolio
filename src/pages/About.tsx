@@ -136,7 +136,7 @@ export default function About() {
             {/* CTA */}
             <motion.div {...fadeUp(0.45)}>
               <button
-                className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-200"
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-200 hover:cursor-pointer"
                 style={{
                   background: "linear-gradient(135deg, #7c3aed, #2563eb)",
                   color: "#fff",
@@ -207,20 +207,6 @@ export default function About() {
               ))}
             </div>
 
-            {/* Decorative connecting line between rows */}
-            <div
-              className="absolute hidden md:block"
-              style={{
-                width: 2,
-                height: 28,
-                background: "linear-gradient(180deg, #7c3aed44, transparent)",
-                borderRadius: 2,
-                left: "50%",
-                top: "calc(50% - 14px)",
-                transform: "translateX(-50%)",
-              }}
-            />
-
             {/* Floating "Open to work" pill */}
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
@@ -234,7 +220,6 @@ export default function About() {
                 boxShadow: "0 8px 24px rgba(5,150,105,0.12)",
               }}
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-bold" style={{ color: "#059669" }}>Open to work</span>
             </motion.div>
           </div>

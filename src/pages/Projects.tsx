@@ -33,7 +33,7 @@ const projects = [
     logoBg: undefined,       // undefined = gradient auto pour les icônes Lucide
     logoSize: 70,            // % de la taille du bloc (ignoré pour les icônes Lucide)
     logoFit: "contain" as const,
-    status: "Terminé",
+    status: "En cours",
     gradient: "linear-gradient(135deg, #34d399, #14b8a6)",
     accent: "#10b981",
     link: "",
@@ -56,7 +56,7 @@ const projects = [
     accent: "#4535A0",
     link: "https://infiniteluxurytrips.net",
     featured: false,
-    category: "Application web" as Category,
+    category: "Site web" as Category,
   },
   {
     id: 3,
@@ -101,6 +101,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
   "Terminé":  { bg: "rgba(16,185,129,0.1)",  text: "#059669" },
   "En ligne": { bg: "rgba(59,130,246,0.1)",  text: "#2563eb" },
   "Livré":    { bg: "rgba(245,158,11,0.1)",  text: "#d97706" },
+  "En cours": { bg: "rgba(239,68,68,0.1)",   text: "#dc2626" },
 };
 
 // ── ProjectIcon — image URL ou composant Lucide ───────────

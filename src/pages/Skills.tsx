@@ -159,7 +159,7 @@ export default function Skills() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, ease: EASE }}
-            className="md:col-span-1 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0"
+            className="md:col-span-1 flex flex-row md:flex-col  gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0"
           >
             {categories.map(({ id, icon: Icon, label, color, bg, border }) => {
               const isActive = id === active;
@@ -168,7 +168,7 @@ export default function Skills() {
                   key={id}
                   onClick={() => setActive(id)}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 shrink-0 md:shrink"
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 shrink-0 md:shrink hover:cursor-pointer"
                   style={{
                     background: isActive ? bg : "#fff",
                     border: `1.5px solid ${isActive ? border : "#e2e8f0"}`,

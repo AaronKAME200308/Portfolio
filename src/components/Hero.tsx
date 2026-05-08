@@ -94,7 +94,6 @@ export default function Hero() {
                 color: "#7c3aed",
                 boxShadow: "0 2px 12px rgba(124,58,237,0.08)",
               }}>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               Développeur Freelance disponible
             </div>
           </motion.div>
