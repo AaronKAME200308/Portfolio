@@ -94,6 +94,24 @@ const projects = [
     featured: false,
     category: "Site web" as Category,
   },
+  {
+    id: 5,
+    title: "MenuQR",
+    subtitle: "Application web pour restaurants, fastfood & autres",
+    description:
+      "Application web permettant aux restaurants de créer un menu digital accessible via QR code. Les clients peuvent consulter le menu, et laisser des avis.",
+    tags: ["React JS", "Tailwind CSS", "Node.js", "Supabase"],
+    logo:"/logo.png",
+    logoBg: "linear-gradient(135deg, #2E7D32, #1B5E20)",  // fond blanc pour ce logo",
+    logoSize: 70,
+    logoFit: "cover" as const,
+    status: "En cours",
+    gradient: "linear-gradient(135deg, #2E7D32, #1B5E20)",
+    accent: "#2E7D32",
+    link: "https://menu-qr-gules.vercel.app/",
+    featured: false,
+    category: "Application web" as Category,
+  },
 ];
 
 // ── Status colors ─────────────────────────────────────────
