@@ -246,7 +246,7 @@ const FeaturedCard = ({ project }: { project: typeof projects[0] }) => {
             </div>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            <button onClick={() => window.open(project.git, "_blank")} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
               style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent  ; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
