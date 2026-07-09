@@ -37,6 +37,7 @@ const projects = [
     gradient: "linear-gradient(135deg, #34d399, #14b8a6)",
     accent: "#10b981",
     link: "",
+    git: "https://github.com/AaronKAME200308/Aa.git",
     featured: true,
     category: "Application mobile" as Category,
   },
@@ -55,6 +56,7 @@ const projects = [
     gradient: "linear-gradient(135deg, #231A55, #4535A0)",
     accent: "#4535A0",
     link: "https://infiniteluxurytrips.net",
+    git: "https://github.com/AaronKAME200308/InfinitLuxuryTripsClient.git",
     featured: false,
     category: "Site web" as Category,
   },
@@ -73,6 +75,7 @@ const projects = [
     gradient: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",
     accent: "#f2cc6a",
     link: "https://jpgraphicdesign.net",
+    git: "https://github.com/AaronKAME200308/jp-graphic-design.git",
     featured: false,
     category: "Portfolio" as Category,
   },
@@ -91,6 +94,7 @@ const projects = [
     gradient: "linear-gradient(135deg, #0a4d7c, #23c367)",
     accent: "#23c367",
     link: "https://yapithepartners.com/",
+    git: "https://github.com/AaronKAME200308/yapithe.git",
     featured: false,
     category: "Site web" as Category,
   },
@@ -109,6 +113,7 @@ const projects = [
     gradient: "linear-gradient(135deg, #2E7D32, #1B5E20)",
     accent: "#2E7D32",
     link: "https://menu-qr-gules.vercel.app/",
+    git: "https://github.com/AaronKAME200308/MenuQr.git",
     featured: false,
     category: "Application web" as Category,
   },
@@ -315,7 +320,7 @@ const SmallCard = ({ project, index }: { project: typeof projects[0]; index: num
         </div>
 
         <div className="flex gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
+          <button  onClick={(e) => { e.stopPropagation(); window.open(project.git, "_blank"); }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
             style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
