@@ -2,13 +2,8 @@ import { useMemo, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  Boxes,
-  Database,
-  Globe,
-  Brain,
-  Smartphone,
-  Server,
   ChevronDown,
+  Scissors,
   Workflow,
   Network,
   Table2,
@@ -75,37 +70,31 @@ const T: Record<string, Tool> = {
 /* ── Compétences ── */
 const SKILLS = [
   {
-    icon: Server,
     title: "Conception et réalisation d'API robustes",
     text: "Des APIs REST structurées autour de systèmes précis : schémas validés, authentification, gestion des erreurs et documentation générée avec FastAPI. Aussi en Node.js et Express.",
     tools: ["fastapi", "python", "node", "express", "symfony"],
   },
   {
-    icon: Boxes,
     title: "Analyse, conception et réalisation de systèmes d'information",
     text: "De l'expression du besoin à l'application livrée : modélisation UML et Merise, architecture logicielle, développement et suivi du code.",
     tools: ["uml", "merise", "java", "symfony", "postgres"],
   },
   {
-    icon: Globe,
     title: "Conception, réalisation et déploiement de sites web",
     text: "Portfolios, sites vitrines et plateformes : de la maquette à la mise en ligne, avec des interfaces rapides, responsives et soignées.",
     tools: ["react", "ts", "tailwind", "figma", "github"],
   },
   {
-    icon: Smartphone,
     title: "Conception et réalisation d'applications mobiles",
     text: "Des applications mobiles multiplateformes branchées sur une API et une base de données, pensées pour l'usage réel sur le terrain.",
     tools: ["rn", "js", "ts", "fastapi", "supabase"],
   },
   {
-    icon: Brain,
     title: "Entraînement de modèles d'IA et vision par ordinateur",
     text: "Collecte et préparation d'images, entraînement et intégration de modèles de détection, comme pour reconnaître des maladies de plantes.",
     tools: ["python", "tf", "keras"],
   },
   {
-    icon: Database,
     title: "Modélisation et administration de bases de données",
     text: "Schémas relationnels propres, requêtes SQL efficaces, authentification et stockage avec Supabase et PostgreSQL.",
     tools: ["postgres", "supabase", "sql", "mysql"],
@@ -155,13 +144,190 @@ function ToolCard({ tool, index, total, open, reduce }: { tool: Tool; index: num
   );
 }
 
-/* ── Carte de compétence ── */
+/* ── Mini-scènes animées (une par compétence) ── */
+const INK = "#0e2f20";
+const AUN = "#1e7b4a";
+const MOSS = "#6baf7b";
+const monoF = "'JetBrains Mono', monospace";
+
+type R = { r: boolean | null };
+type AP = { r: boolean | null; attributeName: string; values: string; dur: string; keyTimes?: string; begin?: string; type?: string };
+const An = ({ r, ...p }: AP) => (r ? null : <animate {...p} repeatCount="indefinite" />);
+const AnT = ({ r, type, ...p }: AP) =>
+  r ? null : <animateTransform {...p} type={type as "translate"} repeatCount="indefinite" />;
+
+const SceneApi = ({ r }: R) => (
+  <g>
+    <rect x="22" y="32" width="62" height="48" rx="9" fill="#fff" stroke={INK} strokeWidth="2" />
+    <text x="53" y="61" textAnchor="middle" fontSize="11" fontFamily={monoF} fill={INK}>client</text>
+    <rect x="216" y="32" width="62" height="48" rx="9" fill={INK} />
+    <text x="247" y="61" textAnchor="middle" fontSize="11" fontFamily={monoF} fill={MOSS}>API</text>
+    <line x1="90" y1="46" x2="210" y2="46" stroke={INK} strokeOpacity=".25" strokeDasharray="3 4" />
+    <line x1="90" y1="66" x2="210" y2="66" stroke={INK} strokeOpacity=".25" strokeDasharray="3 4" />
+    <circle r="4.5" cy="46" cx="94" fill={AUN}>
+      <An r={r} attributeName="cx" values="94;206;206" keyTimes="0;0.5;1" dur="2.4s" />
+    </circle>
+    <circle r="4.5" cy="66" cx="206" fill={MOSS}>
+      <An r={r} attributeName="cx" values="206;206;94" keyTimes="0;0.5;1" dur="2.4s" />
+    </circle>
+    <text x="150" y="38" textAnchor="middle" fontSize="8.5" fontFamily={monoF} fill={INK}>POST /users</text>
+    <text x="150" y="86" textAnchor="middle" fontSize="8.5" fontFamily={monoF} fill={AUN} fontWeight="700">
+      201 Created
+      <An r={r} attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.5;0.6;0.9;1" dur="2.4s" />
+    </text>
+  </g>
+);
+
+const SceneSi = ({ r }: R) => {
+  const box = (x: number, y: number, label: string) => (
+    <g key={label}>
+      <rect x={x} y={y} width="74" height="40" rx="6" fill="#fff" stroke={INK} strokeWidth="2" />
+      <rect x={x} y={y} width="74" height="13" rx="6" fill={INK} />
+      <text x={x + 37} y={y + 10} textAnchor="middle" fontSize="8" fontFamily={monoF} fill={MOSS}>{label}</text>
+      <line x1={x + 8} y1={y + 24} x2={x + 52} y2={y + 24} stroke={INK} strokeOpacity=".3" strokeWidth="2" strokeLinecap="round" />
+      <line x1={x + 8} y1={y + 32} x2={x + 38} y2={y + 32} stroke={INK} strokeOpacity=".3" strokeWidth="2" strokeLinecap="round" />
+    </g>
+  );
+  return (
+    <g>
+      <path d="M94 42 L120 62 M196 62 L224 42" stroke={AUN} strokeWidth="2" strokeDasharray="5 5" fill="none">
+        <An r={r} attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" />
+      </path>
+      {box(14, 16, "Client")}
+      {box(113, 58, "Commande")}
+      {box(212, 16, "Produit")}
+      <circle r="4" fill={MOSS}>
+        <AnT r={r} attributeName="transform" type="translate" values="94 42;120 62;94 42" dur="2.4s" />
+      </circle>
+    </g>
+  );
+};
+
+const SceneWeb = ({ r }: R) => {
+  const bar = (y: number, w: number, d: string, fill = INK, op = ".18") => (
+    <rect key={y} x="84" y={y} height="9" rx="4.5" fill={fill} fillOpacity={op} width="0">
+      <An r={r} attributeName="width" values={`0;${w};${w};0`} keyTimes="0;0.35;0.85;1" dur="3.4s" begin={d} />
+    </rect>
+  );
+  return (
+    <g>
+      <rect x="64" y="10" width="172" height="94" rx="9" fill="#fff" stroke={INK} strokeWidth="2" />
+      <line x1="64" y1="27" x2="236" y2="27" stroke={INK} strokeWidth="2" />
+      <circle cx="76" cy="18.5" r="2.5" fill={INK} fillOpacity=".3" />
+      <circle cx="85" cy="18.5" r="2.5" fill={INK} fillOpacity=".3" />
+      <circle cx="94" cy="18.5" r="2.5" fill={INK} fillOpacity=".3" />
+      <rect x="84" y="36" width="0" height="26" rx="5" fill={AUN}>
+        <An r={r} attributeName="width" values="0;132;132;0" keyTimes="0;0.3;0.85;1" dur="3.4s" />
+      </rect>
+      {bar(70, 96, "0.25s")}
+      {bar(84, 66, "0.5s")}
+    </g>
+  );
+};
+
+const SceneMobile = ({ r }: R) => (
+  <g>
+    <rect x="116" y="6" width="68" height="100" rx="12" fill="#fff" stroke={INK} strokeWidth="2.2" />
+    <rect x="144" y="10" width="12" height="3" rx="1.5" fill={INK} fillOpacity=".4" />
+    <rect x="126" y="62" width="48" height="8" rx="4" fill={INK} fillOpacity=".15" />
+    <rect x="126" y="76" width="34" height="8" rx="4" fill={INK} fillOpacity=".15" />
+    <rect x="126" y="90" width="42" height="8" rx="4" fill={INK} fillOpacity=".15" />
+    <g>
+      <rect x="123" y="20" width="54" height="22" rx="7" fill={INK} />
+      <circle cx="134" cy="31" r="4" fill={MOSS} />
+      <rect x="143" y="26" width="26" height="4" rx="2" fill={MOSS} />
+      <rect x="143" y="33" width="18" height="4" rx="2" fill="#fff" fillOpacity=".5" />
+      <AnT r={r} attributeName="transform" type="translate" values="0 -34;0 0;0 0;0 -34" keyTimes="0;0.2;0.75;1" dur="3s" />
+      <An r={r} attributeName="opacity" values="0;1;1;0" keyTimes="0;0.2;0.75;1" dur="3s" />
+    </g>
+    <path d="M66 56 q-10 0 -10 10 M60 48 q-20 0 -20 18" stroke={AUN} strokeWidth="2" fill="none" strokeLinecap="round" strokeOpacity=".6" />
+    <path d="M234 56 q10 0 10 10 M240 48 q20 0 20 18" stroke={AUN} strokeWidth="2" fill="none" strokeLinecap="round" strokeOpacity=".6" />
+  </g>
+);
+
+const SceneIa = ({ r }: R) => (
+  <g>
+    <g transform="translate(150 58) rotate(-28)">
+      <path d="M-46 0 C-24 -34 24 -34 46 0 C24 34 -24 34 -46 0 Z" fill={AUN} />
+      <line x1="-46" y1="0" x2="40" y2="0" stroke="#fff" strokeOpacity=".7" strokeWidth="2" />
+      <circle cx="-8" cy="-9" r="4" fill="#7a4b1f" />
+      <circle cx="14" cy="8" r="3" fill="#7a4b1f" />
+    </g>
+    <path d="M92 28 v-10 h10 M208 28 v-10 h-10 M92 90 v10 h10 M208 90 v10 h-10" stroke={INK} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+    <line x1="96" x2="204" y1="24" y2="24" stroke={MOSS} strokeWidth="2.5" strokeLinecap="round">
+      <An r={r} attributeName="y1" values="24;94;24" dur="3s" />
+      <An r={r} attributeName="y2" values="24;94;24" dur="3s" />
+    </line>
+    <rect x="212" y="48" width="62" height="18" rx="5" fill={INK} />
+    <text x="243" y="60" textAnchor="middle" fontSize="8.5" fontFamily={monoF} fill={MOSS}>mildiou 94%</text>
+  </g>
+);
+
+const SceneDb = ({ r }: R) => {
+  const rows = [48, 64, 80];
+  return (
+    <g>
+      <rect x="62" y="12" width="176" height="92" rx="8" fill="#fff" stroke={INK} strokeWidth="2" />
+      <rect x="62" y="12" width="176" height="22" rx="8" fill={INK} />
+      {["id", "nom", "rôle"].map((h, i) => (
+        <text key={h} x={74 + i * 58} y="27" fontSize="9" fontFamily={monoF} fill={MOSS}>{h}</text>
+      ))}
+      {rows.map((y, ri) => (
+        <g key={y} opacity="0">
+          {[0, 1, 2].map((c) => (
+            <rect key={c} x={74 + c * 58} y={y - 7} width={c === 0 ? 14 : 36} height="8" rx="4" fill={ri === 2 ? AUN : INK} fillOpacity={ri === 2 ? ".85" : ".2"} />
+          ))}
+          <An r={r} attributeName="opacity" values="0;1;1;0" keyTimes={`0;${0.12 + ri * 0.15};0.9;1`} dur="3.4s" />
+        </g>
+      ))}
+    </g>
+  );
+};
+
+const SCENES = [SceneApi, SceneSi, SceneWeb, SceneMobile, SceneIa, SceneDb];
+
+/* ── Code-barres décoratif, propre à chaque ticket ── */
+function Barcode({ seed }: { seed: number }) {
+  const bars = useMemo(() => {
+    let x = 0;
+    const out: { x: number; w: number }[] = [];
+    for (let i = 0; i < 22; i++) {
+      const w = 1 + Math.floor(Math.abs(Math.sin((i + 1) * (seed + 3.7)) * 10) % 3);
+      out.push({ x, w });
+      x += w + 1.6;
+    }
+    return { out, width: x };
+  }, [seed]);
+  return (
+    <svg viewBox={`0 0 ${bars.width} 22`} className="h-[22px] w-auto" aria-hidden="true">
+      {bars.out.map((b, i) => (
+        <rect key={i} x={b.x} y="0" width={b.w} height="22" fill={INK} fillOpacity=".75" />
+      ))}
+    </svg>
+  );
+}
+
+/* ── Encoches du ticket (masques) ── */
+const NOTCH = 11;
+const notchMask = (edge: "bottom" | "top"): React.CSSProperties => {
+  const y = edge === "bottom" ? "100%" : "0";
+  const g = (x: string) => `radial-gradient(circle ${NOTCH}px at ${x} ${y}, #0000 98%, #000)`;
+  return {
+    WebkitMaskImage: `${g("0")}, ${g("100%")}`,
+    maskImage: `${g("0")}, ${g("100%")}`,
+    WebkitMaskComposite: "source-in",
+    maskComposite: "intersect",
+  };
+};
+
+/* ── Carte de compétence : un ticket qu'on déchire ── */
 function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: number }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
   const pointer = useRef("mouse");
-  const Icon = skill.icon;
+  const Scene = SCENES[index];
   const tools = skill.tools.map((k) => T[k]);
+  const rest = [-0.9, 0.6, -0.5, 0.7, -0.6, 0.8][index % 6];
 
   return (
     <motion.article
@@ -170,40 +336,76 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
       onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
       onClick={() => pointer.current !== "mouse" && setOpen((o) => !o)}
-      className={`relative flex flex-col rounded-[1.25rem] border bg-white/[0.04] p-6 pb-0 transition-colors duration-300 cursor-default ${
-        open ? "border-moss" : "border-white/10"
-      }`}
+      className="relative cursor-default"
+      style={{ filter: "drop-shadow(0 14px 18px rgba(0,0,0,0.35))" }}
     >
-      <div className="flex items-start justify-between mb-5">
-        <span className="w-11 h-11 rounded-xl bg-moss flex items-center justify-center">
-          <Icon size={20} className="text-forest" />
-        </span>
-        <span className="font-mono-label text-moss">{String(index + 1).padStart(2, "0")}</span>
-      </div>
-
-      <h3 className="font-display font-bold text-[1.2rem] leading-snug mb-3 !text-cream" style={{ letterSpacing: "-0.01em" }}>
-        {skill.title}
-      </h3>
-      <p className="text-sm leading-relaxed text-sage/75 mb-5">{skill.text}</p>
-
-      {/* Éventail d'outils */}
-      <div className="relative mt-auto -mx-6 h-[168px] border-t border-dashed border-moss/40 overflow-hidden rounded-b-[1.25rem] bg-black/20">
-        {tools.map((t, i) => (
-          <ToolCard key={t.name + i} tool={t} index={i} total={tools.length} open={open} reduce={reduce} />
-        ))}
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen((o) => (pointer.current === "mouse" ? true : !o));
-          }}
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cream text-forest font-mono-label !text-[10px] cursor-pointer border-0"
+      <motion.div
+        animate={{ rotate: open ? 0 : rest, y: open ? -6 : 0 }}
+        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 220, damping: 18 }}
+      >
+        {/* Partie principale */}
+        <div
+          className="relative bg-cream rounded-t-[1.25rem] px-6 pt-5 pb-7"
+          style={notchMask("bottom")}
         >
-          Outils · {tools.length}
-          <ChevronDown size={12} className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
-        </button>
-      </div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="font-mono-label !text-[10px] text-ink-mute leading-tight">
+                N° {String(index + 1).padStart(2, "0")}
+                <br />
+                <span className="text-aun">Compétence</span>
+              </span>
+            </div>
+            <Barcode seed={index + 1} />
+          </div>
+
+          <div className="relative h-[112px] rounded-xl bg-sage/70 border border-sage mb-5 overflow-hidden">
+            <svg viewBox="0 0 300 112" className="absolute inset-0 w-full h-full" aria-hidden="true">
+              <defs>
+                <pattern id={`dots-${index}`} width="14" height="14" patternUnits="userSpaceOnUse">
+                  <circle cx="1.5" cy="1.5" r="1" fill="#0e2f20" fillOpacity=".12" />
+                </pattern>
+              </defs>
+              <rect width="300" height="112" fill={`url(#dots-${index})`} />
+              <Scene r={reduce} />
+            </svg>
+          </div>
+
+          <h3 className="font-display font-bold text-[1.2rem] leading-snug mb-3" style={{ letterSpacing: "-0.01em" }}>
+            {skill.title}
+          </h3>
+          <p className="text-sm leading-relaxed text-ink-mute m-0">{skill.text}</p>
+        </div>
+
+        {/* Talon détachable : l'éventail d'outils */}
+        <motion.div
+          className="relative bg-[#e6eee4] rounded-b-[1.25rem] h-[172px] overflow-hidden"
+          style={{ ...notchMask("top"), transformOrigin: "100% 0" }}
+          animate={{ y: open ? 12 : 0, rotate: open ? -2.2 : 0 }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 240, damping: 16 }}
+        >
+          <div
+            className="absolute top-0 left-[14px] right-[14px] border-t-2 border-dashed border-[#b9c9bb]"
+            aria-hidden="true"
+          />
+          {tools.map((t, i) => (
+            <ToolCard key={t.name + i} tool={t} index={i} total={tools.length} open={open} reduce={reduce} />
+          ))}
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((o) => (pointer.current === "mouse" ? true : !o));
+            }}
+            className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest text-cream font-mono-label !text-[10px] cursor-pointer border-0 whitespace-nowrap"
+          >
+            <Scissors size={11} />
+            Outils · {tools.length}
+            <ChevronDown size={12} className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+          </button>
+        </motion.div>
+      </motion.div>
     </motion.article>
   );
 }
@@ -232,7 +434,7 @@ export default function Skills() {
             </motion.h2>
           </div>
           <motion.p {...fadeUp(0.2)} className="text-sm text-sage/70 max-w-xs">
-            Survole une carte (ou touche-la sur mobile) pour dévoiler les outils derrière chaque compétence.
+            Survole un ticket (ou touche-le sur mobile) pour déchirer le talon et dévoiler les outils derrière chaque compétence.
           </motion.p>
         </div>
 

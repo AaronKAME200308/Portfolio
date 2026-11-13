@@ -37,10 +37,10 @@ export default function Footer() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <footer className="relative overflow-hidden bg-forest pt-20 pb-9">
+    <footer className="relative overflow-hidden bg-cream pt-20 pb-9">
       {/* Grand symbole en filigrane */}
-      <div className="absolute -bottom-24 -right-16 pointer-events-none opacity-[0.05]" aria-hidden="true">
-        <img src={LOGO_SRC} alt="" className="w-[520px] h-[520px] object-contain block brightness-0 invert" />
+      <div className="absolute -bottom-24 -right-16 pointer-events-none opacity-[0.07]" aria-hidden="true">
+        <img src={LOGO_SRC} alt="" className="w-[520px] h-[520px] object-contain block" />
       </div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -48,15 +48,15 @@ export default function Footer() {
           {/* Marque */}
           <motion.div {...reveal(0)}>
             <span className="inline-flex items-center gap-2.5 mb-5">
-              <img src={LOGO_SRC} alt="" className="h-9 w-9 object-contain block brightness-0 invert" />
+              <img src={LOGO_SRC} alt="" className="h-9 w-9 object-contain block" />
               <span
-                className="font-display font-semibold leading-none text-white"
+                className="font-display font-semibold leading-none text-aun"
                 style={{ fontSize: 34, letterSpacing: "-0.01em" }}
               >
                 Aun
               </span>
             </span>
-            <p className="text-sm leading-relaxed mb-6 text-sage/70 max-w-xs">
+            <p className="text-sm leading-relaxed mb-6 text-ink-mute max-w-xs">
               Développeur freelance passionné par la création d'expériences web et mobile élégantes.
             </p>
             <div className="flex gap-2">
@@ -68,7 +68,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   aria-label={label}
                   whileHover={{ y: -3 }}
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-sage border border-white/15 bg-white/5 transition-colors hover:bg-aun hover:border-aun hover:text-white"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-forest border border-sage bg-white transition-colors hover:bg-aun hover:border-aun hover:text-white"
                 >
                   <Icon size={17} />
                 </motion.a>
@@ -78,13 +78,13 @@ export default function Footer() {
 
           {/* Navigation */}
           <motion.div {...reveal(0.1)}>
-            <p className="font-mono-label mb-5 text-moss">Navigation</p>
+            <p className="font-mono-label mb-5 text-aun">Navigation</p>
             <ul className="list-none m-0 p-0 flex flex-col gap-1.5">
               {navLinks.map((l) => (
                 <li key={l.id}>
                   <button
                     onClick={() => scrollTo(l.id)}
-                    className="group flex items-center gap-2 text-sm bg-transparent border-0 cursor-pointer py-1 text-sage/80 hover:text-white transition-colors text-left"
+                    className="group flex items-center gap-2 text-sm bg-transparent border-0 cursor-pointer py-1 text-ink-soft hover:text-aun transition-colors text-left"
                   >
                     {l.label}
                     <ArrowUpRight
@@ -99,19 +99,19 @@ export default function Footer() {
 
           {/* Contact */}
           <motion.div {...reveal(0.2)}>
-            <p className="font-mono-label mb-5 text-moss">Contact</p>
+            <p className="font-mono-label mb-5 text-aun">Contact</p>
             <div className="flex flex-col gap-3.5">
               {contactItems.map(({ icon: Icon, value, href }) => (
                 <div key={value} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10">
-                    <Icon size={14} className="text-moss" />
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white border border-sage">
+                    <Icon size={14} className="text-aun" />
                   </div>
                   {href ? (
-                    <a href={href} className="text-sm text-sage/80 no-underline hover:text-white transition-colors">
+                    <a href={href} className="text-sm text-ink-soft no-underline hover:text-aun transition-colors">
                       {value}
                     </a>
                   ) : (
-                    <span className="text-sm text-sage/80">{value}</span>
+                    <span className="text-sm text-ink-soft">{value}</span>
                   )}
                 </div>
               ))}
@@ -121,28 +121,28 @@ export default function Footer() {
           {/* Carte d'appel à l'action */}
           <motion.div
             {...reveal(0.3)}
-            className="rounded-2xl p-6 bg-aun/20 border border-moss/30"
+            className="rounded-2xl p-6 bg-sage/60 border border-sage"
           >
-            <p className="font-display font-semibold text-lg text-white mb-2">Vous avez un projet ?</p>
-            <p className="text-sm leading-relaxed mb-5 text-sage/75">
+            <p className="font-display font-semibold text-lg text-forest mb-2">Vous avez un projet ?</p>
+            <p className="text-sm leading-relaxed mb-5 text-ink-mute">
               Disponible pour de nouvelles missions freelance. Démarrons la conversation.
             </p>
             <button
               onClick={() => scrollTo("contact")}
-              className="keycap text-sm font-semibold px-5 py-3 [--key-face:#f6f4ec] [--key-edge:#9aa595] [--key-text:#0e2f20]"
+              className="keycap text-sm font-semibold px-5 py-3 [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
             >
               Démarrons ensemble
             </button>
           </motion.div>
         </div>
 
-        <div className="h-px mb-6 bg-white/10" />
+        <div className="h-px mb-6 bg-sage" />
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs m-0 text-sage/60">
+          <p className="text-xs m-0 text-ink-mute">
             © {new Date().getFullYear()} Aaron KAME MOUELE · Tous droits réservés.
           </p>
-          <p className="text-xs m-0 text-sage/60">Yaoundé, Cameroun</p>
+          <p className="text-xs m-0 text-ink-mute">Yaoundé, Cameroun</p>
         </div>
       </div>
     </footer>
