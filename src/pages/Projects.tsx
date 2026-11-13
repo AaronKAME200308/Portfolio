@@ -1,26 +1,44 @@
-import { useState } from "react";
-import { type LucideIcon, ExternalLink, Github, Globe, Leaf, LayoutGrid, Monitor, AppWindow, Smartphone, Brain } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  type LucideIcon,
+  ExternalLink,
+  Github,
+  Globe,
+  Leaf,
+  LayoutGrid,
+  Monitor,
+  AppWindow,
+  Smartphone,
+  Brain,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.6, delay, ease: EASE },
+});
 
 // ── Catégories ────────────────────────────────────────────
 type Category = "Tous" | "Portfolio" | "Site web" | "Application web" | "Application mobile" | "IA / ML";
 
 const CATEGORIES: { key: Category; icon: React.ReactNode }[] = [
-  { key: "Tous",               icon: <LayoutGrid size={13} />  },
-  { key: "Portfolio",          icon: <Monitor size={13} />     },
-  { key: "Site web",           icon: <Globe size={13} />       },
-  { key: "Application web",    icon: <AppWindow size={13} />   },
-  { key: "Application mobile", icon: <Smartphone size={13} />  },
-  { key: "IA / ML",            icon: <Brain size={13} />       },
+  { key: "Tous", icon: <LayoutGrid size={14} /> },
+  { key: "Portfolio", icon: <Monitor size={14} /> },
+  { key: "Site web", icon: <Globe size={14} /> },
+  { key: "Application web", icon: <AppWindow size={14} /> },
+  { key: "Application mobile", icon: <Smartphone size={14} /> },
+  { key: "IA / ML", icon: <Brain size={14} /> },
 ];
 
 // ── Projets ───────────────────────────────────────────────
-// logo     : string = chemin image | React.ElementType = icône Lucide
-// logoBg   : couleur de fond du bloc (défaut: "#fff" pour image, gradient pour icône)
-// logoSize : taille de l'image en % dans le bloc (défaut: 70)
-// logoFit  : "contain" | "cover" (défaut: "contain")
+// logo     : string = chemin image | icône Lucide
+// logoBg   : fond de l'aperçu (défaut : "gradient" du projet)
+// logoSize : taille de l'image en % dans le bloc (défaut : 70)
+// logoFit  : "contain" | "cover"
 const projects = [
   {
     id: 1,
@@ -29,13 +47,12 @@ const projects = [
     description:
       "Application mobile permettant la détection des maladies des plantes grâce à l'intelligence artificielle. Modèle de vision par ordinateur entraîné sur des milliers d'images de feuilles.",
     tags: ["React Native", "FastAPI", "Python", "TensorFlow", "PostgreSQL"],
-    logo: Leaf,
-    logoBg: undefined,       // undefined = gradient auto pour les icônes Lucide
-    logoSize: 70,            // % de la taille du bloc (ignoré pour les icônes Lucide)
+    logo: Leaf as string | LucideIcon,
+    logoBg: undefined as string | undefined,
+    logoSize: 70,
     logoFit: "contain" as const,
     status: "En cours",
     gradient: "linear-gradient(135deg, #34d399, #14b8a6)",
-    accent: "#10b981",
     link: "",
     git: "https://github.com/AaronKAME200308/Aa.git",
     featured: true,
@@ -48,13 +65,12 @@ const projects = [
     description:
       "Plateforme de voyage moderne avec exploration de destinations, galeries d'images immersives et interface de réservation. Design soigné, navigation fluide.",
     tags: ["React JS", "Tailwind CSS", "Node.js", "Supabase"],
-    logo: "https://infiniteluxurytrips.net/logoilt.jpeg",
-    logoBg: undefined,
+    logo: "https://infiniteluxurytrips.net/logoilt.jpeg" as string | LucideIcon,
+    logoBg: undefined as string | undefined,
     logoSize: 70,
     logoFit: "cover" as const,
     status: "En ligne",
     gradient: "linear-gradient(135deg, #231A55, #4535A0)",
-    accent: "#4535A0",
     link: "https://infiniteluxurytrips.net",
     git: "https://github.com/AaronKAME200308/InfinitLuxuryTripsClient.git",
     featured: false,
@@ -67,13 +83,12 @@ const projects = [
     description:
       "Site portfolio pour un graphiste freelance, mettant en avant ses réalisations avec une galerie d'images, une section de réservations clients et un formulaire de contact intégré.",
     tags: ["React JS", "Tailwind CSS", "Supabase"],
-    logo: "https://jpgraphicdesign.net/logoblanc.png",
-    logoBg: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",          // fond blanc pour ce logo
-    logoSize: 70,            // 70% du bloc
+    logo: "https://jpgraphicdesign.net/logoblanc.png" as string | LucideIcon,
+    logoBg: "linear-gradient(135deg,#f2cc6a,#f2cc6a)" as string | undefined,
+    logoSize: 70,
     logoFit: "contain" as const,
     status: "En ligne",
     gradient: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",
-    accent: "#f2cc6a",
     link: "https://jpgraphicdesign.net",
     git: "https://github.com/AaronKAME200308/jp-graphic-design.git",
     featured: false,
@@ -86,13 +101,12 @@ const projects = [
     description:
       "Site vitrine pour une entreprise locale, avec présentation des services, témoignages clients et formulaire de contact intégré. Vidéo Youtube, Blog et bien plus",
     tags: ["React JS", "Tailwind CSS", "Node js"],
-    logo: "/images.png",
-    logoBg: undefined,
+    logo: "/images.png" as string | LucideIcon,
+    logoBg: undefined as string | undefined,
     logoSize: 70,
     logoFit: "cover" as const,
     status: "En ligne",
     gradient: "linear-gradient(135deg, #0a4d7c, #23c367)",
-    accent: "#23c367",
     link: "https://yapithepartners.com/",
     git: "https://github.com/AaronKAME200308/yapithe.git",
     featured: false,
@@ -105,13 +119,12 @@ const projects = [
     description:
       "Application web permettant aux restaurants de créer un menu digital accessible via QR code. Les clients peuvent consulter le menu, et laisser des avis.",
     tags: ["React JS", "Tailwind CSS", "Node.js", "Supabase"],
-    logo:"/logo.png",
-    logoBg: "linear-gradient(135deg, #2E7D32, #1B5E20)",  // fond blanc pour ce logo",
+    logo: "/logo.png" as string | LucideIcon,
+    logoBg: "linear-gradient(135deg, #2E7D32, #1B5E20)" as string | undefined,
     logoSize: 70,
     logoFit: "cover" as const,
     status: "En cours",
     gradient: "linear-gradient(135deg, #2E7D32, #1B5E20)",
-    accent: "#2E7D32",
     link: "https://menu-qr-gules.vercel.app/",
     git: "https://github.com/AaronKAME200308/MenuQr.git",
     featured: false,
@@ -119,50 +132,87 @@ const projects = [
   },
 ];
 
-// ── Status colors ─────────────────────────────────────────
-const statusColors: Record<string, { bg: string; text: string }> = {
-  "Terminé":  { bg: "rgba(16,185,129,0.1)",  text: "#059669" },
-  "En ligne": { bg: "rgba(59,130,246,0.1)",  text: "#2563eb" },
-  "Livré":    { bg: "rgba(245,158,11,0.1)",  text: "#d97706" },
-  "En cours": { bg: "rgba(239,68,68,0.1)",   text: "#dc2626" },
+type Project = (typeof projects)[number];
+
+// ── Utilitaires ───────────────────────────────────────────
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).host.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 };
 
-// ── ProjectIcon — image URL ou composant Lucide ───────────
+/* Bord de papier déchiré (vert forêt) vers la section Contact */
+function TornEdge({ fill = "#0e2f20" }: { fill?: string }) {
+  const d = useMemo(() => {
+    const w = 1440, h = 40, steps = 80;
+    let p = `M0 ${h} L0 14`;
+    for (let i = 1; i <= steps; i++) {
+      const r = Math.abs((Math.sin(i * 53.3) * 43758.5453) % 1);
+      p += ` L${((w / steps) * i).toFixed(1)} ${(6 + r * 18).toFixed(1)}`;
+    }
+    return p + ` L${w} ${h} Z`;
+  }, []);
+  return (
+    <svg
+      viewBox="0 0 1440 40"
+      preserveAspectRatio="none"
+      className="absolute bottom-0 left-0 w-full h-7 lg:h-10 z-30"
+      style={{ filter: "drop-shadow(0 -2px 3px rgba(0,0,0,0.12))" }}
+      aria-hidden="true"
+    >
+      <path d={d} fill={fill} />
+    </svg>
+  );
+}
+
+// ── Statut : point + libellé ──────────────────────────────
+const Status = ({ status }: { status: string }) => {
+  const live = status === "En ligne";
+  return (
+    <span className="inline-flex items-center gap-2 whitespace-nowrap font-mono-label !text-[10px] text-forest">
+      <span className="relative flex w-2 h-2">
+        {live && <span className="absolute inset-0 rounded-full bg-aun animate-ping opacity-60" />}
+        <span className={`relative w-2 h-2 rounded-full ${live ? "bg-aun" : "bg-[#e0a21a]"}`} />
+      </span>
+      {status}
+    </span>
+  );
+};
+
+// ── Logo : image ou icône Lucide ──────────────────────────
 const ProjectIcon = ({
   logo,
   gradient,
   logoBg,
   logoSize = 70,
-  logoFit  = "contain",
-  sizeLg   = false,
+  logoFit = "contain",
+  large = false,
 }: {
-  logo:      string | LucideIcon;
-  gradient:  string;
-  logoBg?:   string;
+  logo: string | LucideIcon;
+  gradient: string;
+  logoBg?: string;
   logoSize?: number;
-  logoFit?:  "contain" | "cover";
-  sizeLg?:   boolean;
+  logoFit?: "contain" | "cover";
+  large?: boolean;
 }) => {
-  const sizeClass = sizeLg ? "w-24 h-24 rounded-3xl" : "w-12 h-12 rounded-2xl";
-  const iconSize  = sizeLg ? 40 : 22;
+  const sizeClass = large ? "w-24 h-24 rounded-3xl" : "w-16 h-16 rounded-2xl";
+  const iconSize = large ? 40 : 28;
 
   if (typeof logo === "string") {
-    const bg = logoBg ?? "#fff";
     return (
       <div
-        className={`${sizeClass} overflow-hidden shadow-xl flex items-center justify-center`}
-        style={{
-          background: bg,
-          border: logoBg ? "none" : "1.5px solid #e2e8f0",
-        }}
+        className={`${sizeClass} overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.25)] flex items-center justify-center`}
+        style={{ background: logoBg ?? "#fff" }}
       >
         <img
           src={logo}
-          alt="logo"
+          alt=""
           style={{
-            width:      logoFit === "cover" ? "100%" : `${logoSize}%`,
-            height:     logoFit === "cover" ? "100%" : `${logoSize}%`,
-            objectFit:  logoFit,
+            width: logoFit === "cover" ? "100%" : `${logoSize}%`,
+            height: logoFit === "cover" ? "100%" : `${logoSize}%`,
+            objectFit: logoFit,
           }}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -172,11 +222,10 @@ const ProjectIcon = ({
     );
   }
 
-  // Composant Lucide — logoBg permet de surcharger le gradient
   const Icon = logo;
   return (
     <div
-      className={`${sizeClass} flex items-center justify-center shadow-xl`}
+      className={`${sizeClass} flex items-center justify-center shadow-[0_10px_24px_rgba(0,0,0,0.25)]`}
       style={{ background: logoBg ?? gradient }}
     >
       <Icon size={iconSize} className="text-white" />
@@ -184,246 +233,212 @@ const ProjectIcon = ({
   );
 };
 
-
-const FeaturedCard = ({ project }: { project: typeof projects[0] }) => {
-  const status = statusColors[project.status] ?? { bg: "#f1f5f9", text: "#64748b" };
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 32 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.45, ease: EASE }}
-      className="group relative rounded-3xl overflow-hidden cursor-pointer"
-      style={{
-        background: "#fff",
-        border: `1.5px solid ${project.accent}`,
-        boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
-        minHeight: 280,
-      }}
-      whileHover={{ y: -5, boxShadow: "0 16px 48px rgba(0,0,0,0.12)" } as any}
-      onClick={() => project.link && window.open(project.link, "_blank")}
+// ── Fenêtre de navigateur : aperçu du projet ──────────────
+const BrowserPreview = ({ project, large = false }: { project: Project; large?: boolean }) => (
+  <div className="flex flex-col h-full">
+    <div className="flex items-center gap-3 px-4 py-2.5 bg-sage/70 border-b border-sage">
+      <span className="flex gap-1.5 shrink-0" aria-hidden="true">
+        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+      </span>
+      <span className="flex-1 min-w-0 truncate rounded-md bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
+        {project.link ? hostOf(project.link) : "localhost · en développement"}
+      </span>
+    </div>
+    <div
+      className="relative flex-1 flex items-center justify-center"
+      style={{ background: project.gradient, minHeight: large ? 260 : 150 }}
     >
-      <div className="absolute top-0 left-0 right-0"
-        style={{ height: 8, background: project.gradient, transform: "skewY(-1deg)", transformOrigin: "top left" }} />
-
-      <div className="grid md:grid-cols-2 gap-0 h-full">
-        {/* Left visual */}
-        <div className="relative flex items-center justify-center p-12"
-          style={{ background: `linear-gradient(135deg, ${project.accent}08, ${project.accent}18)`, minHeight: 240 }}>
-          <div className="absolute" style={{ width: 220, height: 220, borderRadius: "50%", background: project.gradient, opacity: 0.08, right: -40, top: "50%", transform: "translateY(-50%)" }} />
-          <ProjectIcon logo={project.logo} gradient={project.gradient} logoBg={project.logoBg} logoSize={project.logoSize} logoFit={project.logoFit} sizeLg />
-          <span className="absolute top-5 left-5 px-3 py-1 rounded-full text-xs font-semibold"
-            style={{ background: "rgba(255,255,255,0.85)", color: "#475569", backdropFilter: "blur(4px)" }}>
-            {project.category}
-          </span>
-          <span className="absolute bottom-5 left-5 px-3 py-1 rounded-full text-xs font-bold"
-            style={{ background: status.bg, color: status.text }}>
-            {project.status}
-          </span>
-        </div>
-
-        {/* Right content */}
-        <div className="p-8 flex flex-col justify-between">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: project.accent }}>
-              Featured Project
-            </div>
-            <h3 className="font-black text-3xl mb-1"
-              style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif", lineHeight: 1.1 }}>
-              {project.title}
-            </h3>
-            <p className="text-sm mb-4" style={{ color: "#94a3b8" }}>{project.subtitle}</p>
-            <p className="text-sm leading-relaxed mb-6" style={{ color: "#475569" }}>{project.description}</p>
-            <div className="flex flex-wrap gap-1.5 mb-6">
-              {project.tags.map((tag) => (
-                <span key={tag} className="px-2.5 py-1 rounded-lg text-xs font-medium"
-                  style={{ background: `${project.accent}10`, color: project.accent, border: `1px solid ${project.accent}20` }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => window.open(project.git, "_blank")} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
-              style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent  ; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
-              <Github size={14} /> Code
-            </button>
-            {project.link && (
-              <button onClick={() => window.open(project.link, "_blank")}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200"
-                style={{ background: project.gradient, boxShadow: `0 4px 14px ${project.accent}40` }}>
-                <ExternalLink size={14} /> Voir le projet
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
+      <div className="relative">
+        <ProjectIcon
+          logo={project.logo}
+          gradient={project.gradient}
+          logoBg={project.logoBg}
+          logoSize={project.logoSize}
+          logoFit={project.logoFit}
+          large={large}
+        />
       </div>
-    </motion.div>
+    </div>
+  </div>
+);
+
+// ── Pastilles de technologies ─────────────────────────────
+const Tags = ({ tags, max }: { tags: string[]; max?: number }) => {
+  const shown = max ? tags.slice(0, max) : tags;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {shown.map((t) => (
+        <span key={t} className="px-2 py-1 rounded-md border border-sage bg-cream font-mono text-[11px] text-ink-soft">
+          {t}
+        </span>
+      ))}
+      {max && tags.length > max && (
+        <span className="px-2 py-1 rounded-md bg-sage/60 font-mono text-[11px] text-ink-mute">+{tags.length - max}</span>
+      )}
+    </div>
   );
 };
 
-// ── Small card ────────────────────────────────────────────
-const SmallCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
-  const status = statusColors[project.status] ?? { bg: "#f1f5f9", text: "#64748b" };
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 32 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
-      className="group relative rounded-3xl overflow-hidden cursor-pointer flex flex-col"
-      style={{ background: "#fff", border: `1.5px solid ${project.accent}`, boxShadow: "0 2px 16px rgba(0,0,0,0.05)" }}
-      whileHover={{ y: -5, boxShadow: "0 16px 48px rgba(0,0,0,0.11)" } as any}
-      onClick={() => project.link && window.open(project.link, "_blank")}
+// ── Boutons : touches de clavier ──────────────────────────
+const Actions = ({ project }: { project: Project }) => (
+  <div className="flex flex-wrap gap-3 pt-1">
+    {project.link && (
+      <a
+        href={project.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
+      >
+        <ExternalLink size={14} /> Voir le projet
+      </a>
+    )}
+    <a
+      href={project.git}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#ffffff] [--key-edge:#a9bcae] [--key-text:#0e2f20]"
     >
-      <div style={{ height: 6, background: project.gradient, transform: "skewY(-1.5deg)", transformOrigin: "top left", flexShrink: 0 }} />
+      <Github size={14} /> Code
+    </a>
+  </div>
+);
 
-      <div className="relative flex items-center justify-between px-6 py-5"
-        style={{ background: `linear-gradient(135deg, ${project.accent}06, ${project.accent}12)` }}>
-        <ProjectIcon logo={project.logo} gradient={project.gradient} logoBg={project.logoBg} logoSize={project.logoSize} logoFit={project.logoFit} />
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold"
-            style={{ background: "rgba(255,255,255,0.85)", color: "#475569" }}>
-            {project.category}
-          </span>
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: status.bg, color: status.text }}>
-            {project.status}
-          </span>
-        </div>
+// ── Carte à la une (2 colonnes) ───────────────────────────
+const FeaturedCard = ({ project }: { project: Project }) => (
+  <motion.article
+    layout
+    initial={{ opacity: 0, y: 32 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, scale: 0.95 }}
+    transition={{ duration: 0.45, ease: EASE }}
+    whileHover={{ y: -4 }}
+    className="h-full grid md:grid-cols-2 rounded-[1.5rem] overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.25)]"
+  >
+    <BrowserPreview project={project} large />
+    <div className="p-7 md:p-8 flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono-label !text-[10px] text-aun">À la une</span>
+        <Status status={project.status} />
       </div>
-
-      <div className="p-6 flex flex-col flex-1">
-        <h3 className="font-black text-xl mb-0.5" style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif" }}>
+      <div>
+        <h3 className="font-display font-extrabold text-3xl leading-[1.05] mb-1.5" style={{ letterSpacing: "-0.02em" }}>
           {project.title}
         </h3>
-        <p className="text-xs mb-3" style={{ color: "#94a3b8" }}>{project.subtitle}</p>
-        <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#475569" }}>{project.description}</p>
-
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {project.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="px-2 py-1 rounded-lg text-[11px] font-medium"
-              style={{ background: `${project.accent}10`, color: project.accent, border: `1px solid ${project.accent}20` }}>
-              {tag}
-            </span>
-          ))}
-          {project.tags.length > 3 && (
-            <span className="px-2 py-1 rounded-lg text-[11px] font-medium" style={{ background: "#f1f5f9", color: "#94a3b8" }}>
-              +{project.tags.length - 3}
-            </span>
-          )}
-        </div>
-
-        <div className="flex gap-2">
-          <button  onClick={(e) => { e.stopPropagation(); window.open(project.git, "_blank"); }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
-            style={{ background: "#f8fafc", color: "#64748b", border: `1.5px solid ${project.accent}` }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = project.accent; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = project.accent; (e.currentTarget as HTMLElement).style.color = "#64748b"; }}>
-            <Github size={12} /> Code
-          </button>
-          {project.link && (
-            <button onClick={(e) => { e.stopPropagation(); window.open(project.link, "_blank"); }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all"
-              style={{ background: project.gradient }}>
-              <ExternalLink size={12} /> Voir
-            </button>
-          )}
-        </div>
+        <p className="text-sm text-ink-mute m-0">{project.subtitle}</p>
       </div>
-    </motion.div>
-  );
-};
+      <p className="text-sm leading-relaxed text-ink-soft m-0">{project.description}</p>
+      <Tags tags={project.tags} />
+      <div className="mt-auto">
+        <Actions project={project} />
+      </div>
+    </div>
+  </motion.article>
+);
+
+// ── Carte standard ────────────────────────────────────────
+const SmallCard = ({ project, index }: { project: Project; index: number }) => (
+  <motion.article
+    layout
+    initial={{ opacity: 0, y: 32 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, scale: 0.95 }}
+    transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
+    whileHover={{ y: -4 }}
+    className="h-full flex flex-col rounded-[1.5rem] overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.2)]"
+  >
+    <BrowserPreview project={project} />
+    <div className="p-6 flex flex-col gap-3 flex-1">
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono-label !text-[10px] text-ink-mute">{project.category}</span>
+        <Status status={project.status} />
+      </div>
+      <div>
+        <h3 className="font-display font-bold text-xl leading-tight mb-1" style={{ letterSpacing: "-0.01em" }}>
+          {project.title}
+        </h3>
+        <p className="text-xs text-ink-mute m-0">{project.subtitle}</p>
+      </div>
+      <p className="text-sm leading-relaxed text-ink-soft m-0 flex-1">{project.description}</p>
+      <Tags tags={project.tags} max={3} />
+      <Actions project={project} />
+    </div>
+  </motion.article>
+);
 
 // ═══════════════════════════════════════════════════════════
 export default function Projects() {
   const [activeTab, setActiveTab] = useState<Category>("Tous");
 
-  const filtered = activeTab === "Tous"
-    ? projects
-    : projects.filter((p) => p.category === activeTab);
-
+  const filtered = activeTab === "Tous" ? projects : projects.filter((p) => p.category === activeTab);
   const featured = filtered.filter((p) => p.featured);
-  const rest     = filtered.filter((p) => !p.featured);
+  const rest = filtered.filter((p) => !p.featured);
 
   const countFor = (cat: Category) =>
     cat === "Tous" ? projects.length : projects.filter((p) => p.category === cat).length;
 
   return (
-    <section id="projects" className="py-24" style={{ background: "#fff" }}>
-      <div className="max-w-6xl mx-auto px-6">
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: EASE }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-12" style={{ background: "#7AB2B2" }} />
-            <span className="font-semibold text-sm uppercase tracking-widest" style={{ color: "#7AB2B2" }}>
-              Projets
-            </span>
+    <section id="projects" className="relative overflow-hidden bg-cream pt-24 pb-32 lg:pt-32 lg:pb-40">
+      <div className="relative max-w-6xl mx-auto px-6">
+        {/* ── En-tête ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+          <div>
+            <motion.p {...fadeUp(0)} className="font-mono-label text-aun mb-5">
+              <span className="text-moss">03 /</span> Projets
+            </motion.p>
+            <motion.h2
+              {...fadeUp(0.1)}
+              className="font-display font-extrabold leading-[1.05] max-w-2xl"
+              style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
+            >
+              Ce que j'ai <span className="text-aun">construit</span>, du prototype à la mise en ligne.
+            </motion.h2>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-            <h2 className="font-black text-4xl md:text-5xl"
-              style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif", lineHeight: 1.05 }}>
-              Ce que j'ai<br />
-              <span style={{ color: "#0072FF" }}>construit</span>
-            </h2>
-            <p className="text-sm max-w-xs" style={{ color: "#94a3b8" }}>
-              Des projets concrets, du prototype à la mise en production.
-            </p>
-          </div>
-        </motion.div>
+          <motion.p {...fadeUp(0.2)} className="text-sm text-ink-mute max-w-xs">
+            Des projets concrets pour de vrais clients, avec le code ou le site à portée de clic.
+          </motion.p>
+        </div>
 
-        {/* ── TABS ── */}
+        {/* ── Filtres ── */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.15, ease: EASE }}
-          className="flex md:flex-wrap flex-row gap-2 mb-10 overflow-x-auto md:overflow-visible pb-2 md:pb-0 "
+          {...fadeUp(0.25)}
+          className="flex flex-row md:flex-wrap gap-2 mb-10 overflow-x-auto md:overflow-visible pb-2 md:pb-0"
+          role="tablist"
+          aria-label="Catégories de projets"
         >
           {CATEGORIES.map(({ key, icon }) => {
             const isActive = activeTab === key;
             const count = countFor(key);
             if (count === 0 && key !== "Tous") return null;
             return (
-              <motion.button
+              <button
                 key={key}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveTab(key)}
-                whileTap={{ scale: 0.96 }}
-                className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 shrink-0 md:shrink hover:cursor-pointer"
-                style={{
-                  background: isActive ? "#0072FF" : "#f8fafc",
-                  color: isActive ? "#fff" : "#64748b",
-                  border: isActive ? "1.5px solid #0072FF" : "1.5px solid #e2e8f0",
-                  boxShadow: isActive ? "0 4px 14px rgba(0,114,255,0.28)" : "none",
-                }}
+                className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold cursor-pointer transition-colors ${
+                  isActive
+                    ? "bg-forest text-cream border-forest"
+                    : "bg-white text-ink-soft border-sage hover:border-aun hover:text-aun"
+                }`}
               >
                 {icon}
                 {key}
                 <span
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                  style={{
-                    background: isActive ? "rgba(255,255,255,0.25)" : "rgba(0,114,255,0.08)",
-                    color: isActive ? "#fff" : "#0072FF",
-                  }}
+                  className={`font-mono text-[10px] px-1.5 py-0.5 rounded-full ${
+                    isActive ? "bg-white/15 text-cream" : "bg-sage text-forest"
+                  }`}
                 >
                   {count}
                 </span>
-              </motion.button>
+              </button>
             );
           })}
         </motion.div>
 
-        {/* ── GRID ── */}
+        {/* ── Grille ── */}
         <AnimatePresence mode="popLayout">
           {filtered.length === 0 ? (
             <motion.div
@@ -431,35 +446,28 @@ export default function Projects() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center py-20"
-              style={{ color: "#94a3b8" }}
+              className="text-center py-20 text-ink-mute"
             >
-              <div className="text-5xl mb-4">🗂️</div>
-              <p className="font-semibold" style={{ fontFamily: "'Syne', sans-serif" }}>
-                Aucun projet dans cette catégorie pour l'instant.
-              </p>
+              <p className="font-display font-semibold m-0">Aucun projet dans cette catégorie pour l'instant.</p>
             </motion.div>
           ) : (
             <motion.div key="grid" layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Featured prend 2 colonnes sur lg */}
               {featured.map((p) => (
                 <div key={p.id} className="col-span-1 md:col-span-2 lg:col-span-2">
                   <FeaturedCard project={p} />
                 </div>
               ))}
-              {/* 1ère small card à côté du featured */}
-              {featured.length > 0 && rest.slice(0, 1).map((p, i) => (
-                <SmallCard key={p.id} project={p} index={i} />
-              ))}
-              {/* Reste des cards */}
+              {featured.length > 0 &&
+                rest.slice(0, 1).map((p, i) => <SmallCard key={p.id} project={p} index={i} />)}
               {(featured.length > 0 ? rest.slice(1) : rest).map((p, i) => (
                 <SmallCard key={p.id} project={p} index={i + (featured.length > 0 ? 1 : 0)} />
               ))}
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
+
+      <TornEdge />
     </section>
   );
 }

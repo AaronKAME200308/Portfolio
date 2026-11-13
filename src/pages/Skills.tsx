@@ -1,331 +1,249 @@
-import { useState } from "react";
-import { Code2, Server, Database, Brain, Layers } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
+import type { ComponentType } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  Boxes,
+  Database,
+  Globe,
+  Brain,
+  Smartphone,
+  Server,
+  ChevronDown,
+  Workflow,
+  Network,
+  Table2,
+} from "lucide-react";
+import {
+  SiFastapi,
+  SiPython,
+  SiNodedotjs,
+  SiExpress,
+  SiSymfony,
+  SiPostgresql,
+  SiReact,
+  SiTypescript,
+  SiJavascript,
+  SiTailwindcss,
+  SiFigma,
+  SiGithub,
+  SiSupabase,
+  SiTensorflow,
+  SiKeras,
+  SiMysql,
+} from "react-icons/si";
+import { FaJava } from "react-icons/fa";
+
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-// ── Data ──────────────────────────────────────────────────
-const categories = [
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.6, delay, ease: EASE },
+});
+
+/* ── Outils : logo (couleur officielle) + nom ── */
+type IconC = ComponentType<{ size?: number; color?: string; className?: string }>;
+type Tool = { name: string; icon: IconC; color: string };
+
+const T: Record<string, Tool> = {
+  fastapi: { name: "FastAPI", icon: SiFastapi, color: "#009688" },
+  python: { name: "Python", icon: SiPython, color: "#3776AB" },
+  node: { name: "Node.js", icon: SiNodedotjs, color: "#5FA04E" },
+  express: { name: "Express", icon: SiExpress, color: "#0b0f0c" },
+  symfony: { name: "Symfony", icon: SiSymfony, color: "#0b0f0c" },
+  java: { name: "Java", icon: FaJava, color: "#E76F00" },
+  postgres: { name: "PostgreSQL", icon: SiPostgresql, color: "#336791" },
+  mysql: { name: "MySQL", icon: SiMysql, color: "#00758F" },
+  supabase: { name: "Supabase", icon: SiSupabase, color: "#3ECF8E" },
+  react: { name: "React", icon: SiReact, color: "#149ECA" },
+  rn: { name: "React Native", icon: SiReact, color: "#149ECA" },
+  ts: { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+  js: { name: "JavaScript", icon: SiJavascript, color: "#D4B106" },
+  tailwind: { name: "Tailwind", icon: SiTailwindcss, color: "#06B6D4" },
+  figma: { name: "Figma", icon: SiFigma, color: "#F24E1E" },
+  github: { name: "GitHub", icon: SiGithub, color: "#0b0f0c" },
+  tf: { name: "TensorFlow", icon: SiTensorflow, color: "#E8710A" },
+  keras: { name: "Keras", icon: SiKeras, color: "#D00000" },
+  // Pas de logo officiel : icônes de la charte
+  uml: { name: "UML", icon: Workflow as IconC, color: "#1e7b4a" },
+  merise: { name: "Merise", icon: Network as IconC, color: "#1e7b4a" },
+  sql: { name: "SQL", icon: Table2 as IconC, color: "#1e7b4a" },
+};
+
+/* ── Compétences ── */
+const SKILLS = [
   {
-    id: "frontend",
-    icon: Code2,
-    label: "Front-end",
-    color: "#7c3aed",
-    bg: "#f5f3ff",
-    border: "rgba(124,58,237,0.15)",
-    gradient: "linear-gradient(90deg, #7c3aed, #2563eb)",
-    skills: [
-      { name: "React JS",       level: 95 },
-      { name: "React Native",   level: 90 },
-      { name: "Tailwind CSS",   level: 95 },
-      { name: "HTML / CSS",     level: 98 },
-      { name: "JavaScript",     level: 90 },
-    ],
-  },
-  {
-    id: "backend",
     icon: Server,
-    label: "Back-end",
-    color: "#2563eb",
-    bg: "#eff6ff",
-    border: "rgba(37,99,235,0.15)",
-    gradient: "linear-gradient(90deg, #2563eb, #0ea5e9)",
-    skills: [
-      { name: "FastAPI (Python)", level: 85 },
-      { name: "Node.js / Express",level: 80 },
-      { name: "PHP / Symfony",    level: 75 },
-      { name: "Java",             level: 70 },
-      { name: "REST API",         level: 88 },
-    ],
+    title: "Conception et réalisation d'API robustes",
+    text: "Des APIs REST structurées autour de systèmes précis : schémas validés, authentification, gestion des erreurs et documentation générée avec FastAPI. Aussi en Node.js et Express.",
+    tools: ["fastapi", "python", "node", "express", "symfony"],
   },
   {
-    id: "database",
-    icon: Database,
-    label: "Bases de données",
-    color: "#059669",
-    bg: "#ecfdf5",
-    border: "rgba(5,150,105,0.15)",
-    gradient: "linear-gradient(90deg, #059669, #14b8a6)",
-    skills: [
-      { name: "PostgreSQL", level: 85 },
-      { name: "Supabase",   level: 82 },
-      { name: "SQL",        level: 88 },
-    ],
+    icon: Boxes,
+    title: "Analyse, conception et réalisation de systèmes d'information",
+    text: "De l'expression du besoin à l'application livrée : modélisation UML et Merise, architecture logicielle, développement et suivi du code.",
+    tools: ["uml", "merise", "java", "symfony", "postgres"],
   },
   {
-    id: "ai",
+    icon: Globe,
+    title: "Conception, réalisation et déploiement de sites web",
+    text: "Portfolios, sites vitrines et plateformes : de la maquette à la mise en ligne, avec des interfaces rapides, responsives et soignées.",
+    tools: ["react", "ts", "tailwind", "figma", "github"],
+  },
+  {
+    icon: Smartphone,
+    title: "Conception et réalisation d'applications mobiles",
+    text: "Des applications mobiles multiplateformes branchées sur une API et une base de données, pensées pour l'usage réel sur le terrain.",
+    tools: ["rn", "js", "ts", "fastapi", "supabase"],
+  },
+  {
     icon: Brain,
-    label: "IA / ML",
-    color: "#e11d48",
-    bg: "#fff1f2",
-    border: "rgba(225,29,72,0.15)",
-    gradient: "linear-gradient(90deg, #e11d48, #f97316)",
-    skills: [
-      { name: "Python",              level: 82 },
-      { name: "TensorFlow / Keras",  level: 70 },
-      { name: "Computer Vision",     level: 68 },
-    ],
+    title: "Entraînement de modèles d'IA et vision par ordinateur",
+    text: "Collecte et préparation d'images, entraînement et intégration de modèles de détection, comme pour reconnaître des maladies de plantes.",
+    tools: ["python", "tf", "keras"],
   },
   {
-    id: "methods",
-    icon: Layers,
-    label: "Conception",
-    color: "#d97706",
-    bg: "#fffbeb",
-    border: "rgba(217,119,6,0.15)",
-    gradient: "linear-gradient(90deg, #d97706, #f59e0b)",
-    skills: [
-      { name: "UML / Merise",           level: 85 },
-      { name: "Architecture logicielle", level: 80 },
-      { name: "Git / GitHub",            level: 90 },
-    ],
+    icon: Database,
+    title: "Modélisation et administration de bases de données",
+    text: "Schémas relationnels propres, requêtes SQL efficaces, authentification et stockage avec Supabase et PostgreSQL.",
+    tools: ["postgres", "supabase", "sql", "mysql"],
   },
 ];
 
-const allTags = [
-  "React JS", "React Native", "Tailwind CSS", "JavaScript",
-  "TypeScript", "HTML5", "CSS3",
-  "FastAPI", "Node.js", "Express", "PHP", "Symfony", "Java",
-  "Python", "TensorFlow",
-  "PostgreSQL", "Supabase", "MySQL",
-  "Git", "GitHub", "Figma", "VS Code",
-  "UML", "Merise", "REST API",
-];
+/* Bord de papier déchiré (crème) vers la section suivante */
+function TornEdge({ fill = "#f6f4ec" }: { fill?: string }) {
+  const d = useMemo(() => {
+    const w = 1440, h = 40, steps = 80;
+    let p = `M0 ${h} L0 14`;
+    for (let i = 1; i <= steps; i++) {
+      const r = Math.abs((Math.sin(i * 91.7) * 43758.5453) % 1);
+      p += ` L${((w / steps) * i).toFixed(1)} ${(6 + r * 18).toFixed(1)}`;
+    }
+    return p + ` L${w} ${h} Z`;
+  }, []);
+  return (
+    <svg
+      viewBox="0 0 1440 40"
+      preserveAspectRatio="none"
+      className="absolute bottom-0 left-0 w-full h-7 lg:h-10 z-30"
+      style={{ filter: "drop-shadow(0 -2px 3px rgba(0,0,0,0.25))" }}
+      aria-hidden="true"
+    >
+      <path d={d} fill={fill} />
+    </svg>
+  );
+}
 
-// ── Animated progress bar ─────────────────────────────────
-const Bar = ({ level, gradient, delay }: { level: number; gradient: string; delay: number }) => (
-  <motion.div
-    className="h-full rounded-full"
-    style={{ background: gradient }}
-    initial={{ width: 0 }}
-    whileInView={{ width: `${level}%` }}
-    viewport={{ once: true, margin: "-40px" }}
-    transition={{ duration: 0.7, delay, ease: EASE }}
-  />
-);
+/* ── Mini-carte d'outil ── */
+function ToolCard({ tool, index, total, open, reduce }: { tool: Tool; index: number; total: number; open: boolean; reduce: boolean | null }) {
+  const c = (total - 1) / 2;
+  const openAngle = (index - c) * (total > 4 ? 14 : 17);
+  const closedAngle = (index - c) * 1.4;
+  const Icon = tool.icon;
+  return (
+    <motion.div
+      className="absolute left-1/2 bottom-10 -ml-[35px] w-[70px] h-[88px] rounded-xl bg-white border border-sage flex flex-col items-center justify-center gap-2 shadow-[0_6px_14px_rgba(14,47,32,0.16)]"
+      style={{ transformOrigin: "50% 250%", zIndex: index + 1 }}
+      animate={{ rotate: open ? openAngle : closedAngle, y: open ? -6 : 0 }}
+      transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 20, delay: open ? index * 0.04 : 0 }}
+    >
+      <Icon size={26} color={tool.color} />
+      <span className="font-mono text-[9px] leading-none text-ink-soft text-center px-1">{tool.name}</span>
+    </motion.div>
+  );
+}
 
-// ═══════════════════════════════════════════════════════════
-export default function Skills() {
-  const [active, setActive] = useState("frontend");
-  const current = categories.find((c) => c.id === active)!;
+/* ── Carte de compétence ── */
+function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: number }) {
+  const reduce = useReducedMotion();
+  const [open, setOpen] = useState(false);
+  const pointer = useRef("mouse");
+  const Icon = skill.icon;
+  const tools = skill.tools.map((k) => T[k]);
 
   return (
-    <section id="skills" className="py-28 overflow-hidden" style={{ background: "#f8fafc" }}>
-      <div className="max-w-6xl mx-auto px-6">
+    <motion.article
+      {...fadeUp(0.08 * (index % 3))}
+      onPointerDown={(e) => (pointer.current = e.pointerType)}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
+      onClick={() => pointer.current !== "mouse" && setOpen((o) => !o)}
+      className={`relative flex flex-col rounded-[1.25rem] border bg-white/[0.04] p-6 pb-0 transition-colors duration-300 cursor-default ${
+        open ? "border-moss" : "border-white/10"
+      }`}
+    >
+      <div className="flex items-start justify-between mb-5">
+        <span className="w-11 h-11 rounded-xl bg-moss flex items-center justify-center">
+          <Icon size={20} className="text-forest" />
+        </span>
+        <span className="font-mono-label text-moss">{String(index + 1).padStart(2, "0")}</span>
+      </div>
 
-        {/* ── Header ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, ease: EASE }}
+      <h3 className="font-display font-bold text-[1.2rem] leading-snug mb-3 !text-cream" style={{ letterSpacing: "-0.01em" }}>
+        {skill.title}
+      </h3>
+      <p className="text-sm leading-relaxed text-sage/75 mb-5">{skill.text}</p>
+
+      {/* Éventail d'outils */}
+      <div className="relative mt-auto -mx-6 h-[168px] border-t border-dashed border-moss/40 overflow-hidden rounded-b-[1.25rem] bg-black/20">
+        {tools.map((t, i) => (
+          <ToolCard key={t.name + i} tool={t} index={i} total={tools.length} open={open} reduce={reduce} />
+        ))}
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen((o) => (pointer.current === "mouse" ? true : !o));
+          }}
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cream text-forest font-mono-label !text-[10px] cursor-pointer border-0"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-12" style={{ background: "#7c3aed", opacity: 0.4 }} />
-            <span className="font-semibold text-sm uppercase tracking-widest" style={{ color: "#7c3aed" }}>
-              Compétences
-            </span>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-4">
-            <h2
-              className="font-black leading-tight"
-              style={{
-                fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
-                color: "#0f172a",
-                fontFamily: "'Syne', sans-serif",
-              }}
+          Outils · {tools.length}
+          <ChevronDown size={12} className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+    </motion.article>
+  );
+}
+
+export default function Skills() {
+  return (
+    <section id="skills" className="relative overflow-hidden bg-forest pt-24 pb-32 lg:pt-32 lg:pb-40">
+      {/* Halo vert discret */}
+      <div
+        className="absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full pointer-events-none"
+        aria-hidden="true"
+        style={{ background: "radial-gradient(circle, rgba(30,123,74,0.35), transparent 70%)" }}
+      />
+      <div className="relative max-w-6xl mx-auto px-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
+          <div>
+            <motion.p {...fadeUp(0)} className="font-mono-label text-sage mb-5">
+              <span className="text-moss">02 /</span> Compétences
+            </motion.p>
+            <motion.h2
+              {...fadeUp(0.1)}
+              className="font-display font-extrabold leading-[1.05] max-w-2xl !text-cream"
+              style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
             >
-              Mon stack<br />
-              <span style={{
-                background: "linear-gradient(90deg, #7c3aed, #2563eb)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}>
-                technique
-              </span>
-            </h2>
-            <p className="text-sm max-w-xs" style={{ color: "#94a3b8" }}>
-              Technologies maîtrisées du frontend au déploiement, en passant par l'IA.
-            </p>
+              Ce que je sais <span className="text-moss">faire</span>, pas seulement ce que j'utilise.
+            </motion.h2>
           </div>
-        </motion.div>
-
-        {/* ── MAIN LAYOUT : sidebar + panel ── */}
-        <div className="grid md:grid-cols-4 gap-8 mb-14">
-
-          {/* ══ SIDEBAR — vertical category nav ══ */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, ease: EASE }}
-            className="md:col-span-1 flex flex-row md:flex-col  gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0"
-          >
-            {categories.map(({ id, icon: Icon, label, color, bg, border }) => {
-              const isActive = id === active;
-              return (
-                <motion.button
-                  key={id}
-                  onClick={() => setActive(id)}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all duration-200 shrink-0 md:shrink hover:cursor-pointer"
-                  style={{
-                    background: isActive ? bg : "#fff",
-                    border: `1.5px solid ${isActive ? border : "#e2e8f0"}`,
-                    boxShadow: isActive ? `0 4px 16px ${color}18` : "0 1px 4px rgba(0,0,0,0.04)",
-                    minWidth: 140,
-                  }}
-                >
-                  {/* Active indicator bar */}
-                  <div
-                    className="hidden md:block w-0.5 h-6 rounded-full transition-all duration-200"
-                    style={{
-                      background: isActive ? color : "transparent",
-                      opacity: isActive ? 1 : 0,
-                    }}
-                  />
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: isActive ? `${color}15` : "#f1f5f9" }}
-                  >
-                    <Icon size={15} style={{ color: isActive ? color : "#94a3b8" }} />
-                  </div>
-                  <span
-                    className="text-xs font-bold leading-tight"
-                    style={{
-                      color: isActive ? color : "#64748b",
-                      fontFamily: "'Syne', sans-serif",
-                    }}
-                  >
-                    {label}
-                  </span>
-                </motion.button>
-              );
-            })}
-          </motion.div>
-
-          {/* ══ PANEL — progress bars ══ */}
-          <div className="md:col-span-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: EASE }}
-                className="rounded-3xl p-8"
-                style={{
-                  background: "#fff",
-                  border: `1.5px solid ${current.border}`,
-                  boxShadow: `0 4px 24px ${current.color}0e`,
-                }}
-              >
-                {/* Panel header */}
-                <div className="flex items-center gap-4 mb-8">
-                  <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                    style={{ background: current.bg }}
-                  >
-                    <current.icon size={22} style={{ color: current.color }} />
-                  </div>
-                  <div>
-                    <h3
-                      className="font-black text-xl"
-                      style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif" }}
-                    >
-                      {current.label}
-                    </h3>
-                    <p className="text-xs" style={{ color: "#94a3b8" }}>
-                      {current.skills.length} technologies
-                    </p>
-                  </div>
-                </div>
-
-                {/* Skill bars */}
-                <div className="space-y-5">
-                  {current.skills.map(({ name, level }, i) => (
-                    <div key={name}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-semibold" style={{ color: "#334155" }}>
-                          {name}
-                        </span>
-                        <span
-                          className="text-xs font-bold px-2 py-0.5 rounded-full"
-                          style={{ background: current.bg, color: current.color }}
-                        >
-                          {level}%
-                        </span>
-                      </div>
-                      <div
-                        className="h-2.5 rounded-full overflow-hidden"
-                        style={{ background: `${current.color}12` }}
-                      >
-                        <Bar level={level} gradient={current.gradient} delay={i * 0.07} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <motion.p {...fadeUp(0.2)} className="text-sm text-sage/70 max-w-xs">
+            Survole une carte (ou touche-la sur mobile) pour dévoiler les outils derrière chaque compétence.
+          </motion.p>
         </div>
 
-        {/* ── ALL TAGS ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, ease: EASE }}
-          className="rounded-3xl p-8"
-          style={{
-            background: "#fff",
-            border: "1.5px solid #e2e8f0",
-            boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3
-              className="font-black text-lg"
-              style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif" }}
-            >
-              Toutes mes technologies
-            </h3>
-            <span
-              className="text-xs font-semibold px-3 py-1 rounded-full"
-              style={{ background: "#f5f3ff", color: "#7c3aed" }}
-            >
-              {allTags.length} outils
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {allTags.map((tag, i) => (
-              <motion.span
-                key={tag}
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.025, duration: 0.3, ease: "backOut" }}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium cursor-default transition-all duration-200"
-                style={{
-                  background: "#f8fafc",
-                  border: "1.5px solid #e2e8f0",
-                  color: "#475569",
-                }}
-                whileHover={{
-                  background: "#f5f3ff",
-                  borderColor: "rgba(124,58,237,0.3)",
-                  color: "#7c3aed",
-                  y: -2,
-                } as any}
-              >
-                {tag}
-              </motion.span>
-            ))}
-          </div>
-        </motion.div>
-
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {SKILLS.map((s, i) => (
+            <SkillCard key={s.title} skill={s} index={i} />
+          ))}
+        </div>
       </div>
+
+      <TornEdge />
     </section>
   );
 }

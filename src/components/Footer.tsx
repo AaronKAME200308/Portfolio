@@ -1,160 +1,95 @@
 import { Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
+// Ton SVG du dossier public/ : change le nom si ton fichier s'appelle autrement
+const LOGO_SRC = "/Aun/aun-symbole-vert.svg";
+
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const navLinks = [
-  { id: "about",    label: "À propos"    },
-  { id: "skills",   label: "Compétences" },
-  { id: "projects", label: "Projets"     },
-  { id: "contact",  label: "Contact"     },
+  { id: "about", label: "À propos" },
+  { id: "skills", label: "Compétences" },
+  { id: "projects", label: "Projets" },
+  { id: "contact", label: "Contact" },
 ];
 
 const socials = [
-  { icon: Github,   href: "https://github.com/AaronKAME200308",                       label: "GitHub"   },
+  { icon: Github, href: "https://github.com/AaronKAME200308", label: "GitHub" },
   { icon: Linkedin, href: "https://www.linkedin.com/in/aaron-kame-mouele-b82619289/", label: "LinkedIn" },
-  { icon: Mail,     href: "mailto:aaronmouele11@gmail.com",                           label: "Email"    },
+  { icon: Mail, href: "mailto:aaronmouele11@gmail.com", label: "Email" },
 ];
 
 const contactItems = [
-  { icon: Mail,   value: "aaronmouele11@gmail.com", href: "mailto:aaronmouele11@gmail.com" },
-  { icon: Phone,  value: "+237 670 464 488",        href: "tel:+237670464488"              },
-  { icon: MapPin, value: "Yaoundé, Cameroun",       href: null                             },
+  { icon: Mail, value: "aaronmouele11@gmail.com", href: "mailto:aaronmouele11@gmail.com" },
+  { icon: Phone, value: "+237 670 464 488", href: "tel:+237670464488" },
+  { icon: MapPin, value: "Yaoundé, Cameroun", href: null },
 ];
+
+const reveal = (delay = 0) => ({
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.55, delay, ease: EASE },
+});
 
 export default function Footer() {
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <footer
-      className="relative overflow-hidden"
-      style={{
-        background: "linear-gradient(170deg, #0f0b1e 0%, #12112b 55%, #0c1628 100%)",
-        paddingTop: 72,
-        paddingBottom: 36,
-      }}
-    >
-      {/* ── Background glows ── */}
-      <div className="absolute pointer-events-none" style={{ top: -100, left: -80, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 70%)" }} />
-      <div className="absolute pointer-events-none" style={{ bottom: -60, right: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)" }} />
-
-      {/* ── Dot grid decoration ── */}
-      <svg className="absolute top-6 right-6 opacity-[0.06]" width="120" height="120">
-        {Array.from({ length: 5 }, (_, r) =>
-          Array.from({ length: 5 }, (_, c) => (
-            <circle key={`${r}-${c}`} cx={c * 22 + 11} cy={r * 22 + 11} r="2" fill="#a78bfa" />
-          ))
-        )}
-      </svg>
+    <footer className="relative overflow-hidden bg-forest pt-20 pb-9">
+      {/* Grand symbole en filigrane */}
+      <div className="absolute -bottom-24 -right-16 pointer-events-none opacity-[0.05]" aria-hidden="true">
+        <img src={LOGO_SRC} alt="" className="w-[520px] h-[520px] object-contain block brightness-0 invert" />
+      </div>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
-
-        {/* ── TOP GRID ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-
-          {/* Brand */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, ease: EASE }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div
-  className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
-  style={{
-    background: "linear-gradient(135deg, #ede9fe, #dbeafe)",
-    boxShadow: "0 3px 12px rgba(124,58,237,0.15)",
-  }}
->
-            <img
-              src="/logo_name.png"
-              alt="Logo"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center",
-                display: "block",
-              }}
-            />
-          </div>
-              <div>
-                <p className="font-bold text-base text-white m-0" style={{ fontFamily: "'Syne', sans-serif", lineHeight: 1.2 }}>
-                  Aaron KAME
-                </p>
-                <p className="text-xs m-0" style={{ color: "rgba(255,255,255,0.35)" }}>Full-Stack Developer</p>
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.38)" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+          {/* Marque */}
+          <motion.div {...reveal(0)}>
+            <span className="inline-flex items-center gap-2.5 mb-5">
+              <img src={LOGO_SRC} alt="" className="h-9 w-9 object-contain block brightness-0 invert" />
+              <span
+                className="font-display font-semibold leading-none text-white"
+                style={{ fontSize: 34, letterSpacing: "-0.01em" }}
+              >
+                Aun
+              </span>
+            </span>
+            <p className="text-sm leading-relaxed mb-6 text-sage/70 max-w-xs">
               Développeur freelance passionné par la création d'expériences web et mobile élégantes.
             </p>
-            {/* Socials */}
             <div className="flex gap-2">
               {socials.map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}
                   href={href}
-                  target="_blank"
+                  target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
                   aria-label={label}
-                  whileHover={{ y: -3, scale: 1.08 }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "rgba(255,255,255,0.5)",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(124,58,237,0.35), rgba(59,130,246,0.25))";
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.4)";
-                    (e.currentTarget as HTMLElement).style.color = "#fff";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)";
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.5)";
-                  }}
+                  whileHover={{ y: -3 }}
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-sage border border-white/15 bg-white/5 transition-colors hover:bg-aun hover:border-aun hover:text-white"
                 >
-                  <Icon size={16} />
+                  <Icon size={17} />
                 </motion.a>
               ))}
             </div>
           </motion.div>
 
           {/* Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.1, ease: EASE }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: "rgba(255,255,255,0.28)" }}>
-              Navigation
-            </p>
-            <ul className="list-none m-0 p-0 flex flex-col gap-2">
+          <motion.div {...reveal(0.1)}>
+            <p className="font-mono-label mb-5 text-moss">Navigation</p>
+            <ul className="list-none m-0 p-0 flex flex-col gap-1.5">
               {navLinks.map((l) => (
                 <li key={l.id}>
                   <button
                     onClick={() => scrollTo(l.id)}
-                    className="flex items-center gap-2 text-sm transition-colors duration-200 group"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "rgba(255,255,255,0.45)",
-                      padding: "3px 0",
-                      textAlign: "left",
-                    }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.9)"}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)"}
+                    className="group flex items-center gap-2 text-sm bg-transparent border-0 cursor-pointer py-1 text-sage/80 hover:text-white transition-colors text-left"
                   >
                     {l.label}
                     <ArrowUpRight
-                      size={12}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity -translate-x-1 group-hover:translate-x-0 group-hover:-translate-y-1"
-                      style={{ transition: "all 0.2s ease" }}
+                      size={13}
+                      className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
                     />
                   </button>
                 </li>
@@ -162,103 +97,52 @@ export default function Footer() {
             </ul>
           </motion.div>
 
-          {/* Contact info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.2, ease: EASE }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: "rgba(255,255,255,0.28)" }}>
-              Contact
-            </p>
+          {/* Contact */}
+          <motion.div {...reveal(0.2)}>
+            <p className="font-mono-label mb-5 text-moss">Contact</p>
             <div className="flex flex-col gap-3.5">
               {contactItems.map(({ icon: Icon, value, href }) => (
                 <div key={value} className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    <Icon size={13} style={{ color: "rgba(167,139,250,0.85)" }} />
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10">
+                    <Icon size={14} className="text-moss" />
                   </div>
                   {href ? (
-                    <a
-                      href={href}
-                      className="text-xs transition-colors duration-200"
-                      style={{ color: "rgba(255,255,255,0.45)", textDecoration: "none" }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.85)"}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)"}
-                    >
+                    <a href={href} className="text-sm text-sage/80 no-underline hover:text-white transition-colors">
                       {value}
                     </a>
                   ) : (
-                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{value}</span>
+                    <span className="text-sm text-sage/80">{value}</span>
                   )}
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* CTA card */}
+          {/* Carte d'appel à l'action */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.3, ease: EASE }}
-            className="relative rounded-2xl p-5 overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, rgba(124,58,237,0.18), rgba(59,130,246,0.12))",
-              border: "1px solid rgba(124,58,237,0.28)",
-            }}
+            {...reveal(0.3)}
+            className="rounded-2xl p-6 bg-aun/20 border border-moss/30"
           >
-            {/* Top sheen */}
-            <div className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none" style={{ background: "rgba(255,255,255,0.03)", borderRadius: "16px 16px 0 0" }} />
-
-            <p className="font-bold text-base text-white mb-1.5" style={{ fontFamily: "'Syne', sans-serif" }}>
-              Vous avez un projet ?
-            </p>
-            <p className="text-xs leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p className="font-display font-semibold text-lg text-white mb-2">Vous avez un projet ?</p>
+            <p className="text-sm leading-relaxed mb-5 text-sage/75">
               Disponible pour de nouvelles missions freelance. Démarrons la conversation.
             </p>
-            <motion.button
+            <button
               onClick={() => scrollTo("contact")}
-              whileHover={{ scale: 1.04, y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              className="text-sm font-bold text-white px-5 py-2.5 rounded-xl"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(124,58,237,0.4)",
-              }}
+              className="keycap text-sm font-semibold px-5 py-3 [--key-face:#f6f4ec] [--key-edge:#9aa595] [--key-text:#0e2f20]"
             >
               Démarrons ensemble
-            </motion.button>
+            </button>
           </motion.div>
         </div>
 
-        {/* ── Divider ── */}
-        <div
-          className="mb-6"
-          style={{
-            height: 1,
-            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 30%, rgba(124,58,237,0.18) 50%, rgba(255,255,255,0.08) 70%, transparent)",
-          }}
-        />
+        <div className="h-px mb-6 bg-white/10" />
 
-        {/* ── Bottom bar ── */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs m-0" style={{ color: "rgba(255,255,255,0.28)" }}>
-            © {new Date().getFullYear()} Aaron KAME MOUELE - Tous droits réservés.
+          <p className="text-xs m-0 text-sage/60">
+            © {new Date().getFullYear()} Aaron KAME MOUELE · Tous droits réservés.
           </p>
-          {/* <p className="text-xs m-0 flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
-            Fait avec
-            <Heart size={11} color="#f43f5e" fill="#f43f5e" />
-            en React + Tailwind CSS
-          </p> */}
+          <p className="text-xs m-0 text-sage/60">Yaoundé, Cameroun</p>
         </div>
       </div>
     </footer>

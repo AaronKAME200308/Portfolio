@@ -1,349 +1,212 @@
-import { ArrowDown, Github, Linkedin, Mail, Download } from "lucide-react";
-import { FloatingSymbols3D } from "./FloatingSymbol3D"
+import { useMemo } from "react";
+import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
-import { motion } from "framer-motion";
+// ── Fichiers du dossier public/ : adapte les noms si besoin ──
+const CUTOUT_SRC = "/aaron-cutout.png"; // photo détourée (PNG transparent), le nom doit être exact
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, delay, ease: EASE },
-});
+const WORD = "PORTFOLIO".split("");
 
-// const skills = [
-//   { name: "React Native", color: "#7c3aed", dot: "#8b5cf6", angle: -10, x: "80%", y: "12%" },
-//   { name: "FastAPI + IA",  color: "#059669", dot: "#10b981", angle:   7, x: "82%", y: "68%" },
-//   { name: "Tailwind CSS",  color: "#2563eb", dot: "#3b82f6", angle:  -5, x: "62%", y: "90%" },
-// ];
+// ── Doodles dessinés à la main (SVG) ──────────────────────
+const Sparkle = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 40" className={className} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+    <path d="M20 3 C21 13, 27 19, 37 20 C27 21, 21 27, 20 37 C19 27, 13 21, 3 20 C13 19, 19 13, 20 3 Z" />
+  </svg>
+);
+
+const CurvedArrow = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 80 70" className={className} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M74 6 C50 4, 22 14, 14 52" />
+    <path d="M4 42 L14 54 L26 44" />
+  </svg>
+);
+
+const Scribble = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 180 14" className={className} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true" preserveAspectRatio="none">
+    <path d="M3 9 C30 2, 56 13, 88 6 S146 10, 177 4" />
+  </svg>
+);
+
+// Bord de papier déchiré qui ouvre sur la section suivante (blanche)
+function TornEdge({ fill = "#ffffff" }: { fill?: string }) {
+  const d = useMemo(() => {
+    const w = 1440, h = 40, steps = 80;
+    let p = `M0 ${h} L0 14`;
+    for (let i = 1; i <= steps; i++) {
+      const r = Math.abs((Math.sin(i * 127.1) * 43758.5453) % 1);
+      p += ` L${((w / steps) * i).toFixed(1)} ${(6 + r * 18).toFixed(1)}`;
+    }
+    return p + ` L${w} ${h} Z`;
+  }, []);
+  return (
+    <svg
+      viewBox="0 0 1440 40"
+      preserveAspectRatio="none"
+      className="absolute bottom-0 left-0 w-full h-7 lg:h-10 z-30"
+      style={{ filter: "drop-shadow(0 -2px 3px rgba(0,0,0,0.25))" }}
+      aria-hidden="true"
+    >
+      <path d={d} fill={fill} />
+    </svg>
+  );
+}
 
 export default function Hero() {
+  const reduce = useReducedMotion();
+
+  const pop = (delay = 0) => ({
+    initial: reduce ? false : { opacity: 0, y: 24 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6, delay, ease: EASE },
+  });
+
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center overflow-hidden"
-      style={{ background: "#f8fafc" }}
-    >
-      {/* ── Background decorative ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Diagonal color wash */}
+    <section id="hero" className="relative overflow-hidden bg-forest">
+      {/* ── Décor : grand cercle vert derrière la photo ── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(135deg, #f8fafc 54%, #eef2ff 54%)",
-          }}
-        />
-        {/* Dot grid top-left */}
-        <svg className="absolute top-20 left-8 opacity-[0.07]" width="180" height="180">
-          {Array.from({ length: 6 }, (_, r) =>
-            Array.from({ length: 6 }, (_, c) => (
-              <circle key={`${r}-${c}`} cx={c * 28 + 14} cy={r * 28 + 14} r="2.5" fill="#7c3aed" />
-            ))
-          )}
-        </svg>
-        {/* Dot grid bottom-right */}
-        <svg className="absolute bottom-20 right-12 opacity-[0.07]" width="140" height="140">
-          {Array.from({ length: 5 }, (_, r) =>
-            Array.from({ length: 5 }, (_, c) => (
-              <circle key={`${r}-${c}`} cx={c * 28 + 14} cy={r * 28 + 14} r="2.5" fill="#059669" />
-            ))
-          )}
-        </svg>
-        {/* Decorative rings around photo zone */}
-        <div
-          className="absolute hidden md:block"
-          style={{
-            width: 480,
-            height: 480,
-            borderRadius: "50%",
-            border: "1.5px dashed rgba(124,58,237,0.12)",
-            right: "calc(50% - 520px)",
-            top: "50%",
-            transform: "translateY(-50%)",
-          }}
-        />
-        <div
-          className="absolute hidden md:block"
-          style={{
-            width: 340,
-            height: 340,
-            borderRadius: "50%",
-            border: "1px solid rgba(124,58,237,0.07)",
-            right: "calc(50% - 450px)",
-            top: "50%",
-            transform: "translateY(-50%)",
-          }}
+          className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-aun/30 border border-moss/20"
+          style={{ width: "min(78vw, 700px)", aspectRatio: "1" }}
         />
       </div>
 
-      {/* ── MAIN GRID ── */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-24 pb-20 w-full grid md:grid-cols-5 gap-12 items-center">
-
-        {/* ══ LEFT — Text (3 cols) ══ */}
-        <div className="md:col-span-3 space-y-7">
-
-          {/* Available badge */}
-          <motion.div {...fadeUp(0.1)}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 lg:pt-28 pb-16 lg:pb-20">
+        {/* ══ SCÈNE ══ */}
+        <div className="relative lg:h-[min(84vh,780px)] lg:min-h-[640px]">
+          {/* Titre géant (décoratif), prénom manuscrit, étiquette de fonction */}
+          <div className="relative lg:absolute lg:inset-x-0 lg:top-[4%] z-[1] pt-10 pb-14 lg:pt-0 lg:pb-0">
+            <div
+              aria-hidden="true"
+              className="flex justify-center select-none leading-[0.82]"
               style={{
-                background: "#fff",
-                border: "1.5px solid rgba(124,58,237,0.15)",
-                color: "#7c3aed",
-                boxShadow: "0 2px 12px rgba(124,58,237,0.08)",
-              }}>
-              Développeur Freelance disponible
-            </div>
-          </motion.div>
-
-          {/* Name */}
-          <motion.div {...fadeUp(0.3)} className="relative">
-            {/* Vertical accent bar */}
-            <div className="absolute hidden md:block"
-              style={{
-                width: 5,
-                height: "115%",
-                background: "linear-gradient(180deg, #7c3aed, #059669)",
-                borderRadius: 3,
-                left: -24,
-                top: -8,
-              }}
-            />
-            <p className="text-slate-500 font-medium text-base mb-2">Es tu prêt(e) à innover ? Bonjour, je suis</p>
-            <h1
-              className="font-black leading-[0.9] tracking-tight"
-              style={{
-                fontSize: "clamp(2.8rem, 6.5vw, 5rem)",
-                color: "#0f172a",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                fontSize: "clamp(2.7rem, 14.2vw, 13.5rem)",
+                letterSpacing: "-0.04em",
+                color: "#f6f4ec",
+                textShadow: "0.045em 0.045em 0 #1e7b4a",
               }}
             >
-              Aaron<br />
-              <span style={{
-                background: "linear-gradient(90deg, #7c3aed, #2563eb, #059669)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}>
-                KAME MOUELE
-              </span>
+              {WORD.map((ch, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block"
+                  initial={reduce ? false : { y: "55%", opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.7, delay: 0.1 + i * 0.05, ease: EASE }}
+                >
+                  {ch}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Badge « Aaron » en écriture manuscrite, par-dessus le titre */}
+            <motion.div
+              initial={reduce ? false : { opacity: 0, rotate: -12, scale: 0.9 }}
+              animate={{ opacity: 1, rotate: -6, scale: 1 }}
+              transition={{ delay: 0.9, duration: 0.6, ease: EASE }}
+              aria-hidden="true"
+              className="absolute left-0 top-0 lg:-top-8 lg:left-[1%] z-20 text-moss leading-none"
+              style={{
+                fontFamily: "'Caveat', cursive",
+                fontWeight: 700,
+                fontSize: "clamp(2.4rem, 8vw, 7.2rem)",
+                WebkitTextStroke: "0.12em #0e2f20",
+                paintOrder: "stroke fill",
+              }}
+            >
+              Aun
+            </motion.div>
+
+            {/* Fonction */}
+            <motion.div
+              initial={reduce ? false : { opacity: 0, scale: 0.8, rotate: 6 }}
+              animate={{ opacity: 1, scale: 1, rotate: 3 }}
+              transition={{ delay: 1.1, duration: 0.5, ease: "backOut" }}
+              className="absolute right-0 bottom-1 lg:-bottom-9 lg:right-[1%] z-20"
+            >
+              <div className="bg-cream text-forest px-4 py-2 lg:px-5 lg:py-2.5 font-display font-semibold uppercase tracking-[0.12em] text-[11px] sm:text-sm lg:text-base shadow-[3px_3px_0_#6baf7b]">
+                Développeur web & mobile
+              </div>
+              <Scribble className="w-full h-3 mt-1 text-moss" />
+            </motion.div>
+          </div>
+
+          {/* Photo détourée qui chevauche le titre */}
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.8, ease: EASE }}
+            className="relative z-10 flex justify-center items-end -mt-6 lg:mt-0 lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[88%] pointer-events-none"
+          >
+            <img
+              src={CUTOUT_SRC}
+              alt="Aaron KAME MOUELE"
+              className="h-[340px] sm:h-[420px] lg:h-full w-auto max-w-none object-contain object-bottom"
+              style={{ filter: "drop-shadow(0 18px 22px rgba(0,0,0,0.35))" }}
+            />
+          </motion.div>
+
+          {/* Note manuscrite + flèche, à droite de la photo */}
+          <motion.div
+            {...pop(1.2)}
+            aria-hidden="true"
+            className="hidden lg:flex absolute right-[19%] top-[47%] z-20 items-start gap-1 rotate-[4deg] text-sage"
+          >
+            <CurvedArrow className="w-12 h-10 mt-6 -mr-1 -scale-x-100 rotate-[-12deg] text-moss" />
+            <span style={{ fontFamily: "'Caveat', cursive", fontSize: "1.9rem", lineHeight: 1 }}>
+              du pixel
+              <br />
+              au serveur
+            </span>
+            <Sparkle className="w-6 h-6 text-moss" />
+          </motion.div>
+
+          {/* ── Gauche : nom ── */}
+          <motion.div
+            {...pop(0.8)}
+            className="relative z-20 mt-8 lg:mt-0 lg:absolute lg:bottom-4 lg:left-0 lg:w-[400px]"
+          >
+            <p className="font-mono-label text-moss mb-3">Bonjour, je suis</p>
+            <h1
+              className="font-display font-bold leading-[1.02] text-cream"
+              style={{ fontSize: "clamp(2.2rem, 3.3vw, 3.1rem)", letterSpacing: "-0.03em" }}
+            >
+              Aaron
+              <br />
+              <span className="text-moss whitespace-nowrap">KAME MOUELE</span>
+              <span className="sr-only">, développeur web et mobile freelance</span>
             </h1>
           </motion.div>
 
-          {/* Description */}
-          <motion.p {...fadeUp(0.55)} className="text-slate-600 text-base leading-relaxed max-w-md">
-            Développeur Web & Mobile Full-Stack passionné par la création
-            d'interfaces élégantes et d'APIs robustes. Spécialisé en{" "}
-            <strong style={{ color: "#7c3aed" }}>React</strong>,{" "}
-            <strong style={{ color: "#2563eb" }}>FastAPI</strong> &{" "}
-            <strong style={{ color: "#059669" }}>IA/ML</strong>.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div {...fadeUp(0.75)} className="flex flex-wrap gap-3 pt-1">
-            <motion.button
+          {/* ── Droite : deux boutons ── */}
+          <motion.div
+            {...pop(1.0)}
+            className="relative z-20 mt-8 lg:mt-0 lg:absolute lg:bottom-4 lg:right-0 lg:w-[310px] flex flex-col gap-5"
+          >
+            <button
+              onClick={() => scrollTo("contact")}
+              className="keycap group w-full justify-between px-6 py-4 font-semibold text-base [--key-face:#6baf7b] [--key-edge:#3a7549] [--key-text:#0e2f20]"
+            >
+              Faisons pousser votre projet
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </button>
+            <button
               onClick={() => scrollTo("projects")}
-              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-              className="px-6 py-3.5 rounded-2xl font-bold text-sm text-white hover:cursor-pointer"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #2563eb)",
-                boxShadow: "0 6px 20px rgba(124,58,237,0.3)",
-              }}
+              className="keycap w-full px-6 py-4 font-semibold text-base [--key-face:#1c4a34] [--key-edge:#06150e] [--key-text:#f6f4ec]"
             >
-              Voir mes projets
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-              className="px-6 py-3.5 rounded-2xl font-bold text-sm flex items-center gap-2"
-              onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = "/cv.pdf";
-                  link.download = "Aaron_Kame_Mouele_CV.pdf";
-                  link.click();
-                }}
-              style={{
-                background: "#fff",
-                color: "#475569",
-                border: "1.5px solid #e2e8f0",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                cursor: "pointer",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #7c3aed, #2563eb)";
-                (e.currentTarget as HTMLElement).style.color = "#fff";
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 20px rgba(124,58,237,0.3)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = "#fff";
-                (e.currentTarget as HTMLElement).style.color = "#475569";
-                (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0";
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.05)";
-              }}
-            >
-              <Download size={14} /> Télécharger CV
-            </motion.button>
-          </motion.div>
-
-          {/* Socials */}
-          <motion.div {...fadeUp(0.9)} className="flex items-center gap-3 pt-1">
-            <span className="text-slate-400 text-xs font-medium tracking-wide uppercase">
-              Retrouvez-moi
-            </span>
-            <div className="h-px w-8" style={{ background: "#e2e8f0" }} />
-            {[
-              { icon: Github,   href: "#",        label: "GitHub"   },
-              { icon: Linkedin, href: "#",        label: "LinkedIn" },
-              { icon: Mail,     href: "#contact", label: "Email"    },
-            ].map(({ icon: Icon, href, label }) => (
-              <motion.a
-                key={label}
-                href={href}
-                aria-label={label}
-                whileHover={{ scale: 1.1, y: -2 }}
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200"
-                style={{
-                  background: "#fff",
-                  border: "1.5px solid #e2e8f0",
-                  color: "#94a3b8",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.color = "#7c3aed";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.color = "#94a3b8";
-                  (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0";
-                }}
-              >
-                <Icon size={17} />
-              </motion.a>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* ══ RIGHT — Photo (2 cols) ══ */}
-        <div className="md:col-span-2 relative flex items-center justify-center md:justify-end">
-
-          {/* Floating skill tags */}
-          <FloatingSymbols3D />
-
-          {/* Photo frame */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.7, ease: EASE }}
-            className="relative z-10"
-            style={{ width: 300, height: 360 }}
-          >
-            {/* Offset shadow */}
-            <div
-              className="absolute"
-              style={{
-                inset: 0,
-                borderRadius: "38% 62% 52% 48% / 44% 38% 62% 56%",
-                background: "rgba(124,58,237,0.08)",
-                transform: "translate(14px, 14px)",
-              }}
-            />
-            {/* Gradient border */}
-            <div
-              className="absolute"
-              style={{
-                inset: -3,
-                borderRadius: "38% 62% 52% 48% / 44% 38% 62% 56%",
-                background: "linear-gradient(135deg, rgba(124,58,237,0.35), rgba(5,150,105,0.25))",
-                zIndex: -1,
-              }}
-            />
-            {/* Photo */}
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: "38% 62% 52% 48% / 44% 38% 62% 56%",
-                overflow: "hidden",
-                background: "linear-gradient(135deg, #ede9fe, #dbeafe)",
-                position: "relative",
-              }}
-            >
-              <img
-                src="/aaron.jpeg"
-                alt="Aaron KAME MOUELE"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "top center",
-                  display: "block",
-                }}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
-              />
-              {/* Fallback initials */}
-              {/* <div
-                className="absolute inset-0 flex items-center justify-center font-black text-7xl select-none"
-                style={{
-                  color: "#7c3aed",
-                  opacity: 0.12,
-                  fontFamily: "'Syne', sans-serif",
-                }}
-              >
-                AK
-              </div> */}
-            </div>
-          </motion.div>
-
-          {/* Stats floating card */}
-          <motion.div
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.3, duration: 0.5, ease: EASE }}
-            className="absolute bottom-2 -left-2 z-20 px-4 py-3 rounded-2xl"
-            style={{
-              background: "#fff",
-              border: "1.5px solid rgba(124,58,237,0.1)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div className="flex gap-5">
-              {[
-                { v: "5+",  l: "Projets",    color: "#7c3aed" },
-                { v: "3+",  l: "Ans exp.",   color: "#2563eb" },
-                { v: "∞",   l: "Lignes",     color: "#059669" },
-              ].map(({ v, l, color }) => (
-                <div key={l} className="text-center">
-                  <div className="font-black text-lg leading-none mb-0.5"
-                    style={{ color, fontFamily: "'Syne', sans-serif" }}>
-                    {v}
-                  </div>
-                  <div className="text-[10px] font-medium" style={{ color: "#94a3b8" }}>{l}</div>
-                </div>
-              ))}
-            </div>
+              Découvrir mes réalisations
+            </button>
           </motion.div>
         </div>
       </div>
 
-      {/* ── Scroll indicator ── */}
-      <motion.button
-        onClick={() => scrollTo("about")}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-colors duration-200"
-        style={{ color: "#cbd5e1" }}
-        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#7c3aed"}
-        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#cbd5e1"}
-      >
-        <span className="text-[10px] font-semibold tracking-widest uppercase">Scroll</span>
-        <motion.div animate={{ y: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}>
-          <ArrowDown size={15} />
-        </motion.div>
-      </motion.button>
+      <TornEdge />
     </section>
   );
 }

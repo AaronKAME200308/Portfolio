@@ -9,9 +9,9 @@ import emailjs from "@emailjs/browser";
 // 2. Créez un service (Gmail, Outlook…) → copiez le Service ID
 // 3. Créez un Email Template        → copiez le Template ID
 // 4. Allez dans Account → API Keys  → copiez la Public Key
-const EMAILJS_SERVICE_ID  = "service_g1bupfs";   // ex: "service_abc123"
-const EMAILJS_TEMPLATE_ID = "template_6wnehip";  // ex: "template_xyz789"
-const EMAILJS_PUBLIC_KEY  = "thwBzJSO7Ntifo4PK";   // ex: "aBcDeFgHiJkLmNoPq"
+const EMAILJS_SERVICE_ID  = "service_g1bupfs";
+const EMAILJS_TEMPLATE_ID = "template_6wnehip";
+const EMAILJS_PUBLIC_KEY  = "thwBzJSO7Ntifo4PK";
 
 // Template variables attendues dans votre template EmailJS :
 //   {{from_name}}    → nom de l'expéditeur
@@ -30,43 +30,26 @@ const fadeUp = (delay = 0) => ({
 });
 
 const contactItems = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: "aaronmouele11@gmail.com",
-    href: "mailto:aaronmouele11@gmail.com",
-    color: "#7c3aed",
-    bg: "#f5f3ff",
-  },
-  {
-    icon: Phone,
-    label: "Téléphone",
-    value: "+237 670 464 488",
-    href: "tel:+237670464488",
-    color: "#2563eb",
-    bg: "#eff6ff",
-  },
-  {
-    icon: MapPin,
-    label: "Localisation",
-    value: "Yaoundé, Cameroun",
-    href: null,
-    color: "#059669",
-    bg: "#ecfdf5",
-  },
+  { icon: Mail, label: "Email", value: "aaronmouele11@gmail.com", href: "mailto:aaronmouele11@gmail.com" },
+  { icon: Phone, label: "Téléphone", value: "+237 670 464 488", href: "tel:+237670464488" },
+  { icon: MapPin, label: "Localisation", value: "Yaoundé, Cameroun", href: null },
 ];
 
 const socials = [
-  { icon: Github,   href: "https://github.com/AaronKAME200308",                        label: "GitHub"   },
-  { icon: Linkedin, href: "https://www.linkedin.com/in/aaron-kame-mouele-b82619289/",  label: "LinkedIn" },
+  { icon: Github, href: "https://github.com/AaronKAME200308", label: "GitHub" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/aaron-kame-mouele-b82619289/", label: "LinkedIn" },
 ];
 
 type Status = "idle" | "loading" | "success" | "error";
 
+const inputClass =
+  "w-full rounded-xl border border-sage bg-cream px-3.5 py-3 text-sm text-forest placeholder:text-ink-mute/70 outline-none transition-colors duration-200 focus:border-aun focus:bg-white disabled:opacity-60";
+
+const labelClass = "block font-mono-label !text-[10px] text-ink-mute mb-2";
+
 export default function Contact() {
-  const [form, setForm]     = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<Status>("idle");
-  const [focus, setFocus]   = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -82,10 +65,10 @@ export default function Contact() {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          from_name:  form.name,
+          from_name: form.name,
           from_email: form.email,
-          subject:    form.subject,
-          message:    form.message,
+          subject: form.subject,
+          message: form.message,
         },
         EMAILJS_PUBLIC_KEY
       );
@@ -102,186 +85,142 @@ export default function Contact() {
     }
   };
 
-  const fieldStyle = (name: string): React.CSSProperties => ({
-    width: "100%",
-    padding: "11px 14px",
-    borderRadius: 12,
-    fontSize: 14,
-    border: `1.5px solid ${focus === name ? "#7c3aed" : "#e2e8f0"}`,
-    background: focus === name ? "#faf8ff" : "#f8fafc",
-    fontFamily: "inherit",
-    color: "#0f172a",
-    outline: "none",
-    transition: "all 0.2s ease",
-    boxSizing: "border-box" as const,
-  });
-
-  const labelStyle: React.CSSProperties = {
-    display: "block",
-    fontSize: 11,
-    fontWeight: 700,
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.08em",
-    color: "#94a3b8",
-    marginBottom: 6,
-  };
+  const loading = status === "loading";
 
   return (
-    <section id="contact" className="py-28 overflow-hidden" style={{ background: "#f8fafc" }}>
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="contact" className="relative overflow-hidden bg-forest pt-24 pb-24 lg:pt-32 lg:pb-28">
+      {/* Halo vert discret */}
+      <div
+        className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full pointer-events-none"
+        aria-hidden="true"
+        style={{ background: "radial-gradient(circle, rgba(30,123,74,0.35), transparent 70%)" }}
+      />
 
-        {/* ── Header ── */}
-        <motion.div {...fadeUp(0)}>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="h-px w-12" style={{ background: "#7c3aed", opacity: 0.4 }} />
-            <span className="font-semibold text-sm uppercase tracking-widest" style={{ color: "#7c3aed" }}>
-              Contact
-            </span>
-          </div>
-        </motion.div>
+      <div className="relative max-w-6xl mx-auto px-6">
+        {/* ── En-tête ── */}
+        <div className="mb-14">
+          <motion.p {...fadeUp(0)} className="font-mono-label text-sage mb-5">
+            <span className="text-moss">04 /</span> Contact
+          </motion.p>
+          <motion.h2
+            {...fadeUp(0.1)}
+            className="font-display font-extrabold leading-[1.05] max-w-2xl !text-cream"
+            style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
+          >
+            Faisons <span className="text-moss">pousser</span> votre projet.
+          </motion.h2>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-start">
-
-          {/* ══ LEFT — Info + timeline ══ */}
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-16 items-start">
+          {/* ══ GAUCHE — Infos ══ */}
           <div>
-            <motion.h2
-              {...fadeUp(0.1)}
-              className="font-black leading-tight mb-4"
-              style={{
-                fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
-                color: "#0f172a",
-                fontFamily: "'Syne', sans-serif",
-              }}
-            >
-              Travaillons{" "}
-              <span style={{
-                background: "linear-gradient(90deg, #7c3aed, #2563eb)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}>
-                ensemble
-              </span>
-            </motion.h2>
-
-            <motion.p {...fadeUp(0.2)} className="text-slate-600 leading-relaxed mb-10 max-w-sm">
+            <motion.p {...fadeUp(0.15)} className="text-base leading-relaxed text-sage/80 mb-6 max-w-sm">
               Un projet en tête ? Une mission freelance ? Je réponds sous 24h.
             </motion.p>
 
-            {/* Timeline contact infos */}
-            <div className="relative">
-              <div
-                className="absolute left-5 top-5 bottom-5 w-px"
-                style={{ background: "linear-gradient(180deg, #7c3aed33, #2563eb22, transparent)" }}
-              />
-              <div className="flex flex-col gap-5">
-                {contactItems.map(({ icon: Icon, label, value, href, color, bg }, i) => (
-                  <motion.div key={label} {...fadeUp(0.25 + i * 0.1)} className="flex items-center gap-4 relative">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative z-10"
-                      style={{ background: bg, border: `1.5px solid ${color}22`, boxShadow: `0 2px 10px ${color}14` }}
-                    >
-                      <Icon size={16} style={{ color }} />
-                    </div>
-                    <div className="flex-1 p-4 rounded-2xl" style={{ background: "#fff", border: "1.5px solid #e2e8f0" }}>
-                      <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#94a3b8" }}>
-                        {label}
-                      </p>
-                      {href ? (
-                        <a
-                          href={href}
-                          className="text-sm font-semibold transition-colors duration-200"
-                          style={{ color: "#0f172a", textDecoration: "none" }}
-                          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = color}
-                          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#0f172a"}
-                        >
-                          {value}
-                        </a>
-                      ) : (
-                        <p className="text-sm font-semibold" style={{ color: "#0f172a" }}>{value}</p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+            {/* Disponibilité */}
+            <motion.span
+              {...fadeUp(0.2)}
+              className="inline-flex items-center gap-2.5 mb-8 px-3.5 py-2 rounded-full border border-moss/40 font-mono-label !text-[10px] text-moss"
+            >
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inset-0 rounded-full bg-moss animate-ping opacity-60" />
+                <span className="relative w-2 h-2 rounded-full bg-moss" />
+              </span>
+              Disponible pour de nouvelles missions
+            </motion.span>
+
+            <div className="flex flex-col gap-3">
+              {contactItems.map(({ icon: Icon, label, value, href }, i) => (
+                <motion.div
+                  key={label}
+                  {...fadeUp(0.25 + i * 0.08)}
+                  className="flex items-center gap-4 rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-4 transition-colors duration-300 hover:border-moss"
+                >
+                  <span className="w-11 h-11 shrink-0 rounded-xl bg-moss flex items-center justify-center">
+                    <Icon size={18} className="text-forest" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-mono-label !text-[10px] text-moss m-0 mb-1">{label}</p>
+                    {href ? (
+                      <a
+                        href={href}
+                        className="text-[15px] font-semibold text-cream no-underline break-all transition-colors duration-200 hover:text-moss"
+                      >
+                        {value}
+                      </a>
+                    ) : (
+                      <p className="text-[15px] font-semibold text-cream m-0">{value}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Socials */}
-            <motion.div {...fadeUp(0.6)} className="flex items-center gap-3 mt-8">
-              <span className="text-xs font-medium tracking-wide uppercase" style={{ color: "#94a3b8" }}>Réseaux</span>
-              <div className="h-px flex-1" style={{ background: "#e2e8f0" }} />
+            {/* Réseaux */}
+            <motion.div {...fadeUp(0.5)} className="flex items-center gap-4 mt-8">
+              <span className="font-mono-label !text-[10px] text-sage/70">Réseaux</span>
+              <span className="h-px flex-1 bg-white/10" aria-hidden="true" />
               {socials.map(({ icon: Icon, href, label }) => (
-                <motion.a
+                <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: "#fff", border: "1.5px solid #e2e8f0", color: "#94a3b8", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color = "#7c3aed";
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = "#94a3b8";
-                    (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0";
-                  }}
+                  className="keycap w-11 h-11 justify-center no-underline [--key-face:#f6f4ec] [--key-edge:#6f8f7a] [--key-text:#0e2f20]"
                 >
                   <Icon size={17} />
-                </motion.a>
+                </a>
               ))}
             </motion.div>
           </div>
 
-          {/* ══ RIGHT — Form ══ */}
+          {/* ══ DROITE — Formulaire (fenêtre) ══ */}
           <motion.div
             {...fadeUp(0.2)}
-            className="relative rounded-3xl overflow-hidden"
-            style={{
-              background: "#fff",
-              border: "1.5px solid #e2e8f0",
-              boxShadow: "0 4px 32px rgba(124,58,237,0.07)",
-            }}
+            className="rounded-[1.5rem] overflow-hidden bg-white border border-sage shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)]"
           >
-            {/* Left accent bar */}
-            <div
-              className="absolute left-0 top-0 bottom-0 w-1 rounded-l-3xl"
-              style={{ background: "linear-gradient(180deg, #7c3aed, #3b82f6, #059669)" }}
-            />
+            {/* Barre de fenêtre */}
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-sage/70 border-b border-sage">
+              <span className="flex gap-1.5 shrink-0" aria-hidden="true">
+                <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+                <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+                <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+              </span>
+              <span className="flex-1 min-w-0 truncate rounded-md bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
+                nouveau-message.md
+              </span>
+            </div>
 
-            <div className="p-8 pl-10">
+            <div className="p-7 md:p-9">
               <AnimatePresence mode="wait">
-
-                {/* ── SUCCESS ── */}
+                {/* ── SUCCÈS ── */}
                 {status === "success" && (
                   <motion.div
                     key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
+                    exit={{ opacity: 0, scale: 0.94 }}
                     transition={{ duration: 0.35, ease: EASE }}
                     className="flex flex-col items-center justify-center text-center py-16 gap-4"
                   >
-                    <motion.div
+                    <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{ background: "#ecfdf5" }}
+                      className="w-16 h-16 rounded-full bg-sage flex items-center justify-center"
                     >
-                      <CheckCircle size={32} style={{ color: "#059669" }} />
-                    </motion.div>
-                    <h3 className="font-black text-xl" style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif" }}>
+                      <CheckCircle size={30} className="text-aun" />
+                    </motion.span>
+                    <h3 className="font-display font-bold text-2xl text-forest m-0" style={{ letterSpacing: "-0.01em" }}>
                       Message envoyé !
                     </h3>
-                    <p className="text-sm" style={{ color: "#64748b" }}>
-                      Je vous répondrai dans les plus brefs délais.
-                    </p>
+                    <p className="text-sm text-ink-mute m-0">Je vous répondrai dans les plus brefs délais.</p>
                   </motion.div>
                 )}
 
-                {/* ── FORM (idle / loading / error) ── */}
+                {/* ── FORMULAIRE (idle / loading / error) ── */}
                 {status !== "success" && (
                   <motion.form
                     key="form"
@@ -292,106 +231,82 @@ export default function Contact() {
                     className="space-y-5"
                   >
                     <div>
-                      <h3 className="font-black text-xl mb-1" style={{ color: "#0f172a", fontFamily: "'Syne', sans-serif" }}>
+                      <h3 className="font-display font-bold text-2xl text-forest m-0 mb-1" style={{ letterSpacing: "-0.01em" }}>
                         Envoyez un message
                       </h3>
-                      <p className="text-xs" style={{ color: "#94a3b8" }}>Tous les champs marqués * sont requis</p>
+                      <p className="font-mono-label !text-[10px] text-ink-mute m-0">Tous les champs * sont requis</p>
                     </div>
 
-                    {/* Error banner */}
                     <AnimatePresence>
                       {status === "error" && (
                         <motion.div
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -8 }}
-                          className="flex items-start gap-3 p-3 rounded-xl"
-                          style={{ background: "#fef2f2", border: "1.5px solid #fecaca" }}
+                          role="alert"
+                          className="flex items-start gap-3 p-3.5 rounded-xl border border-[#8c2f1f]/25 bg-[#8c2f1f]/[0.07]"
                         >
-                          <AlertCircle size={16} style={{ color: "#dc2626", flexShrink: 0, marginTop: 1 }} />
-                          <p className="text-xs leading-relaxed" style={{ color: "#b91c1c" }}>{errMsg}</p>
+                          <AlertCircle size={16} className="shrink-0 mt-0.5 text-[#8c2f1f]" />
+                          <p className="text-xs leading-relaxed text-[#8c2f1f] m-0">{errMsg}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
 
-                    {/* Name + Email */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label style={labelStyle}>Nom *</label>
+                        <label htmlFor="c-name" className={labelClass}>Nom *</label>
                         <input
-                          type="text" name="name" required placeholder="Votre nom"
-                          value={form.name} onChange={handleChange}
-                          onFocus={() => setFocus("name")} onBlur={() => setFocus(null)}
-                          style={fieldStyle("name")}
-                          disabled={status === "loading"}
+                          id="c-name" type="text" name="name" required placeholder="Votre nom"
+                          value={form.name} onChange={handleChange} disabled={loading}
+                          className={inputClass}
                         />
                       </div>
                       <div>
-                        <label style={labelStyle}>Email *</label>
+                        <label htmlFor="c-email" className={labelClass}>Email *</label>
                         <input
-                          type="email" name="email" required placeholder="votre@email.com"
-                          value={form.email} onChange={handleChange}
-                          onFocus={() => setFocus("email")} onBlur={() => setFocus(null)}
-                          style={fieldStyle("email")}
-                          disabled={status === "loading"}
+                          id="c-email" type="email" name="email" required placeholder="votre@email.com"
+                          value={form.email} onChange={handleChange} disabled={loading}
+                          className={inputClass}
                         />
                       </div>
                     </div>
 
-                    {/* Subject */}
                     <div>
-                      <label style={labelStyle}>Sujet *</label>
+                      <label htmlFor="c-subject" className={labelClass}>Sujet *</label>
                       <input
-                        type="text" name="subject" required placeholder="Sujet de votre message"
-                        value={form.subject} onChange={handleChange}
-                        onFocus={() => setFocus("subject")} onBlur={() => setFocus(null)}
-                        style={fieldStyle("subject")}
-                        disabled={status === "loading"}
+                        id="c-subject" type="text" name="subject" required placeholder="Sujet de votre message"
+                        value={form.subject} onChange={handleChange} disabled={loading}
+                        className={inputClass}
                       />
                     </div>
 
-                    {/* Message */}
                     <div>
-                      <label style={labelStyle}>Message *</label>
+                      <label htmlFor="c-message" className={labelClass}>Message *</label>
                       <textarea
-                        name="message" required rows={5}
+                        id="c-message" name="message" required rows={5}
                         placeholder="Décrivez votre projet ou votre demande..."
-                        value={form.message} onChange={handleChange}
-                        onFocus={() => setFocus("message")} onBlur={() => setFocus(null)}
-                        style={{ ...fieldStyle("message"), resize: "vertical", lineHeight: 1.65 }}
-                        disabled={status === "loading"}
+                        value={form.message} onChange={handleChange} disabled={loading}
+                        className={`${inputClass} resize-y leading-relaxed`}
                       />
                     </div>
 
-                    {/* Submit */}
-                    <motion.button
+                    <button
                       type="submit"
-                      whileHover={status !== "loading" ? { scale: 1.02, y: -1 } : {}}
-                      whileTap={status !== "loading" ? { scale: 0.97 } : {}}
-                      disabled={status === "loading"}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white"
-                      style={{
-                        background: status === "loading"
-                          ? "linear-gradient(135deg, #a78bfa, #93c5fd)"
-                          : "linear-gradient(135deg, #7c3aed, #3b82f6)",
-                        border: "none",
-                        cursor: status === "loading" ? "not-allowed" : "pointer",
-                        boxShadow: "0 6px 20px rgba(124,58,237,0.28)",
-                        transition: "background 0.3s ease",
-                      }}
+                      disabled={loading}
+                      className="keycap w-full justify-center gap-2 px-6 py-4 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
                     >
-                      {status === "loading" ? (
+                      {loading ? (
                         <>
-                          <Loader2 size={14} className="animate-spin" />
+                          <Loader2 size={15} className="animate-spin" />
                           Envoi en cours…
                         </>
                       ) : (
                         <>
-                          <Send size={14} />
+                          <Send size={15} />
                           Envoyer le message
                         </>
                       )}
-                    </motion.button>
+                    </button>
                   </motion.form>
                 )}
               </AnimatePresence>
