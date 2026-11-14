@@ -9,6 +9,7 @@ import Skills from "./pages/Skills";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import ClientOrderPage from "./pages/ClientOrder";
+import Admin from "./pages/Admin";
 import Footer from "./components/Footer";
 
 const WHATSAPP_NUMBER  = "237670464488";
@@ -35,7 +36,7 @@ function PortfolioPage() {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
   return (
-    <div className="font-body bg-slate-50 text-slate-800 overflow-x-hidden">
+    <div className="font-body bg-cream text-ink overflow-x-hidden">
       <Navbar activeSection={activeSection} />
       <Hero />
       <About />
@@ -103,6 +104,9 @@ export default function App() {
 
         {/* Page commande client — accessible via lien unique */}
         <Route path="/order/:token" element={<ClientOrderPage />} />
+
+        {/* Tableau de bord privé (connexion requise) */}
+        <Route path="/admin" element={<Admin />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<PortfolioPage />} />

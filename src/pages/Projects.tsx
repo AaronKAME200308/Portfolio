@@ -12,6 +12,7 @@ import {
   Brain,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Testimonials from "../components/Testimonials";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -466,6 +467,8 @@ export default function Projects() {
           )}
         </AnimatePresence>
       </div>
+
+      <Testimonials />
 
       <TornEdge />
     </section>

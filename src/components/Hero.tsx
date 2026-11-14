@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 // ── Fichiers du dossier public/ : adapte les noms si besoin ──
 const CUTOUT_SRC = "/aaron-cutout.png"; // photo détourée (PNG transparent), le nom doit être exact
+const LOGO_SRC = "/aun-symbole-vert.svg"; // affiché si la photo est introuvable
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -29,8 +30,8 @@ const Scribble = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-// Bord de papier déchiré qui ouvre sur la section suivante (blanche)
-function TornEdge({ fill = "#ffffff" }: { fill?: string }) {
+// Bord de papier déchiré qui ouvre sur la section suivante (crème, comme À propos)
+function TornEdge({ fill = "#f6f4ec" }: { fill?: string }) {
   const d = useMemo(() => {
     const w = 1440, h = 40, steps = 80;
     let p = `M0 ${h} L0 14`;
@@ -55,6 +56,7 @@ function TornEdge({ fill = "#ffffff" }: { fill?: string }) {
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const [photoOk, setPhotoOk] = useState(true);
 
   const pop = (delay = 0) => ({
     initial: reduce ? false : { opacity: 0, y: 24 },
@@ -144,12 +146,25 @@ export default function Hero() {
             transition={{ delay: 0.45, duration: 0.8, ease: EASE }}
             className="relative z-10 flex justify-center items-end -mt-6 lg:mt-0 lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[88%] pointer-events-none"
           >
-            <img
-              src={CUTOUT_SRC}
-              alt="Aaron KAME MOUELE"
-              className="h-[340px] sm:h-[420px] lg:h-full w-auto max-w-none object-contain object-bottom"
-              style={{ filter: "drop-shadow(0 18px 22px rgba(0,0,0,0.35))" }}
-            />
+            {photoOk ? (
+              <img
+                src={CUTOUT_SRC}
+                alt="Aaron KAME MOUELE"
+                width={800}
+                height={1000}
+                fetchPriority="high"
+                decoding="async"
+                onError={() => setPhotoOk(false)}
+                className="h-[340px] sm:h-[420px] lg:h-full w-auto max-w-none object-contain object-bottom"
+                style={{ filter: "drop-shadow(0 18px 22px rgba(0,0,0,0.35))" }}
+              />
+            ) : (
+              <img
+                src={LOGO_SRC}
+                alt="Logo Aun"
+                className="h-[260px] sm:h-[320px] lg:h-[70%] w-auto self-center opacity-80"
+              />
+            )}
           </motion.div>
 
           {/* Note manuscrite + flèche, à droite de la photo */}

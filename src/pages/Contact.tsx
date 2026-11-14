@@ -70,7 +70,7 @@ const DELAIS = [
   { label: "Je suis flexible", value: "flexible" },
 ];
 
-const STEPS = ["Type de projet", "Budget et délai", "Tes coordonnées"];
+const STEPS = ["Type de projet", "Budget et délai", "Vos coordonnées"];
 
 const contactItems = [
   { icon: Mail, label: "Email", value: "aaronmouele11pro@gmail.com", href: "mailto:aaronmouele11pro@gmail.com" },
@@ -196,8 +196,8 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
           <span className="font-mono text-[10px] text-ink-mute">{today}</span>
         </div>
 
-        <Row k="De" filled={!!brief.name}>{brief.name || "Ton nom"}</Row>
-        <Row k="Email" filled={!!brief.email}><span className="break-all">{brief.email || "ton@email.com"}</span></Row>
+        <Row k="De" filled={!!brief.name}>{brief.name || "Votre nom"}</Row>
+        <Row k="Email" filled={!!brief.email}><span className="break-all">{brief.email || "votre@email.com"}</span></Row>
         <Row k="Projet" filled={typeLabels.length > 0}>
           {typeLabels.length ? (
             <span className="flex flex-wrap gap-1.5">
@@ -209,10 +209,10 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
             "Type de projet"
           )}
         </Row>
-        <Row k="Budget" filled={!!brief.budget}>{brief.budget || "Ta fourchette"}</Row>
-        <Row k="Délai" filled={!!brief.delai}>{brief.delai || "Ton délai"}</Row>
+        <Row k="Budget" filled={!!brief.budget}>{brief.budget || "Votre fourchette"}</Row>
+        <Row k="Délai" filled={!!brief.delai}>{brief.delai || "Votre délai"}</Row>
         <Row k="Message" filled={!!brief.message}>
-          <span className="line-clamp-5 whitespace-pre-line font-normal">{brief.message || "Ton message apparaîtra ici…"}</span>
+          <span className="line-clamp-5 whitespace-pre-line font-normal">{brief.message || "Votre message apparaîtra ici…"}</span>
         </Row>
       </div>
 
@@ -267,7 +267,7 @@ export default function Contact() {
 
   const next = () => {
     if (!canNext) {
-      setHint(step === 0 ? "Choisis au moins un type de projet." : "Choisis un budget et un délai (« À discuter » convient).");
+      setHint(step === 0 ? "Choisissez au moins un type de projet." : "Choisissez un budget et un délai (« À discuter » convient).");
       return;
     }
     setHint("");
@@ -351,7 +351,7 @@ export default function Contact() {
               Faisons pousser <span className="text-moss">votre projet.</span>
             </motion.h2>
             <motion.p {...fadeUp(0.2)} className="text-sage/75 leading-relaxed max-w-md m-0">
-              Trois petites étapes pour me décrire ton idée : je reviens vers toi avec une proposition sous 24h.
+              Trois petites étapes pour me décrire votre idée : je reviens vers vous avec une proposition sous 24h.
             </motion.p>
           </div>
 
@@ -440,7 +440,7 @@ export default function Contact() {
                       transition={{ duration: 0.25, ease: EASE }}
                     >
                       <h3 className="font-display font-bold text-xl mb-1">Qu'est-ce qu'on construit ?</h3>
-                      <p className="text-xs text-ink-mute mb-5">Tu peux en choisir plusieurs.</p>
+                      <p className="text-xs text-ink-mute mb-5">Vous pouvez en choisir plusieurs.</p>
                       <div className="grid sm:grid-cols-2 gap-x-4 gap-y-5 pb-2">
                         {TYPES.map(({ id, label: l, icon: Icon }) => (
                           <Key key={id} on={brief.types.includes(id)} onClick={() => toggleType(id)}>
@@ -496,7 +496,7 @@ export default function Contact() {
                       className="space-y-4"
                     >
                       <div>
-                        <h3 className="font-display font-bold text-xl mb-1">Où te répondre ?</h3>
+                        <h3 className="font-display font-bold text-xl mb-1">Où vous répondre ?</h3>
                         <p className="text-xs text-ink-mute m-0">Tous les champs sont requis.</p>
                       </div>
 
