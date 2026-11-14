@@ -1,21 +1,41 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LangSwitch from "./LangSwitch";
+import { useLang } from "../lib/i18n";
 
 // Ton SVG du dossier public/ : change le nom si ton fichier s'appelle autrement
 const LOGO_SRC = "/Aun/aun-symbole-vert.svg";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const links = [
-  { id: "about", label: "À propos" },
-  { id: "skills", label: "Compétences" },
-  { id: "projects", label: "Projets" },
-];
+const TXT = {
+  fr: {
+    links: [
+      { id: "about", label: "À propos" },
+      { id: "skills", label: "Compétences" },
+      { id: "projects", label: "Projets" },
+    ],
+    contact: "Contact", cta: "Me contacter", home: "Aun, retour à l'accueil",
+    open: "Ouvrir le menu", close: "Fermer le menu",
+  },
+  en: {
+    links: [
+      { id: "about", label: "About" },
+      { id: "skills", label: "Skills" },
+      { id: "projects", label: "Projects" },
+    ],
+    contact: "Contact", cta: "Contact me", home: "Aun, back to home",
+    open: "Open menu", close: "Close menu",
+  },
+};
 
 export default function Navbar({ activeSection }: { activeSection: string }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { lang } = useLang();
+  const T = TXT[lang];
+  const links = T.links;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -48,7 +68,7 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
         <button
           onClick={() => scrollTo("hero")}
           className="shrink-0 cursor-pointer bg-transparent border-0 p-0"
-          aria-label="Aun, retour à l'accueil"
+          aria-label={T.home}
         >
           <span className="inline-flex items-center gap-2.5">
             <img
@@ -110,23 +130,27 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
 
         {/* ── CTA + burger ── */}
         <div className="flex items-center gap-3 shrink-0">
+          <LangSwitch dark={dark} />
+          <div className="hidden md:block">
           <button
-            onClick={() => scrollTo("contact")}
-            className={`keycap hidden md:inline-flex px-5 py-2.5 text-sm font-semibold ${
-              dark
-                ? "[--key-face:#6baf7b] [--key-edge:#3a7549] [--key-text:#0e2f20]"
-                : "[--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
-            }`}
-          >
-            Me contacter
-          </button>
+              onClick={() => scrollTo("contact")}
+              data-k="↵"
+              className={`keycap px-5 py-2.5 text-sm font-semibold ${
+                dark
+                  ? "[--key-face:#6baf7b] [--key-edge:#3a7549] [--key-text:#0e2f20]"
+                  : "[--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
+              }`}
+            >
+              {T.cta}
+            </button>
+          </div>
 
           <button
             onClick={() => setOpen(!open)}
             className={`md:hidden w-11 h-11 rounded-xl flex items-center justify-center border cursor-pointer transition-colors ${
               dark ? "bg-white/10 border-white/25 text-white" : "bg-white border-sage text-forest"
             }`}
-            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-label={open ? T.close : T.open}
             aria-expanded={open}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -155,7 +179,7 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
             className="md:hidden overflow-hidden bg-cream border-t border-b border-sage shadow-lg shadow-forest/10"
           >
             <ul className="flex flex-col gap-1 px-5 py-3 list-none m-0">
-              {[...links, { id: "contact", label: "Contact" }].map((l, i) => {
+              {[...links, { id: "contact", label: T.contact }].map((l, i) => {
                 const isActive = activeSection === l.id;
                 return (
                   <motion.li

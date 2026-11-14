@@ -1,6 +1,7 @@
 // Données partagées entre la page client (/order/:token) et le tableau de bord (/admin)
 
 export type Currency = "XAF" | "USD";
+export type Lang = "fr" | "en";
 
 export const PROJECT_TYPES = [
   { value: "site_vitrine", label: "Site vitrine", desc: "Présenter votre activité en ligne" },
@@ -53,3 +54,43 @@ export const labelOf = (list: readonly { value: string; label: string }[], v?: s
 
 export const budgetLabel = (range?: string | null, cur?: string | null) =>
   labelOf(BUDGETS[cur === "USD" ? "USD" : "XAF"], range);
+
+/* ── Libellés anglais (page client) ── */
+const EN: Record<string, string> = {
+  site_vitrine: "Showcase website", site_ecommerce: "E-commerce", application_web: "Web application",
+  application_mobile: "Mobile application", dashboard_admin: "Dashboard / Admin", autre: "Other",
+  urgent_2sem: "Urgent · under 2 weeks", "1mois": "About 1 month", "2_3mois": "2 to 3 months",
+  plus_3mois: "More than 3 months", flexible: "Flexible",
+  nouveau: "New", en_etude: "Under review", devis_envoye: "Quote sent", en_cours: "In progress",
+  livre: "Delivered", annule: "Cancelled",
+};
+
+export const TYPE_DESC_EN: Record<string, string> = {
+  site_vitrine: "Present your business online", site_ecommerce: "Sell your products online",
+  application_web: "A custom business tool", application_mobile: "Android and iOS",
+  dashboard_admin: "Manage your data", autre: "Describe your need",
+};
+
+/* Libellé dans la langue demandée (français par défaut, comme l'admin) */
+export const tr = (
+  list: readonly { value: string; label: string }[],
+  v: string | null | undefined,
+  lang: Lang = "fr",
+) => (lang === "en" && v && EN[v] ? EN[v] : labelOf(list, v));
+
+const BUDGET_EN: Record<Currency, Record<string, string>> = {
+  XAF: {
+    palier_1: "Under 300,000 FCFA", palier_2: "300,000 – 600,000 FCFA", palier_3: "600,000 – 1,800,000 FCFA",
+    palier_4: "1,800,000 – 3,000,000 FCFA", palier_5: "Over 3,000,000 FCFA", a_discuter: "To be discussed",
+  },
+  USD: {
+    palier_1: "Under $500", palier_2: "$500 – $1,000", palier_3: "$1,000 – $3,000",
+    palier_4: "$3,000 – $5,000", palier_5: "Over $5,000", a_discuter: "To be discussed",
+  },
+};
+
+export const BUDGETS_L = (cur: Currency, lang: Lang) =>
+  lang === "en" ? BUDGETS[cur].map((b) => ({ ...b, label: BUDGET_EN[cur][b.value] })) : BUDGETS[cur];
+
+export const budgetLabelL = (range: string | null | undefined, cur: string | null | undefined, lang: Lang) =>
+  lang === "en" ? BUDGET_EN[cur === "USD" ? "USD" : "XAF"][range ?? ""] ?? range ?? "—" : budgetLabel(range, cur);

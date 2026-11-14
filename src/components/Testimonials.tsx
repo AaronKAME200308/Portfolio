@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import supabase from "../services/supabase";
+import { useLang } from "../lib/i18n";
 
 type Review = { rating: number; comment: string; author: string; company: string | null; submitted_at: string };
 
 /* Avis clients publiés (validés depuis /admin). N'affiche rien s'il n'y en a pas. */
 export default function Testimonials() {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const { lang } = useLang();
 
   useEffect(() => {
     let live = true;
@@ -22,9 +24,9 @@ export default function Testimonials() {
   return (
     <div className="relative max-w-6xl mx-auto px-6 mt-24 lg:mt-32">
       <div className="mb-10">
-        <p className="font-mono-label text-aun mb-3">Retours clients</p>
+        <p className="font-mono-label text-aun mb-3">{lang === "en" ? "Client feedback" : "Retours clients"}</p>
         <h3 className="font-display font-extrabold text-forest leading-[1.05]" style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}>
-          Ils m'ont fait confiance.
+          {lang === "en" ? "They trusted me." : "Ils m'ont fait confiance."}
         </h3>
       </div>
 
@@ -35,7 +37,7 @@ export default function Testimonials() {
             viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.45, delay: i * 0.06 }}
             className="relative m-0 flex flex-col rounded-3xl bg-white border-2 border-ink/10 p-6 shadow-[0_18px_40px_-26px_rgba(14,47,32,0.45)]">
             <span aria-hidden className="font-display font-extrabold text-6xl leading-none text-aun/20 select-none">“</span>
-            <div className="flex gap-0.5 -mt-2 mb-3" role="img" aria-label={`${r.rating} sur 5`}>
+            <div className="flex gap-0.5 -mt-2 mb-3" role="img" aria-label={lang === "en" ? `${r.rating} out of 5` : `${r.rating} sur 5`}>
               {[1, 2, 3, 4, 5].map((n) => (
                 <Star key={n} size={16} fill={n <= r.rating ? "#f59e0b" : "none"} stroke={n <= r.rating ? "#f59e0b" : "#b9c8bd"} />
               ))}
@@ -46,7 +48,7 @@ export default function Testimonials() {
                 {(r.author || "?").charAt(0).toUpperCase()}
               </span>
               <span className="min-w-0">
-                <span className="block font-display font-bold text-forest truncate">{r.author || "Client"}</span>
+                <span className="block font-display font-bold text-forest truncate">{r.author || (lang === "en" ? "Client" : "Client")}</span>
                 {r.company && <span className="block font-mono-label !text-[10px] text-ink-mute truncate">{r.company}</span>}
               </span>
             </figcaption>

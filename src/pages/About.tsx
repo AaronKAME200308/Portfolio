@@ -1,16 +1,15 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { motion, AnimatePresence, animate, useInView, useMotionValue, useReducedMotion } from "framer-motion";
+import { motion, animate, useInView, useMotionValue, useReducedMotion } from "framer-motion";
 import { C, F, EASE, LOGO } from "../components/brand";
+import { useLang, type Lang } from "../lib/i18n";
 
 /* ── Réglages ── */
 const PHOTO_SRC = "/aaron-cutout.png"; // photo détourée (PNG transparent) ; repli : logo
-const FILLET = 24; // raccord concave des onglets
-const TAB_H = 56; // hauteur de l'onglet actif
 const STACK = ["React", "FastAPI", "Node.js", "IA / ML"];
 const STATS = [
-  { to: 5, label: "Projets" },
-  { to: 3, label: "Ans d'exp." },
+  { to: 5, key: "projects" as const },
+  { to: 3, key: "years" as const },
 ];
 
 const fadeUp = (delay = 0) => ({
@@ -27,90 +26,146 @@ const mono = {
   textTransform: "uppercase" as const,
 };
 
-/* ───────── Contenu des onglets ─────────
-   b = texte en gras. Pour la frise, modifie les étapes (ajoute tes années si tu veux). */
+const UI = {
+  fr: {
+    kicker: "À propos",
+    facts: [
+      ["Statut", "Freelance disponible"],
+      ["Base", "Yaoundé, Cameroun"],
+      ["Formation", "Licence en Génie Informatique"],
+    ],
+    stats: { projects: "Projets", years: "Ans d'exp." },
+    cta: "Me contacter",
+    badgeAria: "Badge d'Aaron KAME MOUELE, développeur web et mobile",
+    role: "Développeur web & mobile",
+    place: "Freelance · Yaoundé",
+    prompt: "visiteur@aun:~$",
+    termAria: "Présentation d'Aaron KAME MOUELE, affichée comme un terminal",
+    status: "3 fichiers · UTF-8",
+  },
+  en: {
+    kicker: "About",
+    facts: [
+      ["Status", "Freelance, available"],
+      ["Based in", "Yaoundé, Cameroon"],
+      ["Education", "Bachelor's in Computer Engineering"],
+    ],
+    stats: { projects: "Projects", years: "Yrs exp." },
+    cta: "Contact me",
+    badgeAria: "Badge of Aaron KAME MOUELE, web and mobile developer",
+    role: "Web & mobile developer",
+    place: "Freelance · Yaoundé",
+    prompt: "visitor@aun:~$",
+    termAria: "Introduction to Aaron KAME MOUELE, displayed as a terminal",
+    status: "3 files · UTF-8",
+  },
+};
+
+/* ───────── Contenu du terminal ─────────
+   b = texte en gras. Chaque bloc = une commande `cat fichier` + son résultat. */
 type Seg = { t: string; b?: boolean };
-type Tab =
-  | { id: string; file: string; title: string; kind: "terminal" }
+type Block =
   | { id: string; file: string; title: string; kind: "text"; segs: Seg[] }
   | { id: string; file: string; title: string; kind: "list"; items: { k: string; segs: Seg[] }[] };
 
-const TABS: Tab[] = [
-  {
-    id: "parcours",
-    file: "parcours.md",
-    title: "Mon parcours",
-    kind: "text",
-    segs: [
-      { t: "Je suis " },
-      { t: "Aaron KAME MOUELE", b: true },
-      {
-        t: ", développeur freelance Web & Mobile basé à Yaoundé. Titulaire d'une Licence en Génie Informatique, j'ai construit une expertise complète : ",
-      },
-      { t: "du pixel au serveur.", b: true },
-    ],
-  },
-  {
-    id: "chemin",
-    file: "chemin.md",
-    title: "Mon chemin",
-    kind: "list",
-    items: [
-      { k: "01", segs: [{ t: "Licence en Génie Informatique", b: true }] },
-      { k: "02", segs: [{ t: "Premiers projets web et mobiles", b: true }] },
-      { k: "03", segs: [{ t: "Freelance, pour de vrais clients", b: true }] },
-      { k: "04", segs: [{ t: "Aujourd'hui : IA et mobile", b: true }] },
-    ],
-  },
-  {
-    id: "methode",
-    file: "methode.md",
-    title: "Ma façon de travailler",
-    kind: "text",
-    segs: [
-      {
-        t: "J'aime le code propre, les projets qui ont du sens, et les collaborations où chaque détail compte.",
-      },
-    ],
-  },
-  { id: "terminal", file: "terminal.sh", title: "Terminal", kind: "terminal" },
-];
-
-const countChars = (tab: Tab) =>
-  tab.kind === "terminal"
-    ? 0
-    : tab.kind === "text"
-    ? tab.segs.reduce((n, s) => n + s.t.length, 0)
-    : tab.items.reduce((n, it) => n + it.segs.reduce((m, s) => m + s.t.length, 0), 0);
-
-/* ───────── Hauteur d'une rangée : 60 px (bureau) / 44 px (mobile) ───────── */
-function useRow() {
-  const [row, setRow] = useState(60);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 639px)");
-    const f = () => setRow(mq.matches ? 44 : 60);
-    f();
-    mq.addEventListener("change", f);
-    return () => mq.removeEventListener("change", f);
-  }, []);
-  return row;
-}
-
-/* ───────── Cases d'écriture, discrètes (repère de fond) ───────── */
-const gridStyleFor = (row: number): React.CSSProperties => {
-  const tile = `<svg xmlns='http://www.w3.org/2000/svg' width='48' height='${row}' viewBox='0 0 48 ${row}' shape-rendering='crispEdges'>
-  <path d='M.5 4V${row - 4}M0 4.5H48M0 ${row - 4.5}H48' stroke='#1E7B4A' stroke-opacity='.22' fill='none'/>
-  <path d='M24 4V${row - 4}M0 ${row / 2}H48' stroke='#1E7B4A' stroke-opacity='.14' stroke-dasharray='3 3' fill='none'/>
-</svg>`;
-  return {
-    backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(tile)}")`,
-    backgroundSize: `48px ${row}px`,
-    backgroundRepeat: "round repeat",
-  };
+const BLOCKS_BY_LANG: Record<Lang, Block[]> = {
+  fr: [
+    {
+      id: "parcours",
+      file: "parcours.md",
+      title: "Mon parcours",
+      kind: "text",
+      segs: [
+        { t: "Je suis " },
+        { t: "Aaron KAME MOUELE", b: true },
+        {
+          t: ", développeur freelance Web & Mobile basé à Yaoundé. Titulaire d'une Licence en Génie Informatique, j'ai construit une expertise complète : ",
+        },
+        { t: "du pixel au serveur.", b: true },
+      ],
+    },
+    {
+      id: "chemin",
+      file: "chemin.md",
+      title: "Mon chemin",
+      kind: "list",
+      items: [
+        { k: "01", segs: [{ t: "Licence en Génie Informatique", b: true }] },
+        { k: "02", segs: [{ t: "Premiers projets web et mobiles", b: true }] },
+        { k: "03", segs: [{ t: "Freelance, pour de vrais clients", b: true }] },
+        { k: "04", segs: [{ t: "Aujourd'hui : IA et mobile", b: true }] },
+      ],
+    },
+    {
+      id: "methode",
+      file: "methode.md",
+      title: "Ma façon de travailler",
+      kind: "text",
+      segs: [
+        { t: "J'aime le code propre, les projets qui ont du sens, et les collaborations où chaque détail compte." },
+      ],
+    },
+  ],
+  en: [
+    {
+      id: "parcours",
+      file: "story.md",
+      title: "My story",
+      kind: "text",
+      segs: [
+        { t: "I'm " },
+        { t: "Aaron KAME MOUELE", b: true },
+        {
+          t: ", a freelance Web & Mobile developer based in Yaoundé. With a Bachelor's degree in Computer Engineering, I've built a complete skill set: ",
+        },
+        { t: "from pixel to server.", b: true },
+      ],
+    },
+    {
+      id: "chemin",
+      file: "path.md",
+      title: "My path",
+      kind: "list",
+      items: [
+        { k: "01", segs: [{ t: "Bachelor's in Computer Engineering", b: true }] },
+        { k: "02", segs: [{ t: "First web and mobile projects", b: true }] },
+        { k: "03", segs: [{ t: "Freelancing, for real clients", b: true }] },
+        { k: "04", segs: [{ t: "Today: AI and mobile", b: true }] },
+      ],
+    },
+    {
+      id: "methode",
+      file: "method.md",
+      title: "How I work",
+      kind: "text",
+      segs: [
+        { t: "I like clean code, projects that make sense, and collaborations where every detail matters." },
+      ],
+    },
+  ],
 };
 
+const segsLen = (segs: Seg[]) => segs.reduce((n, s) => n + s.t.length, 0);
+const contentLen = (b: Block) =>
+  b.kind === "text" ? segsLen(b.segs) : b.items.reduce((n, it) => n + segsLen(it.segs), 0);
+
+/* Positions de départ (en caractères) de chaque commande et de son résultat */
+const CMD_PAUSE = 5; // petite pause « Entrée » entre la commande et son résultat
+const BLOCK_GAP = 10; // pause entre deux blocs
+function layoutBlocks(blocks: Block[]) {
+  let pos = 0;
+  const starts = blocks.map((b) => {
+    const cmd = `cat ${b.file}`;
+    const cmdStart = pos;
+    const contentStart = cmdStart + cmd.length + CMD_PAUSE;
+    pos = contentStart + contentLen(b) + BLOCK_GAP;
+    return { cmd, cmdStart, contentStart };
+  });
+  return { starts, total: pos - BLOCK_GAP };
+}
+
 /* ───────── Frappe : nombre de caractères visibles ───────── */
-function useTyping(total: number, resetKey: string, reduce: boolean | null) {
+function useTyping(total: number, run: boolean, resetKey: string, reduce: boolean | null) {
   const [n, setN] = useState(0);
   useEffect(() => {
     if (reduce) {
@@ -118,6 +173,7 @@ function useTyping(total: number, resetKey: string, reduce: boolean | null) {
       return;
     }
     setN(0);
+    if (!run) return;
     let i = 0;
     const id = setInterval(() => {
       i += 2;
@@ -127,7 +183,7 @@ function useTyping(total: number, resetKey: string, reduce: boolean | null) {
       } else setN(i);
     }, 16);
     return () => clearInterval(id);
-  }, [resetKey, total, reduce]);
+  }, [resetKey, total, run, reduce]);
   return n;
 }
 
@@ -138,18 +194,32 @@ const Cursor = ({ reduce }: { reduce: boolean | null }) => (
     transition={{ repeat: Infinity, duration: 1.1, times: [0, 0.5, 0.5, 1] }}
     style={{
       display: "inline-block",
-      width: 10,
-      height: "0.9em",
-      background: C.aun,
+      width: 9,
+      height: "1em",
+      background: C.sauge,
       marginLeft: 2,
-      marginRight: -12,
-      verticalAlign: "middle",
+      marginRight: -11,
+      verticalAlign: "text-bottom",
     }}
   />
 );
 
 /* Affiche les segments : la partie tapée est visible, le reste réserve la place (pas de saut de ligne) */
-function Typed({ segs, start, n, reduce, last }: { segs: Seg[]; start: number; n: number; reduce: boolean | null; last: boolean }) {
+function Typed({
+  segs,
+  start,
+  n,
+  reduce,
+  last,
+  boldColor,
+}: {
+  segs: Seg[];
+  start: number;
+  n: number;
+  reduce: boolean | null;
+  last: boolean;
+  boldColor?: string;
+}) {
   let remaining = n - start;
   let cursorDone = false;
   return (
@@ -163,7 +233,7 @@ function Typed({ segs, start, n, reduce, last }: { segs: Seg[]; start: number; n
         const endCursor = !cursorDone && last && hidden.length === 0 && i === segs.length - 1;
         if (putCursor || endCursor) cursorDone = true;
         return (
-          <span key={i} style={s.b ? { fontWeight: 600, color: C.foret } : undefined}>
+          <span key={i} style={s.b ? { fontWeight: 600, color: boldColor } : undefined}>
             {shown}
             {(putCursor || endCursor) && <Cursor reduce={reduce} />}
             <span style={{ opacity: 0 }}>{hidden}</span>
@@ -187,179 +257,96 @@ function CountUp({ to }: { to: number }) {
   return <span ref={ref}>{v}+</span>;
 }
 
-/* ───────── Terminal interactif ───────── */
-const CONTACT_MAIL = "aaronmouele11@gmail.com";
-const CONTACT_TEL = "+237 670 464 488";
-const PROMPT = "visiteur@aun:~$";
-const SUGGEST = ["help", "whoami", "skills", "stack", "projects", "contact"];
-
-const COMMANDS: Record<string, string[]> = {
-  help: [
-    "Commandes disponibles :",
-    "  whoami    qui suis-je",
-    "  skills    ce que je sais faire",
-    "  stack     mes outils",
-    "  projects  mes réalisations",
-    "  status    ma disponibilité",
-    "  contact   me joindre",
-    "  ls        lister les fichiers",
-    "  clear     effacer l'écran",
-  ],
-  whoami: ["Aaron KAME MOUELE", "Développeur web & mobile, freelance, basé à Yaoundé.", "Du pixel au serveur."],
-  skills: [
-    "› API robustes (FastAPI, Node, Symfony)",
-    "› Analyse, conception et réalisation de systèmes d'information",
-    "› Conception, réalisation et déploiement de sites web",
-    "› Applications mobiles (React Native)",
-    "› IA et vision par ordinateur",
-    "› Bases de données (PostgreSQL, Supabase)",
-  ],
-  stack: ["Front   React · TypeScript · Tailwind", "Back    FastAPI · Node.js · Symfony", "Mobile  React Native", "Data    PostgreSQL · Supabase · MySQL", "IA      Python · TensorFlow · Keras"],
-  projects: ["PlantGuard AI", "Infinite Luxury Trips", "Portfolio JP Graphic Design", "Vitrine Pro Yapithe & Partners", "MenuQR"],
-  status: ["● disponible pour de nouveaux projets", "  Yaoundé · UTC+1"],
-  ls: ["parcours.md  chemin.md  methode.md  terminal.sh"],
-};
-
-type TLine = { kind: "in" | "out" | "err"; text: string };
-
-function Terminal({ height, reduce }: { height: number; reduce: boolean | null }) {
-  const [lines, setLines] = useState<TLine[]>([
-    { kind: "out", text: "Bienvenue. Tape une commande, ou clique sur une suggestion." },
-  ]);
-  const [value, setValue] = useState("");
-  const [hist, setHist] = useState<string[]>([]);
-  const [hi, setHi] = useState(-1);
-  const box = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    box.current?.scrollTo({ top: box.current.scrollHeight });
-  }, [lines]);
-
-  useEffect(() => {
-    if (window.matchMedia("(hover: hover)").matches) input.current?.focus({ preventScroll: true });
-  }, []);
-
-  const goContact = () =>
-    setTimeout(() => document.getElementById("contact")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }), 900);
-
-  const run = (raw: string) => {
-    const cmd = raw.trim().toLowerCase().replace(/\s+/g, " ");
-    if (!cmd) return;
-    setHist((h) => [...h, raw.trim()]);
-    setHi(-1);
-    if (cmd === "clear") return setLines([]);
-    let out: TLine[];
-    if (cmd === "contact") {
-      out = [
-        { kind: "out", text: `email  ${CONTACT_MAIL}` },
-        { kind: "out", text: `tel    ${CONTACT_TEL}` },
-        { kind: "out", text: "→ ouverture du formulaire…" },
-      ];
-      goContact();
-    } else if (cmd === "sudo hire aaron") {
-      out = [
-        { kind: "out", text: "[sudo] mot de passe pour visiteur : ********" },
-        { kind: "out", text: "✔ Excellente décision. Ouverture du formulaire…" },
-      ];
-      goContact();
-    } else if (COMMANDS[cmd]) {
-      out = COMMANDS[cmd].map((text) => ({ kind: "out" as const, text }));
-    } else {
-      out = [{ kind: "err", text: `${cmd.split(" ")[0]} : commande introuvable. Essaie « help ».` }];
-    }
-    setLines((l) => [...l, { kind: "in", text: raw.trim() }, ...out]);
-  };
-
-  const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      run(value);
-      setValue("");
-    } else if (e.key === "ArrowUp" && hist.length) {
-      e.preventDefault();
-      const i = hi < 0 ? hist.length - 1 : Math.max(0, hi - 1);
-      setHi(i);
-      setValue(hist[i]);
-    } else if (e.key === "ArrowDown" && hi >= 0) {
-      e.preventDefault();
-      const i = hi + 1;
-      if (i >= hist.length) {
-        setHi(-1);
-        setValue("");
-      } else {
-        setHi(i);
-        setValue(hist[i]);
-      }
-    }
-  };
+/* ───────── Terminal (affichage seul : les 3 sections tapées l'une après l'autre) ───────── */
+function Terminal({ blocks, lang, reduce }: { blocks: Block[]; lang: Lang; reduce: boolean | null }) {
+  const U = UI[lang];
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const { starts, total } = layoutBlocks(blocks);
+  const n = useTyping(total, inView, lang, reduce);
+  const boldColor = C.creme;
 
   return (
     <div
+      ref={ref}
+      role="region"
+      aria-label={U.termAria}
       className="flex flex-col flex-1"
-      style={{ height: "100%", minHeight: height, background: C.noir, color: C.sauge, fontFamily: F.mono, fontSize: "clamp(0.74rem, 1.6vw, 0.9rem)" }}
-      onClick={() => input.current?.focus({ preventScroll: true })}
+      style={{
+        background: C.noir,
+        color: C.sauge,
+        fontFamily: F.mono,
+        fontSize: "clamp(0.78rem, 1.7vw, 1.02rem)",
+        minHeight: 420,
+      }}
     >
       <div className="flex items-center gap-2 px-4 shrink-0" style={{ height: 34, borderBottom: "1px solid rgba(107,175,123,0.25)" }}>
         {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
           <span key={c} aria-hidden="true" style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.85 }} />
         ))}
-        <span style={{ ...mono, fontSize: 10, color: C.mousse, marginLeft: 8 }}>bash · 80×24</span>
+        <span style={{ ...mono, fontSize: 10, color: C.mousse, marginLeft: 8 }}>bash · ~/about</span>
       </div>
 
-      <div ref={box} className="flex-1 overflow-y-auto px-4 py-3" style={{ lineHeight: 1.65 }} aria-live="polite">
-        {lines.map((l, i) => (
-          <div
-            key={i}
-            style={{
-              whiteSpace: "pre-wrap",
-              overflowWrap: "anywhere",
-              color: l.kind === "err" ? "#ff8a80" : l.kind === "in" ? C.creme : C.sauge,
-            }}
-          >
-            {l.kind === "in" && <span style={{ color: C.mousse }}>{PROMPT} </span>}
-            {l.text}
-          </div>
-        ))}
-        <label className="flex items-center gap-2" style={{ marginTop: 2 }}>
-          <span style={{ color: C.mousse, whiteSpace: "nowrap" }}>{PROMPT}</span>
-          <input
-            ref={input}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={onKey}
-            aria-label="Commande du terminal"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            className="flex-1 min-w-0 bg-transparent outline-none"
-            style={{ color: C.creme, caretColor: C.mousse, font: "inherit", border: 0, padding: 0 }}
-          />
-        </label>
+      <div className="flex-1 px-5 py-5" style={{ lineHeight: 1.75 }}>
+        {blocks.map((b, i) => {
+          const { cmd, cmdStart, contentStart } = starts[i];
+          const isLast = i === blocks.length - 1;
+          let listStart = contentStart;
+          return (
+            <div
+              key={b.id}
+              style={{ visibility: n >= cmdStart ? "visible" : "hidden", marginTop: i ? 22 : 0 }}
+            >
+              <div style={{ overflowWrap: "anywhere" }}>
+                <span style={{ color: C.mousse }}>{UI[lang].prompt} </span>
+                <span style={{ color: C.creme }}>
+                  <Typed segs={[{ t: cmd }]} start={cmdStart} n={n} reduce={reduce} last={false} />
+                </span>
+              </div>
+
+              <div style={{ visibility: n >= contentStart ? "visible" : "hidden", marginTop: 6 }}>
+                <div style={{ fontWeight: 700, color: C.mousse }}>
+                  <span style={{ marginRight: 10 }}>##</span>
+                  {b.title}
+                </div>
+
+                {b.kind === "text" ? (
+                  <p style={{ margin: "4px 0 0", overflowWrap: "anywhere" }}>
+                    <Typed segs={b.segs} start={contentStart} n={n} reduce={reduce} last={isLast} boldColor={boldColor} />
+                  </p>
+                ) : (
+                  <ul style={{ margin: "4px 0 0", padding: 0, listStyle: "none" }}>
+                    {b.items.map((it, idx) => {
+                      const s0 = listStart;
+                      listStart += segsLen(it.segs);
+                      return (
+                        <li key={it.k}>
+                          <span style={{ fontWeight: 700, color: C.mousse, marginRight: 10 }}>{it.k}</span>
+                          <Typed
+                            segs={it.segs}
+                            start={s0}
+                            n={n}
+                            reduce={reduce}
+                            last={isLast && idx === b.items.length - 1}
+                            boldColor={boldColor}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="flex flex-wrap gap-2 px-4 py-3 shrink-0" style={{ borderTop: "1px solid rgba(107,175,123,0.25)" }}>
-        {SUGGEST.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              run(c);
-            }}
-            style={{
-              fontFamily: F.mono,
-              fontSize: 12,
-              color: C.sauge,
-              border: "1px solid rgba(220,234,221,0.35)",
-              borderRadius: 8,
-              padding: "4px 10px",
-              background: "transparent",
-              cursor: "pointer",
-            }}
-          >
-            {c}
-          </button>
-        ))}
+      <div
+        className="flex items-center justify-between gap-4 px-4 shrink-0"
+        style={{ ...mono, fontSize: 11, height: 36, background: C.sauge, color: C.foret }}
+      >
+        <span>{U.status}</span>
+        <span className="hidden sm:inline">bash</span>
       </div>
     </div>
   );
@@ -379,6 +366,8 @@ const BARS = (() => {
 
 function Badge() {
   const reduce = useReducedMotion();
+  const { lang } = useLang();
+  const U = UI[lang];
   const [photo, setPhoto] = useState(true);
   const rot = useMotionValue(reduce ? -2 : 0);
   const idle = useRef<ReturnType<typeof animate> | null>(null);
@@ -409,7 +398,7 @@ function Badge() {
     >
       <motion.div
         role="img"
-        aria-label="Badge d'Aaron KAME MOUELE, développeur web et mobile"
+        aria-label={U.badgeAria}
         className="absolute inset-0"
         style={{ rotate: rot, originX: 0.5, originY: 0, touchAction: "pan-y", cursor: reduce ? "default" : "grab" }}
         onPanStart={() => idle.current?.stop()}
@@ -487,8 +476,8 @@ function Badge() {
           </div>
 
           <div style={{ padding: "10px 14px 0", fontFamily: F.mono, fontSize: 9.5, letterSpacing: "0.06em", color: C.foret, textTransform: "uppercase" }}>
-            Développeur web &amp; mobile
-            <div style={{ color: C.aun, marginTop: 2 }}>Freelance · Yaoundé</div>
+            {U.role}
+            <div style={{ color: C.aun, marginTop: 2 }}>{U.place}</div>
           </div>
 
           <div className="absolute" style={{ left: 14, right: 14, bottom: 12 }}>
@@ -516,121 +505,34 @@ const Cross = ({ pos }: { pos: React.CSSProperties }) => (
   </span>
 );
 
-/* Raccord concave entre l'onglet actif et le corps */
-const Fillet = ({ side }: { side: "left" | "right" }) => (
-  <span
-    aria-hidden="true"
-    className="absolute pointer-events-none"
-    style={{
-      bottom: 0,
-      [side]: -FILLET,
-      width: FILLET,
-      height: FILLET,
-      background: `radial-gradient(circle at ${side === "right" ? "100% 0" : "0 0"}, transparent ${FILLET - 0.5}px, ${C.foret} ${FILLET}px)`,
-    }}
-  />
-);
-
 export default function About() {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(0);
-  const tab = TABS[active];
-  const row = useRow();
-  const zoneRows = row === 60 ? 8 : 10;
-  const typed = useTyping(countChars(tab), tab.id, reduce);
-
-  /* Centrage vertical du texte, calé sur les rangées de cases */
-  const textRef = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState(0);
-  useLayoutEffect(() => {
-    const el = textRef.current;
-    if (!el) return;
-    const compute = () => {
-      const free = row * zoneRows - el.offsetHeight;
-      setOffset(Math.max(0, Math.floor(free / 2 / row) * row));
-    };
-    compute();
-    const ro = new ResizeObserver(compute);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [row, zoneRows, tab.kind]);
+  const { lang } = useLang();
+  const U = UI[lang];
+  const BLOCKS = BLOCKS_BY_LANG[lang];
 
   const scrollToContact = () =>
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") setActive((a) => (a + 1) % TABS.length);
-    if (e.key === "ArrowLeft") setActive((a) => (a - 1 + TABS.length) % TABS.length);
-  };
-
-  const bodySize = "clamp(0.98rem, 2.1vw, 1.75rem)";
-
   return (
     <section id="about" className="relative py-28 overflow-hidden" style={{ background: C.creme, fontFamily: F.body }}>
       <div className="max-w-6xl mx-auto px-6">
-        <motion.p {...fadeUp(0)} className="font-mono-label text-aun mb-8">
-          <span className="text-moss">01 /</span> À propos
-        </motion.p>
+        <div className="flex items-center justify-between gap-4 mb-8">
+          <motion.p {...fadeUp(0)} className="font-mono-label text-aun m-0">
+            <span className="text-moss">01 /</span> {U.kicker}
+          </motion.p>
+          <div className="hidden md:block" style={{ ...mono, fontSize: 11, color: C.aun }}>
+            Yaoundé · 3.87° N · 11.52° E
+          </div>
+        </div>
 
         <motion.div {...fadeUp(0.05)} className="relative">
-          {/* ── Bande d'onglets : l'onglet actif est plein et rejoint le corps ── */}
-          <div className="flex items-end" style={{ height: TAB_H }}>
-            <div role="tablist" aria-label="À propos" onKeyDown={onKeyDown} className="flex items-end">
-              {TABS.map((t, i) => {
-                const isActive = i === active;
-                return (
-                  <button
-                    key={t.id}
-                    role="tab"
-                    id={`tab-${t.id}`}
-                    aria-selected={isActive}
-                    aria-controls={`panel-${t.id}`}
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={() => setActive(i)}
-                    className="relative transition-colors duration-200"
-                    style={{
-                      height: isActive ? TAB_H : TAB_H - 12,
-                      zIndex: isActive ? 2 : 1,
-                      padding: "0 clamp(7px, 2.2vw, 26px)",
-                      background: isActive ? C.foret : C.sauge,
-                      color: isActive ? C.creme : C.foret,
-                      border: "none",
-                      borderRadius: "22px 22px 0 0",
-                      cursor: "pointer",
-                      fontFamily: F.mono,
-                      fontWeight: isActive ? 600 : 500,
-                      fontSize: "clamp(0.62rem, 1.5vw, 0.95rem)",
-                      whiteSpace: "nowrap",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.background = C.blanc;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.background = C.sauge;
-                    }}
-                  >
-                    {t.file}
-                    {isActive && i > 0 && <Fillet side="left" />}
-                    {isActive && <Fillet side="right" />}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div
-              className="hidden md:flex flex-1 items-center justify-end self-stretch"
-              style={{ ...mono, fontSize: 11, color: C.aun, paddingRight: 8 }}
-            >
-              Yaoundé · 3.87° N · 11.52° E
-            </div>
-          </div>
-
           {/* ── Corps du dossier ── */}
           <div
             className="relative"
             style={{
               background: C.foret,
-              borderRadius: "0 28px 28px 28px",
+              borderRadius: 28,
               padding: "clamp(18px, 2.8vw, 34px)",
             }}
           >
@@ -640,132 +542,9 @@ export default function About() {
             <Cross pos={{ bottom: 8, right: 10 }} />
 
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-              {/* ══ ÉDITEUR : texte centré, écrit sur les cases ══ */}
-              <div className="flex flex-col min-w-0" style={{ background: C.blanc, borderRadius: 16, overflow: "hidden" }}>
-                {tab.kind === "terminal" ? (
-                  <div id={`panel-${tab.id}`} role="tabpanel" aria-labelledby={`tab-${tab.id}`} className="flex-1 flex flex-col" style={{ minHeight: row * zoneRows }}>
-                    <Terminal height={row * zoneRows} reduce={reduce} />
-                  </div>
-                ) : (
-                <div className="relative flex-1" style={{ ...gridStyleFor(row), minHeight: row * zoneRows }}>
-                  {/* Gouttière : numéros de ligne alignés sur les rangées */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-y-0 left-0 overflow-hidden select-none"
-                    style={{
-                      width: 52,
-                      background: C.creme,
-                      borderRight: "1px solid rgba(30,123,74,0.25)",
-                      fontFamily: F.mono,
-                      fontSize: 12,
-                      lineHeight: `${row}px`,
-                      textAlign: "right",
-                      paddingRight: 12,
-                      color: "rgba(14,47,32,0.45)",
-                    }}
-                  >
-                    {Array.from({ length: 40 }, (_, i) => (
-                      <div key={i}>{i + 1}</div>
-                    ))}
-                  </div>
-
-                  <div style={{ paddingTop: offset, paddingLeft: 52, transition: "padding-top .25s ease" }}>
-                    <div ref={textRef}>
-                      <AnimatePresence mode="wait" initial={false}>
-                        <motion.div
-                          key={tab.id}
-                          role="tabpanel"
-                          id={`panel-${tab.id}`}
-                          aria-labelledby={`tab-${tab.id}`}
-                          initial={reduce ? false : { opacity: 0, x: 14 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={reduce ? undefined : { opacity: 0, x: -14 }}
-                          transition={{ duration: 0.25, ease: EASE }}
-                          style={{
-                            fontFamily: F.body,
-                            fontSize: bodySize,
-                            lineHeight: `${row}px`,
-                            color: C.noir,
-                            textAlign: "center",
-                            padding: "0 clamp(12px, 3vw, 40px)",
-                          }}
-                        >
-                          <h3
-                            style={{
-                              fontFamily: F.mono,
-                              fontWeight: 700,
-                              fontSize: "clamp(1.05rem, 2.2vw, 1.7rem)",
-                              lineHeight: `${row}px`,
-                              color: C.foret,
-                              margin: 0,
-                            }}
-                          >
-                            <span style={{ color: C.aun, marginRight: 10 }}>##</span>
-                            {tab.title}
-                          </h3>
-
-                          {tab.kind === "text" ? (
-                            <p style={{ margin: 0 }}>
-                              <Typed segs={tab.segs} start={0} n={typed} reduce={reduce} last />
-                            </p>
-                          ) : (
-                            <ul
-                              style={{
-                                margin: 0,
-                                padding: 0,
-                                listStyle: "none",
-                                display: "inline-block",
-                                textAlign: "left",
-                                fontSize: "clamp(0.78rem, 1.9vw, 1.4rem)",
-                              }}
-                            >
-                              {(() => {
-                                let start = 0;
-                                return tab.items.map((it, idx) => {
-                                  const s0 = start;
-                                  start += it.segs.reduce((m, s) => m + s.t.length, 0);
-                                  return (
-                                    <li key={it.k} style={{ lineHeight: `${row}px` }}>
-                                      <span
-                                        style={{
-                                          fontFamily: F.mono,
-                                          fontWeight: 700,
-                                          color: C.aun,
-                                          marginRight: 10,
-                                        }}
-                                      >
-                                        {it.k}
-                                      </span>
-                                      <Typed
-                                        segs={it.segs}
-                                        start={s0}
-                                        n={typed}
-                                        reduce={reduce}
-                                        last={idx === tab.items.length - 1}
-                                      />
-                                    </li>
-                                  );
-                                });
-                              })()}
-                            </ul>
-                          )}
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </div>
-                )}
-
-                {/* Barre d'état */}
-                <div
-                  className="flex items-center justify-between gap-4 px-4"
-                  style={{ ...mono, fontSize: 11, height: 36, background: C.sauge, color: C.foret }}
-                >
-                  <span>{tab.file} · {tab.kind === "terminal" ? "bash" : "UTF-8"}</span>
-                  <span className="hidden sm:inline">
-                    {active + 1} / {TABS.length}
-                  </span>
-                </div>
+              {/* ══ TERMINAL : parcours · chemin · méthode ══ */}
+              <div className="flex flex-col min-w-0" style={{ borderRadius: 16, overflow: "hidden" }}>
+                <Terminal key={lang} blocks={BLOCKS} lang={lang} reduce={reduce} />
               </div>
 
               {/* ══ PANNEAU : badge + données clés ══ */}
@@ -777,11 +556,7 @@ export default function About() {
                 <Badge />
 
                 <dl className="flex flex-col gap-4 m-0" style={{ borderTop: "1px dashed rgba(107,175,123,0.3)", paddingTop: 20 }}>
-                  {[
-                    ["Statut", "Freelance disponible"],
-                    ["Base", "Yaoundé, Cameroun"],
-                    ["Formation", "Licence en Génie Informatique"],
-                  ].map(([k, v]) => (
+                  {U.facts.map(([k, v]) => (
                     <div key={k}>
                       <dt style={{ ...mono, fontSize: 11, color: C.mousse }}>{k}</dt>
                       <dd style={{ margin: "4px 0 0", fontSize: 15, color: C.creme }}>{v}</dd>
@@ -818,12 +593,12 @@ export default function About() {
               </div>
 
               <div className="flex gap-8">
-                {STATS.map(({ to, label }) => (
-                  <div key={label} className="flex items-baseline gap-2.5">
+                {STATS.map(({ to, key }) => (
+                  <div key={key} className="flex items-baseline gap-2.5">
                     <span style={{ fontFamily: F.title, fontWeight: 700, fontSize: 30, lineHeight: 1, color: C.creme }}>
                       <CountUp to={to} />
                     </span>
-                    <span style={{ ...mono, fontSize: 10, color: C.mousse }}>{label}</span>
+                    <span style={{ ...mono, fontSize: 10, color: C.mousse }}>{U.stats[key]}</span>
                   </div>
                 ))}
               </div>
@@ -832,7 +607,7 @@ export default function About() {
                 onClick={scrollToContact}
                 className="keycap px-6 py-3.5 text-sm font-semibold [--key-face:#f6f4ec] [--key-edge:#6f8f7a] [--key-text:#0e2f20]"
               >
-                Me contacter <ArrowRight size={14} />
+                {U.cta} <ArrowRight size={14} />
               </button>
             </motion.div>
           </div>

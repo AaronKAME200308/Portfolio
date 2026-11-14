@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useLang } from "../lib/i18n";
 
 // ── Fichiers du dossier public/ : adapte les noms si besoin ──
 const CUTOUT_SRC = "/aaron-cutout.png"; // photo détourée (PNG transparent), le nom doit être exact
@@ -9,6 +10,19 @@ const LOGO_SRC = "/aun-symbole-vert.svg"; // affiché si la photo est introuvabl
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const WORD = "PORTFOLIO".split("");
+
+const TXT = {
+  fr: {
+    role: "Développeur web & mobile", hello: "Bonjour, je suis", note1: "du pixel", note2: "au serveur",
+    sr: ", développeur web et mobile freelance", cta1: "Faisons pousser votre projet",
+    cta2: "Découvrir mes réalisations", logoAlt: "Logo Aun",
+  },
+  en: {
+    role: "Web & mobile developer", hello: "Hi, I'm", note1: "from pixel", note2: "to server",
+    sr: ", freelance web and mobile developer", cta1: "Let's grow your project",
+    cta2: "See my work", logoAlt: "Aun logo",
+  },
+};
 
 // ── Doodles dessinés à la main (SVG) ──────────────────────
 const Sparkle = ({ className = "" }: { className?: string }) => (
@@ -57,6 +71,8 @@ function TornEdge({ fill = "#f6f4ec" }: { fill?: string }) {
 export default function Hero() {
   const reduce = useReducedMotion();
   const [photoOk, setPhotoOk] = useState(true);
+  const { lang } = useLang();
+  const T = TXT[lang];
 
   const pop = (delay = 0) => ({
     initial: reduce ? false : { opacity: 0, y: 24 },
@@ -133,7 +149,7 @@ export default function Hero() {
               className="absolute right-0 bottom-1 lg:-bottom-9 lg:right-[1%] z-20"
             >
               <div className="bg-cream text-forest px-4 py-2 lg:px-5 lg:py-2.5 font-display font-semibold uppercase tracking-[0.12em] text-[11px] sm:text-sm lg:text-base shadow-[3px_3px_0_#6baf7b]">
-                Développeur web & mobile
+                {T.role}
               </div>
               <Scribble className="w-full h-3 mt-1 text-moss" />
             </motion.div>
@@ -161,7 +177,7 @@ export default function Hero() {
             ) : (
               <img
                 src={LOGO_SRC}
-                alt="Logo Aun"
+                alt={T.logoAlt}
                 className="h-[260px] sm:h-[320px] lg:h-[70%] w-auto self-center opacity-80"
               />
             )}
@@ -175,9 +191,9 @@ export default function Hero() {
           >
             <CurvedArrow className="w-12 h-10 mt-6 -mr-1 -scale-x-100 rotate-[-12deg] text-moss" />
             <span style={{ fontFamily: "'Caveat', cursive", fontSize: "1.9rem", lineHeight: 1 }}>
-              du pixel
+              {T.note1}
               <br />
-              au serveur
+              {T.note2}
             </span>
             <Sparkle className="w-6 h-6 text-moss" />
           </motion.div>
@@ -187,7 +203,7 @@ export default function Hero() {
             {...pop(0.8)}
             className="relative z-20 mt-8 lg:mt-0 lg:absolute lg:bottom-4 lg:left-0 lg:w-[400px]"
           >
-            <p className="font-mono-label text-moss mb-3">Bonjour, je suis</p>
+            <p className="font-mono-label text-moss mb-3">{T.hello}</p>
             <h1
               className="font-display font-bold leading-[1.02] text-cream"
               style={{ fontSize: "clamp(2.2rem, 3.3vw, 3.1rem)", letterSpacing: "-0.03em" }}
@@ -195,7 +211,7 @@ export default function Hero() {
               Aaron
               <br />
               <span className="text-moss whitespace-nowrap">KAME MOUELE</span>
-              <span className="sr-only">, développeur web et mobile freelance</span>
+              <span className="sr-only">{T.sr}</span>
             </h1>
           </motion.div>
 
@@ -206,16 +222,18 @@ export default function Hero() {
           >
             <button
               onClick={() => scrollTo("contact")}
+              data-k="↵"
               className="keycap group w-full justify-between px-6 py-4 font-semibold text-base [--key-face:#6baf7b] [--key-edge:#3a7549] [--key-text:#0e2f20]"
             >
-              Faisons pousser votre projet
+              {T.cta1}
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </button>
             <button
               onClick={() => scrollTo("projects")}
+              data-k="⌘"
               className="keycap w-full px-6 py-4 font-semibold text-base [--key-face:#1c4a34] [--key-edge:#06150e] [--key-text:#f6f4ec]"
             >
-              Découvrir mes réalisations
+              {T.cta2}
             </button>
           </motion.div>
         </div>

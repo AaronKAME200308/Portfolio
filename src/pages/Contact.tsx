@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import supabase from "../services/supabase";
+import { useLang, type Lang } from "../lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -70,12 +71,80 @@ const DELAIS = [
   { label: "Je suis flexible", value: "flexible" },
 ];
 
-const STEPS = ["Type de projet", "Budget et délai", "Vos coordonnées"];
+const TYPE_EN: Record<string, string> = {
+  web: "Website", app: "Web application", mobile: "Mobile application",
+  api: "API / Back-end", ia: "AI / Vision", autre: "Another idea",
+};
+const BUDGET_EN: Record<string, string> = {
+  palier_1: "Under 300,000 FCFA", palier_2: "300,000 – 600,000 FCFA", palier_3: "600,000 – 1,800,000 FCFA",
+  palier_4: "1,800,000 – 3,000,000 FCFA", palier_5: "Over 3,000,000 FCFA", a_discuter: "To be discussed",
+};
+const DELAI_EN: Record<string, string> = {
+  urgent_2sem: "Urgent (under 2 weeks)", "1mois": "About 1 month", "2_3mois": "2 to 3 months",
+  plus_3mois: "More than 3 months", flexible: "I'm flexible",
+};
 
-const contactItems = [
-  { icon: Mail, label: "Email", value: "aaronmouele11pro@gmail.com", href: "mailto:aaronmouele11pro@gmail.com" },
-  { icon: Phone, label: "Téléphone", value: "+237 670 464 488", href: "tel:+237670464488" },
-  { icon: MapPin, label: "Localisation", value: "Yaoundé, Cameroun", href: null as string | null },
+const TXT = {
+  fr: {
+    kicker: "Contact",
+    titleA: "Faisons pousser ",
+    titleB: "votre projet.",
+    intro: "Trois petites étapes pour me décrire votre idée : je reviens vers vous avec une proposition sous 24h.",
+    social: "Réseaux",
+    emailL: "Email", phoneL: "Téléphone", placeL: "Localisation", place: "Yaoundé, Cameroun",
+    win: "nouveau-projet.eml",
+    steps: ["Type de projet", "Budget et délai", "Vos coordonnées"],
+    step: "Étape",
+    s1h: "Qu'est-ce qu'on construit ?", s1p: "Vous pouvez en choisir plusieurs.",
+    s2h: "Budget et délai", s2p: "Une estimation suffit, on affinera ensemble.",
+    budget: "Budget", delay: "Délai souhaité",
+    s3h: "Où vous répondre ?", s3p: "Tous les champs sont requis.",
+    name: "Nom *", namePh: "Votre nom", email: "Email *", emailPh: "votre@email.com",
+    msg: "Message *", msgPh: "Décrivez votre projet en quelques lignes...",
+    back: "Retour", next: "Suivant", send: "Envoyer le brief", sending: "Envoi en cours…", sent: "Message envoyé !",
+    hint1: "Choisissez au moins un type de projet.",
+    hint2: "Choisissez un budget et un délai (« À discuter » convient).",
+    errRate: "Trop d'envois récents. Réessayez dans une heure ou écrivez-moi directement par email.",
+    errEmail: "Adresse email invalide.", errName: "Nom invalide.", errDesc: "Message trop court (10 caractères minimum).",
+    errGeneric: "Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.",
+    pTitle: "Aperçu · brief de projet", pFrom: "De", pProject: "Projet", pBudget: "Budget", pDelay: "Délai", pMsg: "Message",
+    phName: "Votre nom", phEmail: "votre@email.com", phType: "Type de projet", phBudget: "Votre fourchette",
+    phDelay: "Votre délai", phMsg: "Votre message apparaîtra ici…",
+    foot2: "→ Réponse sous 24h", stamp: "ENVOYÉ", locale: "fr-FR",
+  },
+  en: {
+    kicker: "Contact",
+    titleA: "Let's grow ",
+    titleB: "your project.",
+    intro: "Three quick steps to describe your idea: I'll get back to you with a proposal within 24h.",
+    social: "Social",
+    emailL: "Email", phoneL: "Phone", placeL: "Location", place: "Yaoundé, Cameroon",
+    win: "new-project.eml",
+    steps: ["Project type", "Budget and timeline", "Your details"],
+    step: "Step",
+    s1h: "What are we building?", s1p: "You can pick several.",
+    s2h: "Budget and timeline", s2p: "A rough estimate is enough, we'll refine it together.",
+    budget: "Budget", delay: "Desired timeline",
+    s3h: "Where can I reply?", s3p: "All fields are required.",
+    name: "Name *", namePh: "Your name", email: "Email *", emailPh: "your@email.com",
+    msg: "Message *", msgPh: "Describe your project in a few lines...",
+    back: "Back", next: "Next", send: "Send the brief", sending: "Sending…", sent: "Message sent!",
+    hint1: "Pick at least one project type.",
+    hint2: "Pick a budget and a timeline (\"To be discussed\" is fine).",
+    errRate: "Too many recent submissions. Try again in an hour or email me directly.",
+    errEmail: "Invalid email address.", errName: "Invalid name.", errDesc: "Message too short (10 characters minimum).",
+    errGeneric: "Something went wrong. Please try again or contact me directly by email.",
+    pTitle: "Preview · project brief", pFrom: "From", pProject: "Project", pBudget: "Budget", pDelay: "Timeline", pMsg: "Message",
+    phName: "Your name", phEmail: "your@email.com", phType: "Project type", phBudget: "Your range",
+    phDelay: "Your timeline", phMsg: "Your message will appear here…",
+    foot2: "→ Reply within 24h", stamp: "SENT", locale: "en-GB",
+  },
+};
+
+const contactItemsFor = (T: (typeof TXT)["fr"]) => [
+  { icon: Mail, label: T.emailL, value: "aaronmouele11pro@gmail.com", href: "mailto:aaronmouele11pro@gmail.com" },
+  { icon: Phone, label: T.phoneL, value: "+237 670 464 488", href: "tel:+237670464488" },
+  { icon: MapPin, label: T.placeL, value: T.place, href: null as string | null },
 ];
 
 const socials = [
@@ -93,13 +162,13 @@ const scrollOnSmall = (el: HTMLElement | null, block: ScrollLogicalPosition) => 
 };
 
 /* Traduit les erreurs levées par la fonction SQL submit_contact */
-const contactError = (err: unknown) => {
+const contactError = (err: unknown, T: (typeof TXT)["fr"]) => {
   const m = String((err as { message?: string })?.message ?? "");
-  if (m.includes("rate_limited")) return "Trop d'envois récents. Réessayez dans une heure ou écrivez-moi directement par email.";
-  if (m.includes("invalid_email")) return "Adresse email invalide.";
-  if (m.includes("invalid_name")) return "Nom invalide.";
-  if (m.includes("invalid_description")) return "Message trop court (10 caractères minimum).";
-  return "Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.";
+  if (m.includes("rate_limited")) return T.errRate;
+  if (m.includes("invalid_email")) return T.errEmail;
+  if (m.includes("invalid_name")) return T.errName;
+  if (m.includes("invalid_description")) return T.errDesc;
+  return T.errGeneric;
 };
 
 /* Bord de papier déchiré (crème) vers le footer */
@@ -150,7 +219,7 @@ function Key({ on, onClick, children }: { on: boolean; onClick: () => void; chil
         on
           ? {
               transform: "translateY(4px)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 1px 0 var(--key-edge), 0 3px 6px rgba(0,0,0,0.25)",
+              filter: "brightness(0.94)", boxShadow: "inset 0 5px 9px rgba(0,0,0,0.35), inset 0 0 0 1.5px color-mix(in srgb, var(--key-face) 70%, white), 0 0 0 5px var(--key-rim), 0 0 0 6px rgba(0,0,0,0.18)",
             }
           : undefined
       }
@@ -173,11 +242,20 @@ type Brief = { types: string[]; budget: string; delai: string; name: string; ema
 
 const EMPTY_BRIEF: Brief = { types: [], budget: "", delai: "", name: "", email: "", message: "" };
 
+const typeLabelOf = (id: string, lang: Lang) =>
+  lang === "en" ? TYPE_EN[id] ?? id : TYPES.find((t) => t.id === id)?.label ?? id;
+const budgetLabelOf = (v: string, lang: Lang) =>
+  lang === "en" ? BUDGET_EN[v] ?? v : BUDGETS.find((b) => b.value === v)?.label ?? v;
+const delaiLabelOf = (v: string, lang: Lang) =>
+  lang === "en" ? DELAI_EN[v] ?? v : DELAIS.find((d) => d.value === v)?.label ?? v;
+
 /* ── Aperçu live : le ticket se compose pendant la saisie ── */
 function Preview({ brief, status }: { brief: Brief; status: Status }) {
   const reduce = useReducedMotion();
-  const typeLabels = brief.types.map((id) => TYPES.find((t) => t.id === id)?.label ?? id);
-  const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  const { lang } = useLang();
+  const T = TXT[lang];
+  const typeLabels = brief.types.map((id) => typeLabelOf(id, lang));
+  const today = new Date().toLocaleDateString(T.locale, { day: "2-digit", month: "short", year: "numeric" });
 
   const Row = ({ k, children, filled }: { k: string; children: React.ReactNode; filled: boolean }) => (
     <div className="flex gap-4 py-2.5 border-b border-dashed border-[#c9d5c9] last:border-0">
@@ -192,13 +270,13 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
     <div className="relative" style={{ filter: "drop-shadow(0 14px 18px rgba(0,0,0,0.35))" }}>
       <div className="bg-cream rounded-t-[1.25rem] px-6 pt-5 pb-6" style={notchMask("bottom")}>
         <div className="flex items-center justify-between mb-4">
-          <span className="font-mono-label !text-[10px] text-aun">Aperçu · brief de projet</span>
+          <span className="font-mono-label !text-[10px] text-aun">{T.pTitle}</span>
           <span className="font-mono text-[10px] text-ink-mute">{today}</span>
         </div>
 
-        <Row k="De" filled={!!brief.name}>{brief.name || "Votre nom"}</Row>
-        <Row k="Email" filled={!!brief.email}><span className="break-all">{brief.email || "votre@email.com"}</span></Row>
-        <Row k="Projet" filled={typeLabels.length > 0}>
+        <Row k={T.pFrom} filled={!!brief.name}>{brief.name || T.phName}</Row>
+        <Row k="Email" filled={!!brief.email}><span className="break-all">{brief.email || T.phEmail}</span></Row>
+        <Row k={T.pProject} filled={typeLabels.length > 0}>
           {typeLabels.length ? (
             <span className="flex flex-wrap gap-1.5">
               {typeLabels.map((t) => (
@@ -206,13 +284,13 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
               ))}
             </span>
           ) : (
-            "Type de projet"
+            T.phType
           )}
         </Row>
-        <Row k="Budget" filled={!!brief.budget}>{brief.budget || "Votre fourchette"}</Row>
-        <Row k="Délai" filled={!!brief.delai}>{brief.delai || "Votre délai"}</Row>
-        <Row k="Message" filled={!!brief.message}>
-          <span className="line-clamp-5 whitespace-pre-line font-normal">{brief.message || "Votre message apparaîtra ici…"}</span>
+        <Row k={T.pBudget} filled={!!brief.budget}>{brief.budget ? budgetLabelOf(brief.budget, lang) : T.phBudget}</Row>
+        <Row k={T.pDelay} filled={!!brief.delai}>{brief.delai ? delaiLabelOf(brief.delai, lang) : T.phDelay}</Row>
+        <Row k={T.pMsg} filled={!!brief.message}>
+          <span className="line-clamp-5 whitespace-pre-line font-normal">{brief.message || T.phMsg}</span>
         </Row>
       </div>
 
@@ -220,7 +298,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
         <div className="absolute top-0 left-[14px] right-[14px] border-t-2 border-dashed border-[#b9c9bb]" aria-hidden="true" />
         <p className="m-0 font-mono text-[11px] text-ink-mute leading-relaxed">
           → Aaron KAME MOUELE · Yaoundé
-          <br />→ Réponse sous 24h
+          <br />{T.foot2}
         </p>
       </div>
 
@@ -240,7 +318,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
               className="px-6 py-2 rounded-xl font-display font-extrabold text-4xl text-aun border-[5px] border-aun bg-cream/50"
               style={{ letterSpacing: "0.08em", boxShadow: "inset 0 0 0 3px #f6f4ec, 0 0 0 2px rgba(30,123,74,0.4)" }}
             >
-              ENVOYÉ
+              {T.stamp}
             </div>
           </motion.div>
         )}
@@ -250,6 +328,10 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
 }
 
 export default function Contact() {
+  const { lang } = useLang();
+  const T = TXT[lang];
+  const contactItems = contactItemsFor(T);
+  const STEPS = T.steps;
   const [step, setStep] = useState(0);
   const [brief, setBrief] = useState<Brief>(EMPTY_BRIEF);
   const [status, setStatus] = useState<Status>("idle");
@@ -267,7 +349,7 @@ export default function Contact() {
 
   const next = () => {
     if (!canNext) {
-      setHint(step === 0 ? "Choisissez au moins un type de projet." : "Choisissez un budget et un délai (« À discuter » convient).");
+      setHint(step === 0 ? T.hint1 : T.hint2);
       return;
     }
     setHint("");
@@ -280,18 +362,19 @@ export default function Contact() {
     setStatus("loading");
     setErrMsg("");
 
-    const typeLabels = brief.types.map((id) => TYPES.find((t) => t.id === id)?.label ?? id).join(", ");
+    // Le brief est enregistré en français (lisible dans /admin), quelle que soit la langue du visiteur
+    const typeLabels = brief.types.map((id) => typeLabelOf(id, "fr")).join(", ");
     const fullMessage = [
       `Type de projet : ${typeLabels}`,
-      `Budget : ${brief.budget}`,
-      `Délai : ${brief.delai}`,
-      "",
+      `Budget : ${budgetLabelOf(brief.budget, "fr")}`,
+      `Délai : ${delaiLabelOf(brief.delai, "fr")}`,
+      lang === "en" ? "Langue du visiteur : anglais" : "",
       "Message :",
       brief.message,
     ].join("\n");
 
-    const budget = BUDGETS.find((b) => b.label === brief.budget)?.value;
-    const deadline = DELAIS.find((d) => d.label === brief.delai)?.value;
+    const budget = brief.budget;
+    const deadline = brief.delai;
 
     try {
       const { error } = await supabase.rpc("submit_contact", {
@@ -322,7 +405,7 @@ export default function Contact() {
       }, 7000);
     } catch (err: unknown) {
       console.error("Contact error:", err);
-      setErrMsg(contactError(err));
+      setErrMsg(contactError(err, T));
       setStatus("error");
     }
   };
@@ -341,22 +424,22 @@ export default function Contact() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
           <div>
             <motion.p {...fadeUp(0)} className="font-mono-label text-sage mb-5">
-              <span className="text-moss">04 /</span> Contact
+              <span className="text-moss">04 /</span> {T.kicker}
             </motion.p>
             <motion.h2
               {...fadeUp(0.1)}
               className="font-display font-extrabold leading-[1.05] mb-5 !text-cream"
               style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
             >
-              Faisons pousser <span className="text-moss">votre projet.</span>
+              {T.titleA}<span className="text-moss">{T.titleB}</span>
             </motion.h2>
             <motion.p {...fadeUp(0.2)} className="text-sage/75 leading-relaxed max-w-md m-0">
-              Trois petites étapes pour me décrire votre idée : je reviens vers vous avec une proposition sous 24h.
+              {T.intro}
             </motion.p>
           </div>
 
           <motion.div {...fadeUp(0.3)} className="flex items-center gap-3">
-            <span className="font-mono-label !text-[10px] text-moss">Réseaux</span>
+            <span className="font-mono-label !text-[10px] text-moss">{T.social}</span>
             {socials.map(({ icon: Icon, href, label: l }) => (
               <a
                 key={l}
@@ -409,7 +492,7 @@ export default function Contact() {
               <i className="w-2.5 h-2.5 rounded-full bg-forest/25" />
               <i className="w-2.5 h-2.5 rounded-full bg-forest/25" />
               <i className="w-2.5 h-2.5 rounded-full bg-forest/25" />
-              <span className="ml-3 font-mono text-[11px] text-forest/70">nouveau-projet.eml</span>
+              <span className="ml-3 font-mono text-[11px] text-forest/70">{T.win}</span>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 sm:p-8">
@@ -424,7 +507,7 @@ export default function Contact() {
                   ))}
                 </div>
                 <p className="m-0 font-mono-label !text-[10px] text-ink-mute">
-                  Étape {step + 1}/3 · <span className="text-aun">{STEPS[step]}</span>
+                  {T.step} {step + 1}/3 · <span className="text-aun">{STEPS[step]}</span>
                 </p>
               </div>
 
@@ -439,13 +522,13 @@ export default function Contact() {
                       exit={{ opacity: 0, x: -16 }}
                       transition={{ duration: 0.25, ease: EASE }}
                     >
-                      <h3 className="font-display font-bold text-xl mb-1">Qu'est-ce qu'on construit ?</h3>
-                      <p className="text-xs text-ink-mute mb-5">Vous pouvez en choisir plusieurs.</p>
+                      <h3 className="font-display font-bold text-xl mb-1">{T.s1h}</h3>
+                      <p className="text-xs text-ink-mute mb-5">{T.s1p}</p>
                       <div className="grid sm:grid-cols-2 gap-x-4 gap-y-5 pb-2">
                         {TYPES.map(({ id, label: l, icon: Icon }) => (
                           <Key key={id} on={brief.types.includes(id)} onClick={() => toggleType(id)}>
                             <Icon size={16} />
-                            {l}
+                            {typeLabelOf(id, lang)}
                             {brief.types.includes(id) && <Check size={14} className="ml-auto" />}
                           </Key>
                         ))}
@@ -462,23 +545,23 @@ export default function Contact() {
                       exit={{ opacity: 0, x: -16 }}
                       transition={{ duration: 0.25, ease: EASE }}
                     >
-                      <h3 className="font-display font-bold text-xl mb-1">Budget et délai</h3>
-                      <p className="text-xs text-ink-mute mb-5">Une estimation suffit, on affinera ensemble.</p>
+                      <h3 className="font-display font-bold text-xl mb-1">{T.s2h}</h3>
+                      <p className="text-xs text-ink-mute mb-5">{T.s2p}</p>
 
-                      <p className={label}>Budget</p>
+                      <p className={label}>{T.budget}</p>
                       <div className="flex flex-wrap gap-x-3 gap-y-4 mb-6 pb-1">
                         {BUDGETS.map((b) => (
-                          <Key key={b.value} on={brief.budget === b.label} onClick={() => set("budget", b.label)}>
-                            {b.label}
+                          <Key key={b.value} on={brief.budget === b.value} onClick={() => set("budget", b.value)}>
+                            {budgetLabelOf(b.value, lang)}
                           </Key>
                         ))}
                       </div>
 
-                      <p className={label}>Délai souhaité</p>
+                      <p className={label}>{T.delay}</p>
                       <div className="flex flex-wrap gap-x-3 gap-y-4 pb-1">
                         {DELAIS.map((d) => (
-                          <Key key={d.value} on={brief.delai === d.label} onClick={() => set("delai", d.label)}>
-                            {d.label}
+                          <Key key={d.value} on={brief.delai === d.value} onClick={() => set("delai", d.value)}>
+                            {delaiLabelOf(d.value, lang)}
                           </Key>
                         ))}
                       </div>
@@ -496,8 +579,8 @@ export default function Contact() {
                       className="space-y-4"
                     >
                       <div>
-                        <h3 className="font-display font-bold text-xl mb-1">Où vous répondre ?</h3>
-                        <p className="text-xs text-ink-mute m-0">Tous les champs sont requis.</p>
+                        <h3 className="font-display font-bold text-xl mb-1">{T.s3h}</h3>
+                        <p className="text-xs text-ink-mute m-0">{T.s3p}</p>
                       </div>
 
                       <AnimatePresence>
@@ -517,26 +600,26 @@ export default function Contact() {
 
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor="c-name" className={label}>Nom *</label>
+                          <label htmlFor="c-name" className={label}>{T.name}</label>
                           <input
-                            id="c-name" type="text" required placeholder="Votre nom"
+                            id="c-name" type="text" required placeholder={T.namePh}
                             value={brief.name} onChange={(e) => set("name", e.target.value)}
                             disabled={status === "loading" || status === "success"} className={field}
                           />
                         </div>
                         <div>
-                          <label htmlFor="c-email" className={label}>Email *</label>
+                          <label htmlFor="c-email" className={label}>{T.email}</label>
                           <input
-                            id="c-email" type="email" required placeholder="votre@email.com"
+                            id="c-email" type="email" required placeholder={T.emailPh}
                             value={brief.email} onChange={(e) => set("email", e.target.value)}
                             disabled={status === "loading" || status === "success"} className={field}
                           />
                         </div>
                       </div>
                       <div>
-                        <label htmlFor="c-message" className={label}>Message *</label>
+                        <label htmlFor="c-message" className={label}>{T.msg}</label>
                         <textarea
-                          id="c-message" required rows={5} minLength={10} placeholder="Décrivez votre projet en quelques lignes..."
+                          id="c-message" required rows={5} minLength={10} placeholder={T.msgPh}
                           value={brief.message} onChange={(e) => set("message", e.target.value)}
                           disabled={status === "loading" || status === "success"}
                           className={`${field} resize-y leading-relaxed`}
@@ -571,7 +654,7 @@ export default function Contact() {
                     onClick={() => { setHint(""); setStep((s) => s - 1); }}
                     className="keycap px-5 py-3.5 text-sm font-semibold [--key-face:#ffffff] [--key-edge:#a9bcae] [--key-text:#0e2f20]"
                   >
-                    <ArrowLeft size={15} /> Retour
+                    <ArrowLeft size={15} /> {T.back}
                   </button>
                 )}
                 {step < 2 ? (
@@ -581,7 +664,7 @@ export default function Contact() {
                     onClick={next}
                     className="keycap flex-1 py-3.5 text-sm font-semibold [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
                   >
-                    Suivant <ArrowRight size={15} />
+                    {T.next} <ArrowRight size={15} />
                   </button>
                 ) : (
                   <button
@@ -593,17 +676,17 @@ export default function Contact() {
                     {status === "loading" ? (
                       <>
                         <Loader2 size={15} className="animate-spin" />
-                        Envoi en cours…
+                        {T.sending}
                       </>
                     ) : status === "success" ? (
                       <>
                         <Check size={15} />
-                        Message envoyé !
+                        {T.sent}
                       </>
                     ) : (
                       <>
                         <Send size={15} />
-                        Envoyer le brief
+                        {T.send}
                       </>
                     )}
                   </button>

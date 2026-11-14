@@ -1,17 +1,40 @@
 import { Github, Linkedin, Mail, ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLang } from "../lib/i18n";
 
 // Ton SVG du dossier public/ : change le nom si ton fichier s'appelle autrement
 const LOGO_SRC = "/Aun/aun-symbole-vert.svg";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const navLinks = [
-  { id: "about", label: "À propos" },
-  { id: "skills", label: "Compétences" },
-  { id: "projects", label: "Projets" },
-  { id: "contact", label: "Contact" },
-];
+const TXT = {
+  fr: {
+    links: [
+      { id: "about", label: "À propos" },
+      { id: "skills", label: "Compétences" },
+      { id: "projects", label: "Projets" },
+      { id: "contact", label: "Contact" },
+    ],
+    blurb: "Développeur freelance passionné par la création d'expériences web et mobile élégantes.",
+    nav: "Navigation", contact: "Contact", place: "Yaoundé, Cameroun",
+    ctaTitle: "Vous avez un projet ?",
+    ctaText: "Disponible pour de nouvelles missions freelance. Démarrons la conversation.",
+    cta: "Démarrons ensemble", rights: "Tous droits réservés.",
+  },
+  en: {
+    links: [
+      { id: "about", label: "About" },
+      { id: "skills", label: "Skills" },
+      { id: "projects", label: "Projects" },
+      { id: "contact", label: "Contact" },
+    ],
+    blurb: "Freelance developer passionate about building elegant web and mobile experiences.",
+    nav: "Navigation", contact: "Contact", place: "Yaoundé, Cameroon",
+    ctaTitle: "Got a project?",
+    ctaText: "Available for new freelance work. Let's start the conversation.",
+    cta: "Let's work together", rights: "All rights reserved.",
+  },
+};
 
 const socials = [
   { icon: Github, href: "https://github.com/AaronKAME200308", label: "GitHub" },
@@ -19,10 +42,10 @@ const socials = [
   { icon: Mail, href: "mailto:aaronmouele11@gmail.com", label: "Email" },
 ];
 
-const contactItems = [
+const contactBase = [
   { icon: Mail, value: "aaronmouele11@gmail.com", href: "mailto:aaronmouele11@gmail.com" },
   { icon: Phone, value: "+237 670 464 488", href: "tel:+237670464488" },
-  { icon: MapPin, value: "Yaoundé, Cameroun", href: null },
+  { icon: MapPin, value: "", href: null },
 ];
 
 const reveal = (delay = 0) => ({
@@ -33,6 +56,10 @@ const reveal = (delay = 0) => ({
 });
 
 export default function Footer() {
+  const { lang } = useLang();
+  const T = TXT[lang];
+  const navLinks = T.links;
+  const contactItems = contactBase.map((c) => (c.icon === MapPin ? { ...c, value: T.place } : c));
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -57,7 +84,7 @@ export default function Footer() {
               </span>
             </span>
             <p className="text-sm leading-relaxed mb-6 text-ink-mute max-w-xs">
-              Développeur freelance passionné par la création d'expériences web et mobile élégantes.
+              {T.blurb}
             </p>
             <div className="flex gap-2">
               {socials.map(({ icon: Icon, href, label }) => (
@@ -78,7 +105,7 @@ export default function Footer() {
 
           {/* Navigation */}
           <motion.div {...reveal(0.1)}>
-            <p className="font-mono-label mb-5 text-aun">Navigation</p>
+            <p className="font-mono-label mb-5 text-aun">{T.nav}</p>
             <ul className="list-none m-0 p-0 flex flex-col gap-1.5">
               {navLinks.map((l) => (
                 <li key={l.id}>
@@ -99,7 +126,7 @@ export default function Footer() {
 
           {/* Contact */}
           <motion.div {...reveal(0.2)}>
-            <p className="font-mono-label mb-5 text-aun">Contact</p>
+            <p className="font-mono-label mb-5 text-aun">{T.contact}</p>
             <div className="flex flex-col gap-3.5">
               {contactItems.map(({ icon: Icon, value, href }) => (
                 <div key={value} className="flex items-center gap-3">
@@ -123,15 +150,15 @@ export default function Footer() {
             {...reveal(0.3)}
             className="rounded-2xl p-6 bg-sage/60 border border-sage"
           >
-            <p className="font-display font-semibold text-lg text-forest mb-2">Vous avez un projet ?</p>
+            <p className="font-display font-semibold text-lg text-forest mb-2">{T.ctaTitle}</p>
             <p className="text-sm leading-relaxed mb-5 text-ink-mute">
-              Disponible pour de nouvelles missions freelance. Démarrons la conversation.
+              {T.ctaText}
             </p>
             <button
               onClick={() => scrollTo("contact")}
               className="keycap text-sm font-semibold px-5 py-3 [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
             >
-              Démarrons ensemble
+              {T.cta}
             </button>
           </motion.div>
         </div>
@@ -140,9 +167,9 @@ export default function Footer() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs m-0 text-ink-mute">
-            © {new Date().getFullYear()} Aaron KAME MOUELE · Tous droits réservés.
+            © {new Date().getFullYear()} Aaron KAME MOUELE · {T.rights}
           </p>
-          <p className="text-xs m-0 text-ink-mute">Yaoundé, Cameroun</p>
+          <p className="text-xs m-0 text-ink-mute">{T.place}</p>
         </div>
       </div>
     </footer>

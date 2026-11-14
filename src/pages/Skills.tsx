@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useLang } from "../lib/i18n";
 import {
   ChevronDown,
   Scissors,
@@ -70,33 +71,69 @@ const T: Record<string, Tool> = {
 /* ── Compétences ── */
 const SKILLS = [
   {
-    title: "Conception et réalisation d'API robustes",
-    text: "Des APIs REST structurées autour de systèmes précis : schémas validés, authentification, gestion des erreurs et documentation générée avec FastAPI. Aussi en Node.js et Express.",
+    fr: {
+      title: "Conception et réalisation d'API robustes",
+      text: "Des APIs REST structurées autour de systèmes précis : schémas validés, authentification, gestion des erreurs et documentation générée avec FastAPI. Aussi en Node.js et Express.",
+    },
+    en: {
+      title: "Design and development of robust APIs",
+      text: "REST APIs built around precise systems: validated schemas, authentication, error handling and auto-generated documentation with FastAPI. Also in Node.js and Express.",
+    },
     tools: ["fastapi", "python", "node", "express", "symfony"],
   },
   {
-    title: "Analyse, conception et réalisation de systèmes d'information",
-    text: "De l'expression du besoin à l'application livrée : modélisation UML et Merise, architecture logicielle, développement et suivi du code.",
+    fr: {
+      title: "Analyse, conception et réalisation de systèmes d'information",
+      text: "De l'expression du besoin à l'application livrée : modélisation UML et Merise, architecture logicielle, développement et suivi du code.",
+    },
+    en: {
+      title: "Analysis, design and development of information systems",
+      text: "From the initial need to the delivered application: UML and Merise modeling, software architecture, development and code tracking.",
+    },
     tools: ["uml", "merise", "java", "symfony", "postgres"],
   },
   {
-    title: "Conception, réalisation et déploiement de sites web",
-    text: "Portfolios, sites vitrines et plateformes : de la maquette à la mise en ligne, avec des interfaces rapides, responsives et soignées.",
+    fr: {
+      title: "Conception, réalisation et déploiement de sites web",
+      text: "Portfolios, sites vitrines et plateformes : de la maquette à la mise en ligne, avec des interfaces rapides, responsives et soignées.",
+    },
+    en: {
+      title: "Design, development and deployment of websites",
+      text: "Portfolios, showcase sites and platforms: from mockup to launch, with fast, responsive and polished interfaces.",
+    },
     tools: ["react", "ts", "tailwind", "figma", "github"],
   },
   {
-    title: "Conception et réalisation d'applications mobiles",
-    text: "Des applications mobiles multiplateformes branchées sur une API et une base de données, pensées pour l'usage réel sur le terrain.",
+    fr: {
+      title: "Conception et réalisation d'applications mobiles",
+      text: "Des applications mobiles multiplateformes branchées sur une API et une base de données, pensées pour l'usage réel sur le terrain.",
+    },
+    en: {
+      title: "Design and development of mobile applications",
+      text: "Cross-platform mobile apps connected to an API and a database, built for real-world use in the field.",
+    },
     tools: ["rn", "js", "ts", "fastapi", "supabase"],
   },
   {
-    title: "Entraînement de modèles d'IA et vision par ordinateur",
-    text: "Collecte et préparation d'images, entraînement et intégration de modèles de détection, comme pour reconnaître des maladies de plantes.",
+    fr: {
+      title: "Entraînement de modèles d'IA et vision par ordinateur",
+      text: "Collecte et préparation d'images, entraînement et intégration de modèles de détection, comme pour reconnaître des maladies de plantes.",
+    },
+    en: {
+      title: "AI model training and computer vision",
+      text: "Image collection and preparation, training and integration of detection models, such as recognizing plant diseases.",
+    },
     tools: ["python", "tf", "keras"],
   },
   {
-    title: "Modélisation et administration de bases de données",
-    text: "Schémas relationnels propres, requêtes SQL efficaces, authentification et stockage avec Supabase et PostgreSQL.",
+    fr: {
+      title: "Modélisation et administration de bases de données",
+      text: "Schémas relationnels propres, requêtes SQL efficaces, authentification et stockage avec Supabase et PostgreSQL.",
+    },
+    en: {
+      title: "Database modeling and administration",
+      text: "Clean relational schemas, efficient SQL queries, authentication and storage with Supabase and PostgreSQL.",
+    },
     tools: ["postgres", "supabase", "sql", "mysql"],
   },
 ];
@@ -179,6 +216,8 @@ const SceneApi = ({ r }: R) => (
 );
 
 const SceneSi = ({ r }: R) => {
+  const { lang } = useLang();
+  const names = lang === "en" ? ["Customer", "Order", "Product"] : ["Client", "Commande", "Produit"];
   const box = (x: number, y: number, label: string) => (
     <g key={label}>
       <rect x={x} y={y} width="74" height="40" rx="6" fill="#fff" stroke={INK} strokeWidth="2" />
@@ -193,9 +232,9 @@ const SceneSi = ({ r }: R) => {
       <path d="M94 42 L120 62 M196 62 L224 42" stroke={AUN} strokeWidth="2" strokeDasharray="5 5" fill="none">
         <An r={r} attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" />
       </path>
-      {box(14, 16, "Client")}
-      {box(113, 58, "Commande")}
-      {box(212, 16, "Produit")}
+      {box(14, 16, names[0])}
+      {box(113, 58, names[1])}
+      {box(212, 16, names[2])}
       <circle r="4" fill={MOSS}>
         <AnT r={r} attributeName="transform" type="translate" values="94 42;120 62;94 42" dur="2.4s" />
       </circle>
@@ -245,7 +284,9 @@ const SceneMobile = ({ r }: R) => (
   </g>
 );
 
-const SceneIa = ({ r }: R) => (
+const SceneIa = ({ r }: R) => {
+  const { lang } = useLang();
+  return (
   <g>
     <g transform="translate(150 58) rotate(-28)">
       <path d="M-46 0 C-24 -34 24 -34 46 0 C24 34 -24 34 -46 0 Z" fill={AUN} />
@@ -259,17 +300,20 @@ const SceneIa = ({ r }: R) => (
       <An r={r} attributeName="y2" values="24;94;24" dur="3s" />
     </line>
     <rect x="212" y="48" width="62" height="18" rx="5" fill={INK} />
-    <text x="243" y="60" textAnchor="middle" fontSize="8.5" fontFamily={monoF} fill={MOSS}>mildiou 94%</text>
+    <text x="243" y="60" textAnchor="middle" fontSize="8.5" fontFamily={monoF} fill={MOSS}>{lang === "en" ? "blight 94%" : "mildiou 94%"}</text>
   </g>
-);
+  );
+};
 
 const SceneDb = ({ r }: R) => {
+  const { lang } = useLang();
+  const heads = lang === "en" ? ["id", "name", "role"] : ["id", "nom", "rôle"];
   const rows = [48, 64, 80];
   return (
     <g>
       <rect x="62" y="12" width="176" height="92" rx="8" fill="#fff" stroke={INK} strokeWidth="2" />
       <rect x="62" y="12" width="176" height="22" rx="8" fill={INK} />
-      {["id", "nom", "rôle"].map((h, i) => (
+      {heads.map((h, i) => (
         <text key={h} x={74 + i * 58} y="27" fontSize="9" fontFamily={monoF} fill={MOSS}>{h}</text>
       ))}
       {rows.map((y, ri) => (
@@ -323,6 +367,8 @@ const notchMask = (edge: "bottom" | "top"): React.CSSProperties => {
 /* ── Carte de compétence : un ticket qu'on déchire ── */
 function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: number }) {
   const reduce = useReducedMotion();
+  const { lang } = useLang();
+  const tx = skill[lang];
   const [open, setOpen] = useState(false);
   const pointer = useRef("mouse");
   const Scene = SCENES[index];
@@ -351,9 +397,9 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <span className="font-mono-label !text-[10px] text-ink-mute leading-tight">
-                N° {String(index + 1).padStart(2, "0")}
+                {lang === "en" ? "No." : "N°"} {String(index + 1).padStart(2, "0")}
                 <br />
-                <span className="text-aun">Compétence</span>
+                <span className="text-aun">{lang === "en" ? "Skill" : "Compétence"}</span>
               </span>
             </div>
             <Barcode seed={index + 1} />
@@ -372,9 +418,9 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
           </div>
 
           <h3 className="font-display font-bold text-[1.2rem] leading-snug mb-3" style={{ letterSpacing: "-0.01em" }}>
-            {skill.title}
+            {tx.title}
           </h3>
-          <p className="text-sm leading-relaxed text-ink-mute m-0">{skill.text}</p>
+          <p className="text-sm leading-relaxed text-ink-mute m-0">{tx.text}</p>
         </div>
 
         {/* Talon détachable : l'éventail d'outils */}
@@ -401,7 +447,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
             className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest text-cream font-mono-label !text-[10px] cursor-pointer border-0 whitespace-nowrap"
           >
             <Scissors size={11} />
-            Outils · {tools.length}
+            {lang === "en" ? "Tools" : "Outils"} · {tools.length}
             <ChevronDown size={12} className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
           </button>
         </motion.div>
@@ -411,6 +457,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
 }
 
 export default function Skills() {
+  const { lang } = useLang();
   return (
     <section id="skills" className="relative overflow-hidden bg-forest pt-24 pb-32 lg:pt-32 lg:pb-40">
       {/* Halo vert discret */}
@@ -430,17 +477,23 @@ export default function Skills() {
               className="font-display font-extrabold leading-[1.05] max-w-2xl !text-cream"
               style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
             >
-              Ce que je sais <span className="text-moss">faire</span>, pas seulement ce que j'utilise.
+              {lang === "en" ? (
+                <>What I can <span className="text-moss">do</span>, not just what I use.</>
+              ) : (
+                <>Ce que je sais <span className="text-moss">faire</span>, pas seulement ce que j'utilise.</>
+              )}
             </motion.h2>
           </div>
           <motion.p {...fadeUp(0.2)} className="text-sm text-sage/70 max-w-xs">
-            Survole un ticket (ou touche-le sur mobile) pour déchirer le talon et dévoiler les outils derrière chaque compétence.
+            {lang === "en"
+              ? "Hover a ticket (or tap it on mobile) to tear off the stub and reveal the tools behind each skill."
+              : "Survolez un ticket (ou touchez-le sur mobile) pour déchirer le talon et dévoiler les outils derrière chaque compétence."}
           </motion.p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {SKILLS.map((s, i) => (
-            <SkillCard key={s.title} skill={s} index={i} />
+            <SkillCard key={i} skill={s} index={i} />
           ))}
         </div>
       </div>

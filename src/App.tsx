@@ -11,14 +11,23 @@ import Contact from "./pages/Contact";
 import ClientOrderPage from "./pages/ClientOrder";
 import Admin from "./pages/Admin";
 import Footer from "./components/Footer";
+import { LangProvider, useLang } from "./lib/i18n";
 
 const WHATSAPP_NUMBER  = "237670464488";
-const WHATSAPP_MESSAGE = "Bonjour, je souhaite discuter d'un projet avec vous.";
+const WHATSAPP_MESSAGE = {
+  fr: "Bonjour, je souhaite discuter d'un projet avec vous.",
+  en: "Hello, I would like to discuss a project with you.",
+};
+const WHATSAPP_UI = {
+  fr: { tip: "Discutons sur WhatsApp 💬", aria: "Contacter sur WhatsApp" },
+  en: { tip: "Let's chat on WhatsApp 💬", aria: "Contact me on WhatsApp" },
+};
 
 // ── Page principale (portfolio) ───────────────────────────
 function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showTooltip,   setShowTooltip]   = useState(false);
+  const { lang } = useLang();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,7 +42,7 @@ function PortfolioPage() {
     return () => observer.disconnect();
   }, []);
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE[lang])}`;
 
   return (
     <div className="font-body bg-cream text-ink overflow-x-hidden">
@@ -61,7 +70,7 @@ function PortfolioPage() {
                 boxShadow: "0 4px 16px rgba(18,140,70,0.3)",
               }}
             >
-              Discutons sur WhatsApp 💬
+              {WHATSAPP_UI[lang].tip}
             </motion.div>
           )}
         </AnimatePresence>
@@ -70,7 +79,7 @@ function PortfolioPage() {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Contacter sur WhatsApp"
+          aria-label={WHATSAPP_UI[lang].aria}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.8 }}
@@ -98,6 +107,7 @@ function PortfolioPage() {
 // ── App avec routing ──────────────────────────────────────
 export default function App() {
   return (
+    <LangProvider>
       <Routes>
         {/* Portfolio principal */}
         <Route path="/" element={<PortfolioPage />} />
@@ -111,5 +121,6 @@ export default function App() {
         {/* 404 fallback */}
         <Route path="*" element={<PortfolioPage />} />
       </Routes>
+    </LangProvider>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Testimonials from "../components/Testimonials";
+import { useLang, type Lang } from "../lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -135,6 +136,49 @@ const projects = [
 
 type Project = (typeof projects)[number];
 
+// ── Traductions ───────────────────────────────────────────
+const CAT_EN: Record<Category, string> = {
+  Tous: "All",
+  Portfolio: "Portfolio",
+  "Site web": "Website",
+  "Application web": "Web app",
+  "Application mobile": "Mobile app",
+  "IA / ML": "AI / ML",
+};
+const catLabel = (c: Category, lang: Lang) => (lang === "en" ? CAT_EN[c] : c);
+
+const STATUS_EN: Record<string, string> = { "En ligne": "Live", "En cours": "In progress" };
+
+const PROJECT_EN: Record<number, { subtitle: string; description: string }> = {
+  1: {
+    subtitle: "AI mobile application",
+    description:
+      "Mobile application that detects plant diseases using artificial intelligence. A computer vision model trained on thousands of leaf images.",
+  },
+  2: {
+    subtitle: "Travel website",
+    description:
+      "Modern travel platform with destination exploration, immersive image galleries and a booking interface. Polished design, smooth navigation.",
+  },
+  3: {
+    subtitle: "Freelance showcase website",
+    description:
+      "Portfolio site for a freelance graphic designer, showcasing his work with an image gallery, a client booking section and an integrated contact form.",
+  },
+  4: {
+    subtitle: "Business showcase website",
+    description:
+      "Showcase website for a local company, with service presentation, client testimonials and an integrated contact form. YouTube video, blog and much more.",
+  },
+  5: {
+    subtitle: "Web app for restaurants, fast food & more",
+    description:
+      "Web application that lets restaurants create a digital menu accessible via QR code. Customers can browse the menu and leave reviews.",
+  },
+};
+
+const localized = (p: Project, lang: Lang): Project => (lang === "en" ? { ...p, ...PROJECT_EN[p.id] } : p);
+
 // ── Utilitaires ───────────────────────────────────────────
 const hostOf = (url: string) => {
   try {
@@ -170,6 +214,7 @@ function TornEdge({ fill = "#0e2f20" }: { fill?: string }) {
 
 // ── Statut : point + libellé ──────────────────────────────
 const Status = ({ status }: { status: string }) => {
+  const { lang } = useLang();
   const live = status === "En ligne";
   return (
     <span className="inline-flex items-center gap-2 whitespace-nowrap font-mono-label !text-[10px] text-forest">
@@ -177,7 +222,7 @@ const Status = ({ status }: { status: string }) => {
         {live && <span className="absolute inset-0 rounded-full bg-aun animate-ping opacity-60" />}
         <span className={`relative w-2 h-2 rounded-full ${live ? "bg-aun" : "bg-[#e0a21a]"}`} />
       </span>
-      {status}
+      {lang === "en" ? STATUS_EN[status] ?? status : status}
     </span>
   );
 };
@@ -235,7 +280,9 @@ const ProjectIcon = ({
 };
 
 // ── Fenêtre de navigateur : aperçu du projet ──────────────
-const BrowserPreview = ({ project, large = false }: { project: Project; large?: boolean }) => (
+const BrowserPreview = ({ project, large = false }: { project: Project; large?: boolean }) => {
+  const { lang } = useLang();
+  return (
   <div className="flex flex-col h-full">
     <div className="flex items-center gap-3 px-4 py-2.5 bg-sage/70 border-b border-sage">
       <span className="flex gap-1.5 shrink-0" aria-hidden="true">
@@ -244,7 +291,7 @@ const BrowserPreview = ({ project, large = false }: { project: Project; large?: 
         <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
       </span>
       <span className="flex-1 min-w-0 truncate rounded-md bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
-        {project.link ? hostOf(project.link) : "localhost · en développement"}
+        {project.link ? hostOf(project.link) : lang === "en" ? "localhost · in development" : "localhost · en développement"}
       </span>
     </div>
     <div
@@ -264,7 +311,8 @@ const BrowserPreview = ({ project, large = false }: { project: Project; large?: 
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // ── Pastilles de technologies ─────────────────────────────
 const Tags = ({ tags, max }: { tags: string[]; max?: number }) => {
@@ -284,7 +332,9 @@ const Tags = ({ tags, max }: { tags: string[]; max?: number }) => {
 };
 
 // ── Boutons : touches de clavier ──────────────────────────
-const Actions = ({ project }: { project: Project }) => (
+const Actions = ({ project }: { project: Project }) => {
+  const { lang } = useLang();
+  return (
   <div className="flex flex-wrap gap-3 pt-1">
     {project.link && (
       <a
@@ -293,7 +343,7 @@ const Actions = ({ project }: { project: Project }) => (
         rel="noopener noreferrer"
         className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
       >
-        <ExternalLink size={14} /> Voir le projet
+        <ExternalLink size={14} /> {lang === "en" ? "View project" : "Voir le projet"}
       </a>
     )}
     <a
@@ -305,10 +355,14 @@ const Actions = ({ project }: { project: Project }) => (
       <Github size={14} /> Code
     </a>
   </div>
-);
+  );
+};
 
 // ── Carte à la une (2 colonnes) ───────────────────────────
-const FeaturedCard = ({ project }: { project: Project }) => (
+const FeaturedCard = ({ project: base }: { project: Project }) => {
+  const { lang } = useLang();
+  const project = localized(base, lang);
+  return (
   <motion.article
     layout
     initial={{ opacity: 0, y: 32 }}
@@ -321,7 +375,7 @@ const FeaturedCard = ({ project }: { project: Project }) => (
     <BrowserPreview project={project} large />
     <div className="p-7 md:p-8 flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <span className="font-mono-label !text-[10px] text-aun">À la une</span>
+        <span className="font-mono-label !text-[10px] text-aun">{lang === "en" ? "Featured" : "À la une"}</span>
         <Status status={project.status} />
       </div>
       <div>
@@ -337,10 +391,14 @@ const FeaturedCard = ({ project }: { project: Project }) => (
       </div>
     </div>
   </motion.article>
-);
+  );
+};
 
 // ── Carte standard ────────────────────────────────────────
-const SmallCard = ({ project, index }: { project: Project; index: number }) => (
+const SmallCard = ({ project: base, index }: { project: Project; index: number }) => {
+  const { lang } = useLang();
+  const project = localized(base, lang);
+  return (
   <motion.article
     layout
     initial={{ opacity: 0, y: 32 }}
@@ -353,7 +411,7 @@ const SmallCard = ({ project, index }: { project: Project; index: number }) => (
     <BrowserPreview project={project} />
     <div className="p-6 flex flex-col gap-3 flex-1">
       <div className="flex items-center justify-between gap-3">
-        <span className="font-mono-label !text-[10px] text-ink-mute">{project.category}</span>
+        <span className="font-mono-label !text-[10px] text-ink-mute">{catLabel(project.category, lang)}</span>
         <Status status={project.status} />
       </div>
       <div>
@@ -367,10 +425,12 @@ const SmallCard = ({ project, index }: { project: Project; index: number }) => (
       <Actions project={project} />
     </div>
   </motion.article>
-);
+  );
+};
 
 // ═══════════════════════════════════════════════════════════
 export default function Projects() {
+  const { lang } = useLang();
   const [activeTab, setActiveTab] = useState<Category>("Tous");
 
   const filtered = activeTab === "Tous" ? projects : projects.filter((p) => p.category === activeTab);
@@ -387,18 +447,24 @@ export default function Projects() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
           <div>
             <motion.p {...fadeUp(0)} className="font-mono-label text-aun mb-5">
-              <span className="text-moss">03 /</span> Projets
+              <span className="text-moss">03 /</span> {lang === "en" ? "Projects" : "Projets"}
             </motion.p>
             <motion.h2
               {...fadeUp(0.1)}
               className="font-display font-extrabold leading-[1.05] max-w-2xl"
               style={{ fontSize: "clamp(2.2rem, 4.6vw, 3.6rem)", letterSpacing: "-0.03em" }}
             >
-              Ce que j'ai <span className="text-aun">construit</span>, du prototype à la mise en ligne.
+              {lang === "en" ? (
+                <>What I've <span className="text-aun">built</span>, from prototype to launch.</>
+              ) : (
+                <>Ce que j'ai <span className="text-aun">construit</span>, du prototype à la mise en ligne.</>
+              )}
             </motion.h2>
           </div>
           <motion.p {...fadeUp(0.2)} className="text-sm text-ink-mute max-w-xs">
-            Des projets concrets pour de vrais clients, avec le code ou le site à portée de clic.
+            {lang === "en"
+              ? "Real projects for real clients, with the code or the live site one click away."
+              : "Des projets concrets pour de vrais clients, avec le code ou le site à portée de clic."}
           </motion.p>
         </div>
 
@@ -407,7 +473,7 @@ export default function Projects() {
           {...fadeUp(0.25)}
           className="flex flex-row md:flex-wrap gap-2 mb-10 overflow-x-auto md:overflow-visible pb-2 md:pb-0"
           role="tablist"
-          aria-label="Catégories de projets"
+          aria-label={lang === "en" ? "Project categories" : "Catégories de projets"}
         >
           {CATEGORIES.map(({ key, icon }) => {
             const isActive = activeTab === key;
@@ -426,7 +492,7 @@ export default function Projects() {
                 }`}
               >
                 {icon}
-                {key}
+                {catLabel(key, lang)}
                 <span
                   className={`font-mono text-[10px] px-1.5 py-0.5 rounded-full ${
                     isActive ? "bg-white/15 text-cream" : "bg-sage text-forest"
@@ -449,7 +515,9 @@ export default function Projects() {
               exit={{ opacity: 0 }}
               className="text-center py-20 text-ink-mute"
             >
-              <p className="font-display font-semibold m-0">Aucun projet dans cette catégorie pour l'instant.</p>
+              <p className="font-display font-semibold m-0">
+                {lang === "en" ? "No projects in this category yet." : "Aucun projet dans cette catégorie pour l'instant."}
+              </p>
             </motion.div>
           ) : (
             <motion.div key="grid" layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
