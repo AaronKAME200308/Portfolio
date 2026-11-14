@@ -13,7 +13,7 @@ export type StatOrder = {
   budget_range: string | null; project_title: string | null; submitted_at: string;
   client_reviews?: ({ rating: number; approved: boolean } | null)[] | { rating: number; approved: boolean } | null;
 };
-export type StatVisit = { created_at: string; visitor_id: string; lang: string | null; device: string | null };
+export type StatVisit = { created_at: string; visitor_id: string; lang: string | null; device: string | null; kind?: string | null };
 export type InvoiceLine = { label: string; price: number; qty: number };
 export type StatInvoice = { order_id: string; issued_on: string; lines: InvoiceLine[]; discount: number };
 
@@ -68,6 +68,9 @@ export function computeStats(
   period: Period, orders: StatOrder[], visits: StatVisit[], invoices: StatInvoice[], now = new Date(),
 ) {
   const { start, end, prevStart } = windows(period, now);
+  // Les stats ne comptent que les humains ; robots et soi-même sont comptés à part
+  const allVisits = visits;
+  visits = visits.filter((v) => !v.kind || v.kind === "human");
   const hasPrev = prevStart !== null && start !== null;
   const cur = <T,>(items: T[], date: (x: T) => string) => items.filter((x) => inRange(date(x), start, end));
   const prev = <T,>(items: T[], date: (x: T) => string) =>
@@ -157,5 +160,10 @@ export function computeStats(
     }
   }
 
-  return { kpi, funnel, byPalier, pipeline, reviews, buckets };
+  const filtered = {
+    bots: allVisits.filter((v) => v.kind === "bot" && inRange(v.created_at, start, end)).length,
+    owner: allVisits.filter((v) => v.kind === "owner" && inRange(v.created_at, start, end)).length,
+  };
+
+  return { kpi, funnel, byPalier, pipeline, reviews, buckets, filtered };
 }

@@ -17,6 +17,15 @@ const visitorId = () => {
   }
 };
 
+// Robots qui exécutent du JavaScript (aperçus de liens, audits, navigateurs automatisés)
+const BOT_RE = /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|gtmetrix|preview|facebookexternalhit|whatsapp|telegram|discord|curl|wget|python|node-fetch|axios|vercel|uptime|monitor|phantom|puppeteer|playwright/i;
+
+const kindOf = (): "human" | "bot" | "owner" => {
+  try { if (localStorage.getItem("aun-owner") === "1") return "owner"; } catch { /* ignore */ }
+  if (navigator.webdriver || BOT_RE.test(navigator.userAgent)) return "bot";
+  return "human";
+};
+
 export function trackVisit(lang: "fr" | "en") {
   try {
     // L'admin ne se compte pas lui-même
@@ -32,6 +41,7 @@ export function trackVisit(lang: "fr" | "en") {
       p_lang: lang,
       p_device: window.matchMedia("(max-width: 767px)").matches ? "mobile" : "desktop",
       p_referrer: ref,
+      p_kind: kindOf(),
     })
     .then(() => undefined, () => undefined);
 }

@@ -9,7 +9,7 @@ function DeltaChip({ d }: { d: Delta }) {
   const Icon = d.up === null ? Minus : d.up ? ArrowUpRight : ArrowDownRight;
   const cls = d.up === null ? "bg-ink/5 text-ink-mute" : d.up ? "bg-aun/15 text-aun" : "bg-red-100 text-red-700";
   return (
-    <span className={`inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-mono-label !text-[10px] ${cls}`}
+    <span className={`inline-flex items-center gap-0.5 whitespace-nowrap shrink-0 rounded-md px-1.5 py-0.5 font-mono-label !text-[10px] ${cls}`}
       title="Par rapport à la période précédente de même durée">
       <Icon size={11} /> {d.label}
     </span>
@@ -69,7 +69,7 @@ export default function StatsPanel({
       {/* chiffres clés */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Kpi label="Visiteurs uniques" value={visitsReady ? String(s.kpi.visitors.v) : "—"} d={s.kpi.visitors.d}
-          hint={visitsReady ? undefined : "table à créer"} />
+          hint={!visitsReady ? "table à créer" : s.filtered.bots + s.filtered.owner > 0 ? `${s.filtered.bots} robots · ${s.filtered.owner} vous (masqués)` : undefined} />
         <Kpi label="Contacts" value={String(s.kpi.contacts.v)} d={s.kpi.contacts.d} hint="formulaire du site" />
         <Kpi label="Commandes validées" value={String(s.kpi.validated.v)} d={s.kpi.validated.d} hint="en cours + livrées" />
         <Kpi label="Facturé" value={fcfa(s.kpi.billed.v)} d={s.kpi.billed.d} />

@@ -210,7 +210,7 @@ function Dashboard({ session }: { session: Session }) {
     const all: StatVisit[] = [];
     let ok = true;
     for (let from = 0; from < 20000; from += 1000) {
-      const r = await supabase.from("site_visits").select("created_at, visitor_id, lang, device")
+      const r = await supabase.from("site_visits").select("created_at, visitor_id, lang, device, kind")
         .order("created_at", { ascending: false }).range(from, from + 999);
       if (r.error) { ok = false; break; }
       all.push(...((r.data ?? []) as StatVisit[]));
@@ -222,6 +222,9 @@ function Dashboard({ session }: { session: Session }) {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Ce navigateur est le vôtre : ses visites du portfolio seront marquées « owner » et masquées
+  useEffect(() => { try { localStorage.setItem("aun-owner", "1"); } catch { /* ignore */ } }, []);
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
