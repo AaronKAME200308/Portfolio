@@ -1,5 +1,5 @@
 
-name: React CI Pipeline
+name: Portfolio CI
 
 on:
   push:
@@ -27,3 +27,9 @@ jobs:
 
       - name: Construire le projet
         run: npm run build
+      
+      - name: Version Node.js
+        run: node -v
+
+      - name: CI Start
+        run: echo "CI Pipeline started successfully"
