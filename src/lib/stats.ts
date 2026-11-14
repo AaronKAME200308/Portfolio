@@ -34,7 +34,7 @@ export const invoiceTotal = (inv: { lines: InvoiceLine[]; discount: number }) =>
   Math.max(0, inv.lines.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0) - (Number(inv.discount) || 0));
 
 export const fcfa = (n: number) =>
-  `${new Intl.NumberFormat("fr-FR").format(Math.round(n)).replace(/[  ]/g, " ")} FCFA`;
+  `${new Intl.NumberFormat("fr-FR").format(Math.round(n)).replace(/[\u202f\u00a0]/g, " ")} FCFA`;
 
 const DAY = 86_400_000;
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());

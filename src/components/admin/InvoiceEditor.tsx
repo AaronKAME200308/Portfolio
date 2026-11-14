@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2, Plus, Trash2, X } from "lucide-react";
 import supabase from "../../services/supabase";
-import InvoiceSheet, { downloadInvoicePdf, type InvoiceData } from "./InvoiceSheet";
+import InvoiceSheet from "./InvoiceSheet";
+import { downloadInvoicePdf, type InvoiceData } from "../../lib/invoice";
 import { fcfa, invoiceTotal, type InvoiceLine } from "../../lib/stats";
 
 export type Invoice = {
