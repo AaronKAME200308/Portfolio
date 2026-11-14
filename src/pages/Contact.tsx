@@ -525,7 +525,7 @@ export default function Contact() {
                       <h3 className="font-display font-bold text-xl mb-1">{T.s1h}</h3>
                       <p className="text-xs text-ink-mute mb-5">{T.s1p}</p>
                       <div className="grid sm:grid-cols-2 gap-x-4 gap-y-5 pb-2">
-                        {TYPES.map(({ id, label: l, icon: Icon }) => (
+                        {TYPES.map(({ id, icon: Icon }) => (
                           <Key key={id} on={brief.types.includes(id)} onClick={() => toggleType(id)}>
                             <Icon size={16} />
                             {typeLabelOf(id, lang)}
