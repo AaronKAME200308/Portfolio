@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { Check, Copy, Loader2, LogOut, Plus, RefreshCw, Star, Trash2 } from "lucide-react";
+import { Check, Copy, FileText, Loader2, LogOut, Plus, RefreshCw, Star, Trash2 } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import supabase from "../services/supabase";
 import {
   DEADLINES, PROJECT_TYPES, STATUSES, labelOf, budgetLabel,
 } from "../lib/orderConfig";
+import StatsPanel from "../components/admin/StatsPanel";
+import InvoiceEditor, { type Invoice } from "../components/admin/InvoiceEditor";
+import { fcfa, invoiceTotal, isContact, type StatVisit } from "../lib/stats";
 
 const LOGO_SRC = "/Aun/aun-symbole-vert.svg";
 
@@ -16,7 +19,7 @@ type Order = {
   description: string | null; features: string | null; preferred_techs: string | null;
   visual_references: string | null; budget_range: string | null; budget_currency: string;
   deadline: string | null; additional_notes: string | null; admin_notes: string | null;
-  submitted_at: string;
+  submitted_at: string; source?: string | null;
   client_reviews: Review[] | Review;
 };
 
@@ -63,10 +66,11 @@ function Login() {
 }
 
 /* ── Détail d'une commande ── */
-function Detail({ o, onChange, onDelete }: { o: Order; onChange: () => void; onDelete: () => void }) {
+function Detail({ o, invoices, onChange, onDelete }: { o: Order; invoices: Invoice[]; onChange: () => void; onDelete: () => void }) {
   const [notes, setNotes] = useState(o.admin_notes ?? "");
   const [copied, setCopied] = useState(false);
   const rv = reviewOf(o);
+  const [inv, setInv] = useState<{ edit: Invoice | null } | null>(null);
 
   const patch = async (values: Record<string, unknown>) => {
     await supabase.from("client_orders").update(values).eq("id", o.id);
@@ -140,6 +144,28 @@ function Detail({ o, onChange, onDelete }: { o: Order; onChange: () => void; onD
           onBlur={() => notes !== (o.admin_notes ?? "") && patch({ admin_notes: notes })} />
       </div>
 
+      {o.status === "livre" ? (
+        <div className="rounded-2xl bg-sage/60 p-4 space-y-3">
+          <p className="font-mono-label text-aun">Facturation</p>
+          {invoices.map((i) => (
+            <div key={i.id} className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="font-semibold text-forest">{i.number}</span>
+              <span className="text-ink-soft">{fcfa(invoiceTotal(i))}</span>
+              <span className={`font-mono-label !text-[10px] rounded-md px-2 py-1 ${i.paid ? "bg-aun/15 text-aun" : "bg-amber-100 text-amber-700"}`}>
+                {i.paid ? "Payée" : "À payer"}
+              </span>
+              <button onClick={() => setInv({ edit: i })} className={`keycap ml-auto px-4 py-2 text-xs font-semibold ${keyWhite}`}>Ouvrir / PDF</button>
+            </div>
+          ))}
+          <button onClick={() => setInv({ edit: null })} className={`keycap px-5 py-3 text-sm font-semibold ${keyGreen}`}>
+            <FileText size={15} /> {invoices.length ? "Nouvelle facture" : "Générer la facture"}
+          </button>
+        </div>
+      ) : (
+        <p className="text-xs text-ink-mute">La facture se génère quand le statut passe à « Livré ».</p>
+      )}
+      {inv && <InvoiceEditor order={o} invoice={inv.edit} onClose={() => setInv(null)} onSaved={onChange} />}
+
       <div className="flex flex-wrap gap-3">
         <button onClick={copy} className={`keycap px-5 py-3 text-sm font-semibold ${keyGreen}`}>
           {copied ? <Check size={15} /> : <Copy size={15} />} {copied ? "Lien copié" : "Copier le lien client"}
@@ -159,6 +185,10 @@ function Dashboard({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [origin, setOrigin] = useState<"all" | "contact" | "lien">("all");
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [visits, setVisits] = useState<StatVisit[]>([]);
+  const [visitsReady, setVisitsReady] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [creating, setCreating] = useState(false);
@@ -172,6 +202,22 @@ function Dashboard({ session }: { session: Session }) {
       .order("submitted_at", { ascending: false });
     if (error) setErr("Lecture impossible : ce compte n'est pas autorisé.");
     else setOrders((data ?? []) as Order[]);
+
+    const inv = await supabase.from("invoices").select("*");
+    if (!inv.error) setInvoices((inv.data ?? []) as Invoice[]);
+
+    // visites : lecture par pages de 1000 (limite Supabase), 20 000 max
+    const all: StatVisit[] = [];
+    let ok = true;
+    for (let from = 0; from < 20000; from += 1000) {
+      const r = await supabase.from("site_visits").select("created_at, visitor_id, lang, device")
+        .order("created_at", { ascending: false }).range(from, from + 999);
+      if (r.error) { ok = false; break; }
+      all.push(...((r.data ?? []) as StatVisit[]));
+      if ((r.data?.length ?? 0) < 1000) break;
+    }
+    setVisits(all);
+    setVisitsReady(ok);
     setLoading(false);
   }, []);
 
@@ -191,7 +237,8 @@ function Dashboard({ session }: { session: Session }) {
     load();
   };
 
-  const shown = orders.filter((o) => filter === "all" || o.status === filter);
+  const shown = orders.filter((o) => (filter === "all" || o.status === filter)
+    && (origin === "all" || (origin === "contact") === isContact(o)));
   const pending = orders.filter((o) => reviewOf(o) && !reviewOf(o)!.approved).length;
 
   return (
@@ -200,7 +247,7 @@ function Dashboard({ session }: { session: Session }) {
         <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src={LOGO_SRC} alt="" className="h-8 w-8 object-contain brightness-0 invert" />
-            <span className="font-display font-bold text-lg">Commandes</span>
+            <span className="font-display font-bold text-lg">Tableau de bord</span>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={load} aria-label="Actualiser" className="p-2 rounded-lg hover:bg-white/10"><RefreshCw size={17} /></button>
@@ -212,6 +259,8 @@ function Dashboard({ session }: { session: Session }) {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+        {!loading && <StatsPanel orders={orders} visits={visits} invoices={invoices} visitsReady={visitsReady} />}
+
         {/* création */}
         <form onSubmit={create} className="rounded-3xl bg-white/70 border-2 border-ink/10 p-6">
           <p className="font-mono-label text-aun mb-4">Nouveau lien client</p>
@@ -231,6 +280,15 @@ function Dashboard({ session }: { session: Session }) {
         </form>
 
         {/* filtres */}
+        <div className="flex flex-wrap items-center gap-2">
+          {([["all", "Toutes origines"], ["contact", "Contacts du site"], ["lien", "Commandes (lien)"]] as const).map(([v, l]) => (
+            <button key={v} onClick={() => setOrigin(v)} aria-pressed={origin === v}
+              className={`font-mono-label !text-[11px] rounded-full px-3 py-1.5 border-2 transition ${
+                origin === v ? "bg-aun text-white border-aun" : "border-ink/15 text-ink-soft hover:border-aun"}`}>
+              {l}
+            </button>
+          ))}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           {[{ value: "all", label: "Tous" }, ...STATUSES].map((s) => (
             <button key={s.value} onClick={() => setFilter(s.value)}
@@ -265,13 +323,14 @@ function Dashboard({ session }: { session: Session }) {
                         {o.reference} · {new Date(o.submitted_at).toLocaleDateString("fr-FR")}
                       </span>
                     </span>
+                    {isContact(o) && <span className="font-mono-label !text-[10px] rounded-md px-2 py-1 bg-moss/30 text-forest">Contact</span>}
                     <span className={`font-mono-label !text-[10px] rounded-md px-2 py-1 ${
                       o.form_completed ? "bg-aun/15 text-aun" : "bg-ink/5 text-ink-mute"}`}>
                       {o.form_completed ? "Reçu" : "En attente"}
                     </span>
                   </button>
                   {isOpen && (
-                    <Detail o={o} onChange={load}
+                    <Detail o={o} invoices={invoices.filter((i) => i.order_id === o.id)} onChange={load}
                       onDelete={async () => { await supabase.from("client_orders").delete().eq("id", o.id); setOpen(null); load(); }} />
                   )}
                 </li>

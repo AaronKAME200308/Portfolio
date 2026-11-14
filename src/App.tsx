@@ -12,6 +12,7 @@ import ClientOrderPage from "./pages/ClientOrder";
 import Admin from "./pages/Admin";
 import Footer from "./components/Footer";
 import { LangProvider, useLang } from "./lib/i18n";
+import { trackVisit } from "./lib/track";
 
 const WHATSAPP_NUMBER  = "237670464488";
 const WHATSAPP_MESSAGE = {
@@ -28,6 +29,8 @@ function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showTooltip,   setShowTooltip]   = useState(false);
   const { lang } = useLang();
+
+  useEffect(() => { trackVisit(lang); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const observer = new IntersectionObserver(
