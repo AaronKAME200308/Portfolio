@@ -20,8 +20,8 @@ const WHATSAPP_MESSAGE = {
   en: "Hello, I would like to discuss a project with you.",
 };
 const WHATSAPP_UI = {
-  fr: { tip: "Discutons sur WhatsApp 💬", aria: "Contacter sur WhatsApp" },
-  en: { tip: "Let's chat on WhatsApp 💬", aria: "Contact me on WhatsApp" },
+  fr: { tip: "Discutons sur WhatsApp ", aria: "Contacter sur WhatsApp" },
+  en: { tip: "Let's chat on WhatsApp ", aria: "Contact me on WhatsApp" },
 };
 
 // ── Page principale (portfolio) ───────────────────────────
