@@ -170,7 +170,7 @@ function ToolCard({ tool, index, total, open, reduce }: { tool: Tool; index: num
   const Icon = tool.icon;
   return (
     <motion.div
-      className="absolute left-1/2 bottom-10 -ml-[35px] w-[70px] h-[88px] rounded-xl bg-white border border-sage flex flex-col items-center justify-center gap-2 shadow-[0_6px_14px_rgba(14,47,32,0.16)]"
+      className="absolute left-1/2 bottom-10 -ml-[35px] w-[70px] h-[88px] rounded-sm bg-white border border-sage flex flex-col items-center justify-center gap-2 shadow-[0_6px_14px_rgba(14,47,32,0.16)]"
       style={{ transformOrigin: "50% 250%", zIndex: index + 1 }}
       animate={{ rotate: open ? openAngle : closedAngle, y: open ? -6 : 0 }}
       transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 20, delay: open ? index * 0.04 : 0 }}
@@ -391,7 +391,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
       >
         {/* Partie principale */}
         <div
-          className="relative bg-cream rounded-t-[1.25rem] px-6 pt-5 pb-7"
+          className="relative bg-cream rounded-t-sm px-6 pt-5 pb-7"
           style={notchMask("bottom")}
         >
           <div className="flex items-center justify-between mb-4">
@@ -405,7 +405,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
             <Barcode seed={index + 1} />
           </div>
 
-          <div className="relative h-[112px] rounded-xl bg-sage/70 border border-sage mb-5 overflow-hidden">
+          <div className="relative h-[112px] rounded-sm bg-sage/70 border border-sage mb-5 overflow-hidden">
             <svg viewBox="0 0 300 112" className="absolute inset-0 w-full h-full" aria-hidden="true">
               <defs>
                 <pattern id={`dots-${index}`} width="14" height="14" patternUnits="userSpaceOnUse">
@@ -425,7 +425,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
 
         {/* Talon détachable : l'éventail d'outils */}
         <motion.div
-          className="relative bg-[#e6eee4] rounded-b-[1.25rem] h-[172px] overflow-hidden"
+          className="relative bg-[#e6eee4] rounded-b-sm h-[172px] overflow-hidden"
           style={{ ...notchMask("top"), transformOrigin: "100% 0" }}
           animate={{ y: open ? 12 : 0, rotate: open ? -2.2 : 0 }}
           transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 240, damping: 16 }}
@@ -444,7 +444,7 @@ function SkillCard({ skill, index }: { skill: (typeof SKILLS)[number]; index: nu
               e.stopPropagation();
               setOpen((o) => (pointer.current === "mouse" ? true : !o));
             }}
-            className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest text-cream font-mono-label !text-[10px] cursor-pointer border-0 whitespace-nowrap"
+            className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded bg-forest text-cream font-mono-label !text-[10px] cursor-pointer border-0 whitespace-nowrap"
           >
             <Scissors size={11} />
             {lang === "en" ? "Tools" : "Outils"} · {tools.length}
@@ -460,12 +460,6 @@ export default function Skills() {
   const { lang } = useLang();
   return (
     <section id="skills" className="relative overflow-hidden bg-forest pt-24 pb-32 lg:pt-32 lg:pb-40">
-      {/* Halo vert discret */}
-      <div
-        className="absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full pointer-events-none"
-        aria-hidden="true"
-        style={{ background: "radial-gradient(circle, rgba(30,123,74,0.35), transparent 70%)" }}
-      />
       <div className="relative max-w-6xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
           <div>

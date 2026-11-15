@@ -12,6 +12,9 @@ const STATS = [
   { to: 3, key: "years" as const },
 ];
 
+/* Rayon unique pour tous les éléments de la page : équivaut à `rounded-sm` de Tailwind (0.125rem) */
+const RS = "4px";
+
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -415,8 +418,8 @@ function Badge() {
           <line x1="60.5" y1="-22" x2="98" y2="68" stroke={C.creme} strokeOpacity=".55" strokeDasharray="4 4" />
           <line x1="139.5" y1="-22" x2="102" y2="68" stroke={C.creme} strokeOpacity=".55" strokeDasharray="4 4" />
           {/* mousqueton */}
-          <rect x="88" y="60" width="24" height="26" rx="8" fill="none" stroke={C.sauge} strokeWidth="4" />
-          <rect x="92" y="78" width="16" height="12" rx="3" fill={C.sauge} />
+          <rect x="88" y="60" width="24" height="26" rx="2" fill="none" stroke={C.sauge} strokeWidth="4" />
+          <rect x="92" y="78" width="16" height="12" rx="2" fill={C.sauge} />
         </svg>
 
         {/* carte */}
@@ -428,16 +431,16 @@ function Badge() {
             width: CARD_W,
             height: 206,
             background: C.creme,
-            borderRadius: 16,
+            borderRadius: RS,
             boxShadow: "0 18px 30px -12px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(14,47,32,0.08)",
             overflow: "hidden",
           }}
         >
           <div style={{ height: 6, background: C.aun }} />
-          <span aria-hidden="true" style={{ position: "absolute", top: 12, left: "50%", marginLeft: -22, width: 44, height: 7, borderRadius: 4, background: C.foret, opacity: 0.85 }} />
+          <span aria-hidden="true" style={{ position: "absolute", top: 12, left: "50%", marginLeft: -22, width: 44, height: 7, borderRadius: RS, background: C.foret, opacity: 0.85 }} />
 
           <div className="flex items-start gap-3" style={{ padding: "26px 14px 0" }}>
-            <div className="relative shrink-0 overflow-hidden" style={{ width: 62, height: 74, borderRadius: 10, background: "rgba(30,123,74,0.35)" }}>
+            <div className="relative shrink-0 overflow-hidden" style={{ width: 62, height: 74, borderRadius: RS, background: "rgba(30,123,74,0.35)" }}>
               {photo ? (
                 <img
                   src={PHOTO_SRC}
@@ -532,7 +535,7 @@ export default function About() {
             className="relative"
             style={{
               background: C.foret,
-              borderRadius: 28,
+              borderRadius: RS,
               padding: "clamp(18px, 2.8vw, 34px)",
             }}
           >
@@ -543,7 +546,7 @@ export default function About() {
 
             <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
               {/* ══ TERMINAL : parcours · chemin · méthode ══ */}
-              <div className="flex flex-col min-w-0" style={{ borderRadius: 16, overflow: "hidden" }}>
+              <div className="flex flex-col min-w-0" style={{ borderRadius: RS, overflow: "hidden" }}>
                 <Terminal key={lang} blocks={BLOCKS} lang={lang} reduce={reduce} />
               </div>
 
@@ -551,7 +554,7 @@ export default function About() {
               <motion.aside
                 {...fadeUp(0.2)}
                 className="flex flex-col justify-center gap-6"
-                style={{ border: "1px solid rgba(107,175,123,0.35)", borderRadius: 16, padding: 24 }}
+                style={{ border: "1px solid rgba(107,175,123,0.35)", borderRadius: RS, padding: 24 }}
               >
                 <Badge />
 
@@ -583,7 +586,7 @@ export default function About() {
                       fontSize: 12,
                       color: C.sauge,
                       border: "1px solid rgba(220,234,221,0.35)",
-                      borderRadius: 8,
+                      borderRadius: RS,
                       padding: "5px 10px",
                     }}
                   >
@@ -605,7 +608,8 @@ export default function About() {
 
               <button
                 onClick={scrollToContact}
-                className="keycap px-6 py-3.5 text-sm font-semibold [--key-face:#f6f4ec] [--key-edge:#6f8f7a] [--key-text:#0e2f20]"
+                className="keycap rounded-sm px-6 py-3.5 text-sm font-semibold [--key-face:#f6f4ec] [--key-edge:#6f8f7a] [--key-text:#0e2f20]"
+                style={{ borderRadius: RS }}
               >
                 {U.cta} <ArrowRight size={14} />
               </button>

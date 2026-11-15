@@ -21,7 +21,7 @@
   --font-body: "Nunito Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --radius-card: 1.25rem;
+  --radius-card: 0.25rem;
 }
 
 @layer base {
@@ -77,7 +77,7 @@
     gap: 0.6rem;
     cursor: pointer;
     border: 0;
-    border-radius: 0.5rem;
+    border-radius: 4px;
     color: var(--key-text);
     /* plateau légèrement concave, reflet en haut */
     background:

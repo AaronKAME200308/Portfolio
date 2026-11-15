@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Mail,
   Phone,
@@ -19,7 +19,7 @@ import {
   Check,
   type LucideIcon,
 } from "lucide-react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, useInView } from "framer-motion";
 import supabase from "../services/supabase";
 import { useLang, type Lang } from "../lib/i18n";
 
@@ -235,7 +235,7 @@ function Key({ on, onClick, children }: { on: boolean; onClick: () => void; chil
 }
 
 const field =
-  "w-full px-3.5 py-3 rounded-xl text-sm text-ink bg-white border-[1.5px] border-sage outline-none transition-all duration-200 placeholder:text-ink-mute/60 focus:border-aun focus:ring-4 focus:ring-aun/15 disabled:opacity-60";
+  "w-full px-3.5 py-3 rounded-sm text-sm text-ink bg-white border-[1.5px] border-sage outline-none transition-all duration-200 placeholder:text-ink-mute/60 focus:border-aun focus:ring-4 focus:ring-aun/15 disabled:opacity-60";
 const label = "block font-mono-label !text-[10px] text-ink-mute mb-2";
 
 type Brief = { types: string[]; budget: string; delai: string; name: string; email: string; message: string };
@@ -268,7 +268,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
 
   return (
     <div className="relative" style={{ filter: "drop-shadow(0 14px 18px rgba(0,0,0,0.35))" }}>
-      <div className="bg-cream rounded-t-[1.25rem] px-6 pt-5 pb-6" style={notchMask("bottom")}>
+      <div className="bg-cream rounded-t-sm px-6 pt-5 pb-6" style={notchMask("bottom")}>
         <div className="flex items-center justify-between mb-4">
           <span className="font-mono-label !text-[10px] text-aun">{T.pTitle}</span>
           <span className="font-mono text-[10px] text-ink-mute">{today}</span>
@@ -280,7 +280,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
           {typeLabels.length ? (
             <span className="flex flex-wrap gap-1.5">
               {typeLabels.map((t) => (
-                <span key={t} className="px-2 py-0.5 rounded-md bg-sage font-mono text-[11px] text-forest font-medium">{t}</span>
+                <span key={t} className="px-2 py-0.5 rounded-sm bg-sage font-mono text-[11px] text-forest font-medium">{t}</span>
               ))}
             </span>
           ) : (
@@ -294,7 +294,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
         </Row>
       </div>
 
-      <div className="relative bg-[#e6eee4] rounded-b-[1.25rem] px-6 py-4" style={notchMask("top")}>
+      <div className="relative bg-[#e6eee4] rounded-b-sm px-6 py-4" style={notchMask("top")}>
         <div className="absolute top-0 left-[14px] right-[14px] border-t-2 border-dashed border-[#b9c9bb]" aria-hidden="true" />
         <p className="m-0 font-mono text-[11px] text-ink-mute leading-relaxed">
           → Aaron KAME MOUELE · Yaoundé
@@ -315,7 +315,7 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
             aria-hidden="true"
           >
             <div
-              className="px-6 py-2 rounded-xl font-display font-extrabold text-4xl text-aun border-[5px] border-aun bg-cream/50"
+              className="px-6 py-2 rounded-sm font-display font-extrabold text-4xl text-aun border-[5px] border-aun bg-cream/50"
               style={{ letterSpacing: "0.08em", boxShadow: "inset 0 0 0 3px #f6f4ec, 0 0 0 2px rgba(30,123,74,0.4)" }}
             >
               {T.stamp}
@@ -324,6 +324,87 @@ function Preview({ brief, status }: { brief: Brief; status: Status }) {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/* ── Carte de coordonnées avec effet de chargement (spinner → contenu) ── */
+const LOAD_MS = 800;    // durée du chargement
+const STAGGER_MS = 150; // décalage entre les cartes (cascade)
+
+type ContactItem = { icon: LucideIcon; label: string; value: string; href: string | null };
+
+function ContactCard({ icon: Icon, label: l, value, href, index }: ContactItem & { index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const reduce = useReducedMotion();
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!inView) return;
+    const t = setTimeout(() => setLoaded(true), reduce ? 0 : LOAD_MS + index * STAGGER_MS);
+    return () => clearTimeout(t);
+  }, [inView, index, reduce]);
+
+  return (
+    <motion.div
+      ref={ref}
+      {...fadeUp(index * 0.08)}
+      className="flex items-center gap-3.5 px-4 py-3.5 rounded-sm bg-white/[0.05] border border-white/10 min-w-0 min-h-[72px]"
+    >
+      {/* Pastille : spinner → icône */}
+      <span className="w-10 h-10 rounded-sm bg-moss flex items-center justify-center shrink-0">
+        <AnimatePresence mode="wait" initial={false}>
+          {loaded ? (
+            <motion.span
+              key="icon"
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            >
+              <Icon size={16} className="text-forest" />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="spinner"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.6 }}
+              transition={{ duration: 0.15 }}
+            >
+              <Loader2 size={16} className="text-forest animate-spin" />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
+
+      {/* Texte : placeholder → contenu */}
+      <div className="min-w-0 flex-1">
+        <AnimatePresence mode="wait" initial={false}>
+          {loaded ? (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <p className="font-mono-label !text-[10px] text-moss mb-0.5">{l}</p>
+              {href ? (
+                <a href={href} className="text-sm font-semibold text-cream no-underline transition-colors hover:text-moss break-all">
+                  {value}
+                </a>
+              ) : (
+                <p className="text-sm font-semibold text-cream m-0">{value}</p>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key="placeholder" exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="space-y-2 animate-pulse">
+              <div className="h-2 w-12 rounded bg-white/10" />
+              <div className="h-3 w-3/4 rounded bg-white/10" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }
 
@@ -412,13 +493,6 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative overflow-hidden bg-forest pt-24 pb-32 lg:pt-32 lg:pb-40">
-      {/* Halo vert discret */}
-      <div
-        className="absolute -bottom-48 -left-40 w-[560px] h-[560px] rounded-full pointer-events-none"
-        aria-hidden="true"
-        style={{ background: "radial-gradient(circle, rgba(30,123,74,0.35), transparent 70%)" }}
-      />
-
       <div className="relative max-w-6xl mx-auto px-6">
         {/* ══ EN-TÊTE ══ */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
@@ -455,38 +529,13 @@ export default function Contact() {
           </motion.div>
         </div>
 
-        {/* ══ COORDONNÉES ══ */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-12">
-          {contactItems.map(({ icon: Icon, label: l, value, href }, i) => (
-            <motion.div
-              key={l}
-              {...fadeUp(0.25 + i * 0.08)}
-              className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl bg-white/[0.05] border border-white/10 min-w-0"
-            >
-              <span className="w-10 h-10 rounded-xl bg-moss flex items-center justify-center shrink-0">
-                <Icon size={16} className="text-forest" />
-              </span>
-              <div className="min-w-0">
-                <p className="font-mono-label !text-[10px] text-moss mb-0.5">{l}</p>
-                {href ? (
-                  <a href={href} className="text-sm font-semibold text-cream no-underline transition-colors hover:text-moss break-all">
-                    {value}
-                  </a>
-                ) : (
-                  <p className="text-sm font-semibold text-cream m-0">{value}</p>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
         {/* ══ BRIEF GUIDÉ + APERÇU ══ */}
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-start">
           {/* ── Fenêtre : brief en 3 étapes ── */}
           <motion.div
             ref={formRef}
             {...fadeUp(0.2)}
-            className="relative min-w-0 scroll-mt-20 rounded-[1.5rem] overflow-hidden bg-cream shadow-[0_24px_50px_-12px_rgba(0,0,0,0.5)]"
+            className="relative min-w-0 scroll-mt-20 rounded overflow-hidden bg-cream shadow-[0_24px_50px_-12px_rgba(0,0,0,0.5)]"
           >
             <div className="flex items-center gap-2 px-5 py-3 bg-sage border-b border-[#c3d6c6]">
               <i className="w-2.5 h-2.5 rounded-full bg-forest/25" />
@@ -590,7 +639,7 @@ export default function Contact() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -8 }}
                             role="alert"
-                            className="flex items-start gap-3 p-3 rounded-xl bg-[#fef2f2] border-[1.5px] border-[#fecaca]"
+                            className="flex items-start gap-3 p-3 rounded-sm bg-[#fef2f2] border-[1.5px] border-[#fecaca]"
                           >
                             <AlertCircle size={16} className="text-[#dc2626] shrink-0 mt-px" />
                             <p className="text-xs leading-relaxed text-[#b91c1c] m-0">{errMsg}</p>
@@ -699,6 +748,13 @@ export default function Contact() {
           <motion.div ref={ticketRef} {...fadeUp(0.3)} className="min-w-0 lg:sticky lg:top-24">
             <Preview brief={brief} status={status} />
           </motion.div>
+        </div>
+
+        {/* ══ COORDONNÉES (après le brief guidé) ══ */}
+        <div className="grid sm:grid-cols-3 gap-4 mt-14">
+          {contactItems.map((item, i) => (
+            <ContactCard key={item.label} {...item} index={i} />
+          ))}
         </div>
       </div>
 

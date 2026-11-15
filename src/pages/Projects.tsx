@@ -10,6 +10,7 @@ import {
   AppWindow,
   Smartphone,
   Brain,
+  MailOpen,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Testimonials from "../components/Testimonials";
@@ -25,7 +26,7 @@ const fadeUp = (delay = 0) => ({
 });
 
 // ── Catégories ────────────────────────────────────────────
-type Category = "Tous" | "Portfolio" | "Site web" | "Application web" | "Application mobile" | "IA / ML";
+type Category = "Tous" | "Portfolio" | "Site web" | "Application web" | "Application mobile" | "IA / ML" | "Invitations Numeriques";
 
 const CATEGORIES: { key: Category; icon: React.ReactNode }[] = [
   { key: "Tous", icon: <LayoutGrid size={14} /> },
@@ -34,6 +35,7 @@ const CATEGORIES: { key: Category; icon: React.ReactNode }[] = [
   { key: "Application web", icon: <AppWindow size={14} /> },
   { key: "Application mobile", icon: <Smartphone size={14} /> },
   { key: "IA / ML", icon: <Brain size={14} /> },
+  { key: "Invitations Numeriques", icon: <MailOpen size={14} /> },
 ];
 
 // ── Projets ───────────────────────────────────────────────
@@ -132,6 +134,24 @@ const projects = [
     featured: false,
     category: "Application web" as Category,
   },
+  {
+    id: 6,
+    title: "Invitations Numériques",
+    subtitle: "Design d'invitations digitales",
+    description:
+      "Design d'invitations numériques pour divers événements, avec options de personnalisation et de partage facile.",
+    tags: ["Figma", "Illustrator", "Photoshop"],
+    logo: "/logo.png" as string | LucideIcon,
+    logoBg: "linear-gradient(135deg, #030304, #030304, #e6e6e6)" as string | undefined,
+    logoSize: 70,
+    logoFit: "cover" as const,
+    status: "En ligne",
+    gradient: "linear-gradient(135deg, #030304,#030304, #e6e6e6)",
+    link: "https://aa-wedding-woad.vercel.app/loic-ingride?apercu=1",
+    git: "",
+    featured: false,
+    category: "Invitations Numeriques" as Category,
+  }
 ];
 
 type Project = (typeof projects)[number];
@@ -144,6 +164,7 @@ const CAT_EN: Record<Category, string> = {
   "Application web": "Web app",
   "Application mobile": "Mobile app",
   "IA / ML": "AI / ML",
+  "Invitations Numeriques": "Digital Invitations",
 };
 const catLabel = (c: Category, lang: Lang) => (lang === "en" ? CAT_EN[c] : c);
 
@@ -243,7 +264,7 @@ const ProjectIcon = ({
   logoFit?: "contain" | "cover";
   large?: boolean;
 }) => {
-  const sizeClass = large ? "w-24 h-24 rounded-3xl" : "w-16 h-16 rounded-2xl";
+  const sizeClass = large ? "w-24 h-24 rounded-sm" : "w-16 h-16 rounded-sm";
   const iconSize = large ? 40 : 28;
 
   if (typeof logo === "string") {
@@ -290,7 +311,7 @@ const BrowserPreview = ({ project, large = false }: { project: Project; large?: 
         <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
         <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
       </span>
-      <span className="flex-1 min-w-0 truncate rounded-md bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
+      <span className="flex-1 min-w-0 truncate rounded bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
         {project.link ? hostOf(project.link) : lang === "en" ? "localhost · in development" : "localhost · en développement"}
       </span>
     </div>
@@ -320,12 +341,12 @@ const Tags = ({ tags, max }: { tags: string[]; max?: number }) => {
   return (
     <div className="flex flex-wrap gap-1.5">
       {shown.map((t) => (
-        <span key={t} className="px-2 py-1 rounded-md border border-sage bg-cream font-mono text-[11px] text-ink-soft">
+        <span key={t} className="px-2 py-1 rounded-sm border border-sage bg-cream font-mono text-[11px] text-ink-soft">
           {t}
         </span>
       ))}
       {max && tags.length > max && (
-        <span className="px-2 py-1 rounded-md bg-sage/60 font-mono text-[11px] text-ink-mute">+{tags.length - max}</span>
+        <span className="px-2 py-1 rounded-sm bg-sage/60 font-mono text-[11px] text-ink-mute">+{tags.length - max}</span>
       )}
     </div>
   );
@@ -370,7 +391,7 @@ const FeaturedCard = ({ project: base }: { project: Project }) => {
     exit={{ opacity: 0, scale: 0.95 }}
     transition={{ duration: 0.45, ease: EASE }}
     whileHover={{ y: -4 }}
-    className="h-full grid md:grid-cols-2 rounded-[1.5rem] overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.25)]"
+    className="h-full grid md:grid-cols-2 rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.25)]"
   >
     <BrowserPreview project={project} large />
     <div className="p-7 md:p-8 flex flex-col gap-4">
@@ -406,7 +427,7 @@ const SmallCard = ({ project: base, index }: { project: Project; index: number }
     exit={{ opacity: 0, scale: 0.95 }}
     transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
     whileHover={{ y: -4 }}
-    className="h-full flex flex-col rounded-[1.5rem] overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.2)]"
+    className="h-full flex flex-col rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.2)]"
   >
     <BrowserPreview project={project} />
     <div className="p-6 flex flex-col gap-3 flex-1">
@@ -485,7 +506,7 @@ export default function Projects() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(key)}
-                className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold cursor-pointer transition-colors ${
+                className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-semibold cursor-pointer transition-colors ${
                   isActive
                     ? "bg-forest text-cream border-forest"
                     : "bg-white text-ink-soft border-sage hover:border-aun hover:text-aun"
