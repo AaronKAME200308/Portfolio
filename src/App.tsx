@@ -18,7 +18,7 @@ import { trackVisit } from "./lib/track";
 function PortfolioPage() {
   const [activeSection, setActiveSection] = useState("hero");
 
-  useEffect(() => { trackVisit(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { trackVisit(); }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

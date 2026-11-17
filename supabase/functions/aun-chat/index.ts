@@ -168,7 +168,7 @@ Deno.serve(async (req) => {
   const lang = body.lang === "en" ? "en" : "fr";
 
   // messages nettoyés : 12 derniers, 600 caractères max, débute par « user »
-  let msgs = (body.messages ?? [])
+  const msgs = (body.messages ?? [])
     .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
     .slice(-12).map((m) => ({ role: m.role, content: m.content.slice(0, 600) }));
   while (msgs.length && msgs[0].role !== "user") msgs.shift();
