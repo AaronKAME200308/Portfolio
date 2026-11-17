@@ -19,7 +19,7 @@ const TXT = {
     nav: "Navigation", contact: "Contact", place: "Yaoundé, Cameroun",
     ctaTitle: "Vous avez un projet ?",
     ctaText: "Disponible pour de nouvelles missions freelance. Démarrons la conversation.",
-    cta: "Démarrons ensemble", rights: "Tous droits réservés.",
+    cta: "Démarrons ensemble", rights: "Tous droits réservés.", privacy: "Politique de confidentialité",
   },
   en: {
     links: [
@@ -32,18 +32,18 @@ const TXT = {
     nav: "Navigation", contact: "Contact", place: "Yaoundé, Cameroon",
     ctaTitle: "Got a project?",
     ctaText: "Available for new freelance work. Let's start the conversation.",
-    cta: "Let's work together", rights: "All rights reserved.",
+    cta: "Let's work together", rights: "All rights reserved.", privacy: "Privacy policy",
   },
 };
 
 const socials = [
   { icon: Github, href: "https://github.com/AaronKAME200308", label: "GitHub" },
   { icon: Linkedin, href: "https://www.linkedin.com/in/aaron-kame-mouele-b82619289/", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:aaronmouele11@gmail.com", label: "Email" },
+  { icon: Mail, href: "mailto:aaronmouele11pro@gmail.com", label: "Email" },
 ];
 
 const contactBase = [
-  { icon: Mail, value: "aaronmouele11@gmail.com", href: "mailto:aaronmouele11@gmail.com" },
+  { icon: Mail, value: "aaronmouele11pro@gmail.com", href: "mailto:aaronmouele11pro@gmail.com" },
   { icon: Phone, value: "+237 670 464 488", href: "tel:+237670464488" },
   { icon: MapPin, value: "", href: null },
 ];
@@ -169,7 +169,9 @@ export default function Footer() {
           <p className="text-xs m-0 text-ink-mute">
             © {new Date().getFullYear()} Aaron KAME MOUELE · {T.rights}
           </p>
-          <p className="text-xs m-0 text-ink-mute">{T.place}</p>
+          <p className="text-xs m-0 text-ink-mute">
+            <a href="/confidentialite" className="underline underline-offset-2 hover:text-aun">{T.privacy}</a> · {T.place}
+          </p>
         </div>
       </div>
     </footer>

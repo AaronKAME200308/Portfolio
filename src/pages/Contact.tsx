@@ -101,6 +101,7 @@ const TXT = {
     s3h: "Où vous répondre ?", s3p: "Tous les champs sont requis.",
     name: "Nom *", namePh: "Votre nom", email: "Email *", emailPh: "votre@email.com",
     msg: "Message *", msgPh: "Décrivez votre projet en quelques lignes...",
+    privA: "En envoyant ce formulaire, vous acceptez que vos informations soient utilisées pour répondre à votre demande. ", privB: "Politique de confidentialité",
     back: "Retour", next: "Suivant", send: "Envoyer le brief", sending: "Envoi en cours…", sent: "Message envoyé !",
     hint1: "Choisissez au moins un type de projet.",
     hint2: "Choisissez un budget et un délai (« À discuter » convient).",
@@ -128,6 +129,7 @@ const TXT = {
     s3h: "Where can I reply?", s3p: "All fields are required.",
     name: "Name *", namePh: "Your name", email: "Email *", emailPh: "your@email.com",
     msg: "Message *", msgPh: "Describe your project in a few lines...",
+    privA: "By sending this form, you agree that your details are used to answer your request. ", privB: "Privacy policy",
     back: "Back", next: "Next", send: "Send the brief", sending: "Sending…", sent: "Message sent!",
     hint1: "Pick at least one project type.",
     hint2: "Pick a budget and a timeline (\"To be discussed\" is fine).",
@@ -741,6 +743,10 @@ export default function Contact() {
                   </button>
                 )}
               </div>
+              <p className="m-0 mt-4 text-xs leading-relaxed text-ink-mute">
+                {T.privA}
+                <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-aun">{T.privB}</a>.
+              </p>
             </form>
           </motion.div>
 

@@ -26,7 +26,9 @@ const kindOf = (): "human" | "bot" | "owner" => {
   return "human";
 };
 
-export function trackVisit(lang: "fr" | "en") {
+export function trackVisit() {
+  let lang: "fr" | "en" = "fr";
+  try { if (localStorage.getItem("aun-lang") === "en") lang = "en"; } catch { /* ignore */ }
   try {
     // L'admin ne se compte pas lui-même
     if (sessionStorage.getItem("aun-tracked")) return;
