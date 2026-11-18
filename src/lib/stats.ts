@@ -13,7 +13,10 @@ export type StatOrder = {
   budget_range: string | null; project_title: string | null; submitted_at: string;
   client_reviews?: ({ rating: number; approved: boolean } | null)[] | { rating: number; approved: boolean } | null;
 };
-export type StatVisit = { created_at: string; visitor_id: string; lang: string | null; device: string | null; kind?: string | null };
+export type StatVisit = {
+  created_at: string; visitor_id: string; lang: string | null; device: string | null; kind?: string | null;
+  id?: number; page?: string | null; referrer?: string | null;
+};
 export type InvoiceLine = { label: string; price: number; qty: number };
 export type StatInvoice = { order_id: string; issued_on: string; lines: InvoiceLine[]; discount: number };
 

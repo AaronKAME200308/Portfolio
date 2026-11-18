@@ -66,7 +66,7 @@ export default function App() {
         <Route path="/privacy" element={<Privacy />} />
 
         {/* Tableau de bord privé (connexion requise) */}
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/*" element={<Admin />} />
 
         {/* 404 fallback */}
         <Route path="*" element={<PortfolioPage />} />

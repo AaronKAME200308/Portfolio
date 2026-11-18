@@ -224,6 +224,14 @@ export default function ChatWidget() {
   const [talk, setTalk] = useState(false);
   const [nudge, setNudge] = useState(false);
   const [wave, setWave] = useState(false);
+  // mobile : mascotte plus petite pour ne pas gêner la page
+  const [small, setSmall] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const on = () => setSmall(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const end = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -543,7 +551,7 @@ export default function ChatWidget() {
           {nudge && !open && (
             <motion.button onClick={() => setOpen(true)}
               initial={{ opacity: 0, x: 10, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.9 }}
-              className="absolute right-[84px] top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm bg-white px-4 py-2.5 text-sm font-semibold text-forest shadow-lg border-2 border-forest/10">
+              className="absolute right-[62px] sm:right-[84px] top-1/2 -translate-y-1/2 w-max max-w-[200px] text-left whitespace-normal sm:max-w-none sm:whitespace-nowrap rounded-sm bg-white px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-sm font-semibold text-forest shadow-lg border-2 border-forest/10">
               {T.nudge}
             </motion.button>
           )}
@@ -553,9 +561,9 @@ export default function ChatWidget() {
           initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.8 }}
           whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.94 }}
-          className="grid place-items-center h-[72px] w-[72px] rounded-sm bg-cream border-2 border-forest/15 shadow-[0_10px_28px_-6px_rgba(14,47,32,0.5)]"
+          className="grid place-items-center h-[50px] w-[50px] sm:h-[72px] sm:w-[72px] rounded-full bg-cream border-2 border-forest/15 shadow-[0_10px_28px_-6px_rgba(14,47,32,0.5)]"
         >
-          <Mascot size={52} mood={mood} look={!open} />
+          <Mascot size={small ? 36 : 52} mood={mood} look={!open} />
         </motion.button>
       </div>
     </div>

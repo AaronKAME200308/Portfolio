@@ -95,6 +95,14 @@ export default function InvoiceEditor({
     setPdfBusy(false);
   };
 
+  const remove = async () => {
+    if (!invoice || !confirm(`Supprimer la facture ${invoice.number} ?`)) return;
+    const { error } = await supabase.from("invoices").delete().eq("id", invoice.id);
+    if (error) return setErr("Suppression impossible.");
+    onSaved();
+    onClose();
+  };
+
   const total = invoiceTotal(data);
 
   return (
@@ -163,6 +171,11 @@ export default function InvoiceEditor({
                 <button type="button" onClick={pdf} disabled={busy || pdfBusy} className={`keycap px-5 py-3 text-sm font-semibold disabled:opacity-70 ${keyGreen}`}>
                   {pdfBusy ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />} Télécharger le PDF
                 </button>
+                {invoice && (
+                  <button type="button" onClick={remove} className={`keycap px-5 py-3 text-sm font-semibold ${keyWhite}`}>
+                    <Trash2 size={15} /> Supprimer
+                  </button>
+                )}
               </div>
             </div>
 

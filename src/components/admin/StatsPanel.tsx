@@ -30,8 +30,8 @@ function Kpi({ label, value, d, hint }: { label: string; value: string; d: Delta
 }
 
 const Card = ({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) => (
-  <section className="rounded-3xl bg-white/70 border-2 border-ink/10 p-5">
-    <div className="flex items-center justify-between gap-3 mb-4">
+  <section className="min-w-0 rounded-2xl sm:rounded-3xl bg-white/70 border-2 border-ink/10 p-4 sm:p-5">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-4">
       <h3 className="font-mono-label text-aun">{title}</h3>
       {aside}
     </div>
@@ -75,7 +75,7 @@ export default function StatsPanel({
         <Kpi label="Facturé" value={fcfa(s.kpi.billed.v)} d={s.kpi.billed.d} />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* comparaison */}
         <Card title="Contacts vs commandes"
           aside={
@@ -133,7 +133,7 @@ export default function StatsPanel({
           aside={<span className="font-mono-label !text-[11px] text-ink-soft">Facturé : {fcfa(s.kpi.billed.v)}</span>}>
           <ul className="space-y-2.5">
             {s.byPalier.map((p) => (
-              <li key={p.key} className="grid grid-cols-[92px_1fr_auto] items-center gap-3 text-sm">
+              <li key={p.key} className="grid grid-cols-[64px_minmax(0,1fr)_auto] sm:grid-cols-[92px_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3 text-sm">
                 <span className="font-mono-label !text-[10px] text-ink-soft">{p.label}</span>
                 <div className="h-3 rounded-full bg-ink/5 overflow-hidden">
                   <div className="h-full rounded-full bg-forest" style={{ width: `${(p.count / palMax) * 100}%`, minWidth: p.count ? 6 : 0 }} />
