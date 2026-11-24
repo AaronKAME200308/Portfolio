@@ -24,7 +24,7 @@ import { useLang, type Lang } from "../lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-// Nombre maximum de projets affichés par page dans la vue « Tous »
+// Nombre maximum de projets affichés par page dans la vue « Tous » (desktop)
 const PAGE_SIZE = 5;
 
 const fadeUp = (delay = 0) => ({
@@ -33,6 +33,21 @@ const fadeUp = (delay = 0) => ({
   viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.6, delay, ease: EASE },
 });
+
+// ── Détection mobile ──────────────────────────────────────
+function useIsMobile(query = "(max-width: 767px)") {
+  const [match, setMatch] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setMatch(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return match;
+}
 
 // ── Catégories ────────────────────────────────────────────
 type Category = "Tous" | "Portfolio" | "Site web" | "Application web" | "Application mobile" | "IA / ML" | "Invitations Numeriques";
@@ -718,6 +733,7 @@ const ProjectWithSubs = ({ project }: { project: Project }) => {
 };
 
 // ── Pagination ────────────────────────────────────────────
+// Desktop : numéros de pages. Mobile : compteur compact « 1 / 6 ».
 const Pagination = ({
   page,
   total,
@@ -741,21 +757,31 @@ const Pagination = ({
       >
         <ChevronLeft size={16} />
       </button>
-      {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
-        <button
-          key={n}
-          type="button"
-          onClick={() => onChange(n)}
-          aria-current={n === page ? "page" : undefined}
-          className={`${btn} ${
-            n === page
-              ? "bg-forest text-cream border-forest"
-              : "bg-white text-ink-soft border-sage hover:border-aun hover:text-aun"
-          }`}
-        >
-          {n}
-        </button>
-      ))}
+
+      {/* Numéros : desktop uniquement */}
+      <div className="hidden md:flex items-center gap-2">
+        {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onChange(n)}
+            aria-current={n === page ? "page" : undefined}
+            className={`${btn} ${
+              n === page
+                ? "bg-forest text-cream border-forest"
+                : "bg-white text-ink-soft border-sage hover:border-aun hover:text-aun"
+            }`}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+
+      {/* Compteur : mobile uniquement */}
+      <span className="md:hidden min-w-16 text-center font-mono text-sm text-ink-soft">
+        {page} / {total}
+      </span>
+
       <button
         type="button"
         className={`${btn} bg-white text-ink-soft border-sage hover:border-aun hover:text-aun`}
@@ -772,6 +798,7 @@ const Pagination = ({
 // ═══════════════════════════════════════════════════════════
 export default function Projects() {
   const { lang } = useLang();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<Category>("Tous");
   const [page, setPage] = useState(1);
 
@@ -783,10 +810,12 @@ export default function Projects() {
   const isAll = activeTab === "Tous";
   const filtered = isAll ? projects : projects.filter((p) => p.category === activeTab);
 
-  // Pagination uniquement dans la vue « Tous » (5 projets max par page)
-  const totalPages = isAll ? Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)) : 1;
+  // Mobile : 1 projet à la fois.
+  // Desktop : 5 par page dans la vue « Tous », tout sur une page dans une catégorie.
+  const pageSize = isMobile ? 1 : isAll ? PAGE_SIZE : Math.max(filtered.length, 1);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
-  const visible = isAll ? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) : filtered;
+  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   // Dans une catégorie, un projet avec sous-pages est affiché avec ses sous-sections
   const withSubs = isAll ? [] : visible.filter((p) => (p.subProjects?.length ?? 0) > 0);
@@ -796,6 +825,12 @@ export default function Projects() {
 
   const countFor = (cat: Category) =>
     cat === "Tous" ? projects.length : projects.filter((p) => p.category === cat).length;
+
+  // Changement de page : sur mobile, on remonte en haut de la section
+  const changePage = (p: number) => {
+    setPage(p);
+    if (isMobile) document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const renderSmall = (p: Project, i: number) => (
     <SmallCard
@@ -912,8 +947,8 @@ export default function Projects() {
           )}
         </AnimatePresence>
 
-        {/* ── Pagination (vue « Tous » uniquement) ── */}
-        {isAll && totalPages > 1 && <Pagination page={currentPage} total={totalPages} onChange={setPage} />}
+        {/* ── Pagination (dès qu'il y a plusieurs pages) ── */}
+        {totalPages > 1 && <Pagination page={currentPage} total={totalPages} onChange={changePage} />}
       </div>
 
       <Testimonials />
