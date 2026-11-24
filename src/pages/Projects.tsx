@@ -1,22 +1,31 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   type LucideIcon,
+  Play,
+  X,
   ExternalLink,
   Github,
   Globe,
   Leaf,
   LayoutGrid,
+  Layers,
   Monitor,
   AppWindow,
   Smartphone,
   Brain,
   MailOpen,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Testimonials from "../components/Testimonials";
 import { useLang, type Lang } from "../lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+// Nombre maximum de projets affichés par page dans la vue « Tous »
+const PAGE_SIZE = 5;
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -38,12 +47,46 @@ const CATEGORIES: { key: Category; icon: React.ReactNode }[] = [
   { key: "Invitations Numeriques", icon: <MailOpen size={14} /> },
 ];
 
-// ── Projets ───────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────
+// Données communes à une carte (projet ou sous-projet)
 // logo     : string = chemin image | icône Lucide
 // logoBg   : fond de l'aperçu (défaut : "gradient" du projet)
 // logoSize : taille de l'image en % dans le bloc (défaut : 70)
 // logoFit  : "contain" | "cover"
-const projects = [
+interface CardData {
+  id: number | string;
+  title: string;
+  subtitle: string;
+  description: string;
+  tags: string[];
+  logo: string | LucideIcon;
+  logoBg?: string;
+  logoSize: number;
+  logoFit: "contain" | "cover";
+  status: string;
+  gradient: string;
+  link: string;
+  git: string;
+  // Vidéo de navigation (optionnelle) : fichier dans /public/videos
+  video?: string;
+  poster?: string; // image d'attente facultative (sinon : 1re image de la vidéo)
+  videoFit?: "cover" | "contain"; // "contain" pour les vidéos verticales (app mobile)
+}
+
+// Sous-projet : une « sous-page » d'un projet (ex. une invitation précise)
+interface SubProject extends CardData {
+  id: string;
+}
+
+interface Project extends CardData {
+  id: number;
+  featured: boolean;
+  category: Category;
+  subProjects?: SubProject[];
+}
+
+// ── Projets ───────────────────────────────────────────────
+const projects: Project[] = [
   {
     id: 1,
     title: "PlantGuard AI",
@@ -51,16 +94,17 @@ const projects = [
     description:
       "Application mobile permettant la détection des maladies des plantes grâce à l'intelligence artificielle. Modèle de vision par ordinateur entraîné sur des milliers d'images de feuilles.",
     tags: ["React Native", "FastAPI", "Python", "TensorFlow", "PostgreSQL"],
-    logo: Leaf as string | LucideIcon,
-    logoBg: undefined as string | undefined,
+    logo: Leaf,
     logoSize: 70,
-    logoFit: "contain" as const,
+    logoFit: "contain",
     status: "En cours",
     gradient: "linear-gradient(135deg, #34d399, #14b8a6)",
     link: "",
     git: "https://github.com/AaronKAME200308/Aa.git",
+    video: "/videos/plantguard.mp4",
+    videoFit: "contain",
     featured: true,
-    category: "Application mobile" as Category,
+    category: "Application mobile",
   },
   {
     id: 2,
@@ -69,16 +113,16 @@ const projects = [
     description:
       "Plateforme de voyage moderne avec exploration de destinations, galeries d'images immersives et interface de réservation. Design soigné, navigation fluide.",
     tags: ["React JS", "Tailwind CSS", "Node.js", "Supabase"],
-    logo: "https://infiniteluxurytrips.net/logoilt.jpeg" as string | LucideIcon,
-    logoBg: undefined as string | undefined,
+    logo: "https://infiniteluxurytrips.net/logoilt.jpeg",
     logoSize: 70,
-    logoFit: "cover" as const,
+    logoFit: "cover",
     status: "En ligne",
     gradient: "linear-gradient(135deg, #231A55, #4535A0)",
     link: "https://infiniteluxurytrips.net",
     git: "https://github.com/AaronKAME200308/InfinitLuxuryTripsClient.git",
+    video: "/videos/infinite-luxury-trips.mp4",
     featured: false,
-    category: "Site web" as Category,
+    category: "Site web",
   },
   {
     id: 3,
@@ -87,16 +131,17 @@ const projects = [
     description:
       "Site portfolio pour un graphiste freelance, mettant en avant ses réalisations avec une galerie d'images, une section de réservations clients et un formulaire de contact intégré.",
     tags: ["React JS", "Tailwind CSS", "Supabase"],
-    logo: "https://jpgraphicdesign.net/logoblanc.png" as string | LucideIcon,
-    logoBg: "linear-gradient(135deg,#f2cc6a,#f2cc6a)" as string | undefined,
+    logo: "https://jpgraphicdesign.net/logoblanc.png",
+    logoBg: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",
     logoSize: 70,
-    logoFit: "contain" as const,
+    logoFit: "contain",
     status: "En ligne",
     gradient: "linear-gradient(135deg,#f2cc6a,#f2cc6a)",
     link: "https://jpgraphicdesign.net",
     git: "https://github.com/AaronKAME200308/jp-graphic-design.git",
+    video: "/videos/jp-graphic-design.mp4",
     featured: false,
-    category: "Portfolio" as Category,
+    category: "Portfolio",
   },
   {
     id: 4,
@@ -105,16 +150,16 @@ const projects = [
     description:
       "Site vitrine pour une entreprise locale, avec présentation des services, témoignages clients et formulaire de contact intégré. Vidéo Youtube, Blog et bien plus",
     tags: ["React JS", "Tailwind CSS", "Node js"],
-    logo: "https://yapithepartners.com/logoorigin.png" as string | LucideIcon,
-    logoBg: undefined as string | undefined,
+    logo: "https://yapithepartners.com/logoorigin.png",
     logoSize: 70,
-    logoFit: "cover" as const,
+    logoFit: "cover",
     status: "En ligne",
     gradient: "linear-gradient(135deg, #0a4d7c, #23c367)",
     link: "https://yapithepartners.com/",
     git: "https://github.com/AaronKAME200308/yapithe.git",
+    video: "/videos/yapithe.mp4",
     featured: false,
-    category: "Site web" as Category,
+    category: "Site web",
   },
   {
     id: 5,
@@ -123,38 +168,59 @@ const projects = [
     description:
       "Application web permettant aux restaurants de créer un menu digital accessible via QR code. Les clients peuvent consulter le menu, et laisser des avis.",
     tags: ["React JS", "Tailwind CSS", "Node.js", "Supabase"],
-    logo: "/logo.png" as string | LucideIcon,
-    logoBg: "linear-gradient(135deg, #2E7D32, #1B5E20)" as string | undefined,
+    logo: "/Logo/menuqr-symbole.svg",
+    logoBg: "linear-gradient(135deg, #ffffff, #c8c8c8)",
     logoSize: 70,
-    logoFit: "cover" as const,
+    logoFit: "cover",
     status: "En cours",
-    gradient: "linear-gradient(135deg, #2E7D32, #1B5E20)",
+    gradient: "linear-gradient(135deg, #d97f00, #5e4b1b)",
     link: "https://menu-qr-gules.vercel.app/",
     git: "https://github.com/AaronKAME200308/MenuQr.git",
+    video: "/videos/menuqr.mp4",
     featured: false,
-    category: "Application web" as Category,
+    category: "Application web",
   },
   {
     id: 6,
     title: "Invitations Numériques",
-    subtitle: "Design d'invitations digitales",
+    subtitle: "Plateforme d'invitations digitales",
     description:
-      "Design d'invitations numériques pour divers événements, avec options de personnalisation et de partage facile.",
-    tags: ["Figma", "Illustrator", "Photoshop"],
-    logo: "/Logo/I&L wedding Logo (3).png" as string | LucideIcon,
-    logoBg: "linear-gradient(135deg, #f3e9e1, #f3e9e1)" as string | undefined,
+      "Plateforme d'invitations numériques pour divers événements, avec options de personnalisation et de partage facile. Retrouvez ci-dessous les invitations réalisées.",
+    tags: ["Figma","React JS", "Tailwind CSS", "Node.js", "Supabase"],
+    logo: "/Logo/aawedding-color.svg",
+    logoBg: "linear-gradient(135deg, #f3eee1, #f3e9e1)",
     logoSize: 70,
-    logoFit: "cover" as const,
+    logoFit: "cover",
     status: "En ligne",
-    gradient: "linear-gradient(135deg, #030304,#030304)",
-    link: "https://aa-wedding-woad.vercel.app/loic-ingride?apercu=1",
+    gradient: "linear-gradient(135deg, #f1bf34, #f4e2b0)",
+    // TODO : vérifier l'adresse du site principal de la plateforme
+    link: "https://aa-wedding-woad.vercel.app/",
     git: "",
+    video: "/videos/invitations.mp4",
     featured: false,
-    category: "Invitations Numeriques" as Category,
-  }
+    category: "Invitations Numeriques",
+    // ── Sous-pages : une entrée par invitation ──
+    subProjects: [
+      {
+        id: "6-1",
+        title: "Invitation Loïc & Ingride",
+        subtitle: "Invitation de mariage",
+        description: "Invitation de mariage numérique personnalisée, avec aperçu interactif et partage facile.",
+        tags: ["Figma", "React JS", "Tailwind CSS", "Node.js", "Supabase"],
+        logo: "/Logo/I&L wedding Logo (3).png",
+        logoBg: "linear-gradient(135deg, #f3e9e1, #f3e9e1)",
+        logoSize: 70,
+        logoFit: "cover",
+        status: "En ligne",
+        gradient: "linear-gradient(135deg, #030304, #a5a5a5)",
+        link: "https://aa-wedding-woad.vercel.app/loic-ingride?apercu=1",
+        git: "",
+        video: "/videos/invitation-loic-ingride.mp4",
+      },
+      // Ajoutez ici les autres invitations (copier le bloc ci-dessus, id "6-2", "6-3"…)
+    ],
+  },
 ];
-
-type Project = (typeof projects)[number];
 
 // ── Traductions ───────────────────────────────────────────
 const CAT_EN: Record<Category, string> = {
@@ -170,35 +236,47 @@ const catLabel = (c: Category, lang: Lang) => (lang === "en" ? CAT_EN[c] : c);
 
 const STATUS_EN: Record<string, string> = { "En ligne": "Live", "En cours": "In progress" };
 
-const PROJECT_EN: Record<number, { subtitle: string; description: string }> = {
-  1: {
+// Clés = id du projet ou du sous-projet (converti en chaîne)
+const PROJECT_EN: Record<string, { title?: string; subtitle: string; description: string }> = {
+  "1": {
     subtitle: "AI mobile application",
     description:
       "Mobile application that detects plant diseases using artificial intelligence. A computer vision model trained on thousands of leaf images.",
   },
-  2: {
+  "2": {
     subtitle: "Travel website",
     description:
       "Modern travel platform with destination exploration, immersive image galleries and a booking interface. Polished design, smooth navigation.",
   },
-  3: {
+  "3": {
     subtitle: "Freelance showcase website",
     description:
       "Portfolio site for a freelance graphic designer, showcasing his work with an image gallery, a client booking section and an integrated contact form.",
   },
-  4: {
+  "4": {
     subtitle: "Business showcase website",
     description:
       "Showcase website for a local company, with service presentation, client testimonials and an integrated contact form. YouTube video, blog and much more.",
   },
-  5: {
+  "5": {
     subtitle: "Web app for restaurants, fast food & more",
     description:
       "Web application that lets restaurants create a digital menu accessible via QR code. Customers can browse the menu and leave reviews.",
   },
+  "6": {
+    subtitle: "Digital invitations platform",
+    description:
+      "Digital invitation platform for all kinds of events, with customization options and easy sharing. Browse the invitations created below.",
+  },
+  "6-1": {
+    title: "Loïc & Ingride Invitation",
+    subtitle: "Wedding invitation",
+    description: "Customized digital wedding invitation, with an interactive preview and easy sharing.",
+  },
 };
 
-const localized = (p: Project, lang: Lang): Project => (lang === "en" ? { ...p, ...PROJECT_EN[p.id] } : p);
+const localized = <T extends { id: number | string }>(p: T, lang: Lang): T =>
+  lang === "en" ? { ...p, ...PROJECT_EN[String(p.id)] } : p;
 
 // ── Utilitaires ───────────────────────────────────────────
 const hostOf = (url: string) => {
@@ -256,6 +334,7 @@ const ProjectIcon = ({
   logoSize = 70,
   logoFit = "contain",
   large = false,
+  small = false,
 }: {
   logo: string | LucideIcon;
   gradient: string;
@@ -263,9 +342,10 @@ const ProjectIcon = ({
   logoSize?: number;
   logoFit?: "contain" | "cover";
   large?: boolean;
+  small?: boolean;
 }) => {
-  const sizeClass = large ? "w-24 h-24 rounded-sm" : "w-16 h-16 rounded-sm";
-  const iconSize = large ? 40 : 28;
+  const sizeClass = small ? "w-10 h-10 rounded-sm" : large ? "w-24 h-24 rounded-sm" : "w-16 h-16 rounded-sm";
+  const iconSize = small ? 18 : large ? 40 : 28;
 
   if (typeof logo === "string") {
     return (
@@ -300,38 +380,175 @@ const ProjectIcon = ({
   );
 };
 
-// ── Fenêtre de navigateur : aperçu du projet ──────────────
-const BrowserPreview = ({ project, large = false }: { project: Project; large?: boolean }) => {
+// ── Modale vidéo (plein écran, avec son) ──────────────────
+const VideoModal = ({ project, onClose }: { project: CardData; onClose: () => void }) => {
   const { lang } = useLang();
-  return (
-  <div className="flex flex-col h-full">
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-sage/70 border-b border-sage">
-      <span className="flex gap-1.5 shrink-0" aria-hidden="true">
-        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
-        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
-        <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
-      </span>
-      <span className="flex-1 min-w-0 truncate rounded bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
-        {project.link ? hostOf(project.link) : lang === "en" ? "localhost · in development" : "localhost · en développement"}
-      </span>
-    </div>
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return createPortal(
     <div
-      className="relative flex-1 flex items-center justify-center"
-      style={{ background: project.gradient, minHeight: large ? 260 : 150 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 md:p-10"
+      role="dialog"
+      aria-modal="true"
+      aria-label={project.title}
+      onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
-      <div className="relative">
-        <ProjectIcon
-          logo={project.logo}
-          gradient={project.gradient}
-          logoBg={project.logoBg}
-          logoSize={project.logoSize}
-          logoFit={project.logoFit}
-          large={large}
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/15 text-white cursor-pointer hover:bg-white/25 transition-colors"
+        aria-label={lang === "en" ? "Close video" : "Fermer la vidéo"}
+      >
+        <X size={20} />
+      </button>
+      <video
+        src={project.video}
+        poster={project.poster}
+        controls
+        autoPlay
+        playsInline
+        onClick={(e) => e.stopPropagation()}
+        className="max-w-full max-h-full rounded-sm bg-black shadow-2xl"
+      />
+    </div>,
+    document.body
+  );
+};
+
+// ── Zone vidéo : lecture au survol, clic = plein écran ────
+const VideoZone = ({
+  project,
+  large,
+  onFail,
+}: {
+  project: CardData;
+  large: boolean;
+  onFail: () => void;
+}) => {
+  const { lang } = useLang();
+  const ref = useRef<HTMLVideoElement>(null);
+  const [open, setOpen] = useState(false);
+
+  const play = () => {
+    ref.current?.play().catch(() => {});
+  };
+  const stop = () => {
+    const v = ref.current;
+    if (v) {
+      v.pause();
+      v.currentTime = 0;
+    }
+  };
+
+  return (
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`${lang === "en" ? "Play video" : "Lire la vidéo"} : ${project.title}`}
+        className="group relative flex-1 overflow-hidden cursor-pointer"
+        style={{ background: project.gradient, minHeight: large ? 260 : 150 }}
+        onMouseEnter={play}
+        onMouseLeave={stop}
+        onFocus={play}
+        onBlur={stop}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
+        <video
+          ref={ref}
+          src={`${project.video}#t=0.1`}
+          poster={project.poster}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onError={onFail}
+          className={`absolute inset-0 w-full h-full ${project.videoFit === "contain" ? "object-contain" : "object-cover"}`}
         />
+        <div className="absolute inset-0 bg-black/10 pointer-events-none" aria-hidden="true" />
+
+        {/* Bouton lecture : s'efface au survol */}
+        <span
+          className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 group-hover:opacity-0 group-focus-visible:opacity-0"
+          aria-hidden="true"
+        >
+          <span className="flex items-center justify-center w-12 h-12 rounded-full bg-white/90 text-forest shadow-lg">
+            <Play size={20} className="ml-0.5" fill="currentColor" />
+          </span>
+        </span>
+
+        {/* Logo en petit badge */}
+        <div className="absolute bottom-3 left-3 pointer-events-none">
+          <ProjectIcon
+            small
+            logo={project.logo}
+            gradient={project.gradient}
+            logoBg={project.logoBg}
+            logoSize={project.logoSize}
+            logoFit={project.logoFit}
+          />
+        </div>
       </div>
+      {open && <VideoModal project={project} onClose={() => setOpen(false)} />}
+    </>
+  );
+};
+
+// ── Fenêtre de navigateur : aperçu du projet ──────────────
+const BrowserPreview = ({ project, large = false }: { project: CardData; large?: boolean }) => {
+  const { lang } = useLang();
+  // Si la vidéo est absente ou ne charge pas, on retombe sur le logo
+  const [videoFailed, setVideoFailed] = useState(false);
+  const hasVideo = !!project.video && !videoFailed;
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-3 px-4 py-2.5 bg-sage/70 border-b border-sage">
+        <span className="flex gap-1.5 shrink-0" aria-hidden="true">
+          <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+          <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+          <i className="w-2.5 h-2.5 rounded-full bg-forest/20" />
+        </span>
+        <span className="flex-1 min-w-0 truncate rounded bg-white/80 px-3 py-1 font-mono text-[10.5px] text-ink-mute">
+          {project.link ? hostOf(project.link) : lang === "en" ? "localhost · in development" : "localhost · en développement"}
+        </span>
+      </div>
+      {hasVideo ? (
+        <VideoZone project={project} large={large} onFail={() => setVideoFailed(true)} />
+      ) : (
+        <div
+          className="relative flex-1 flex items-center justify-center"
+          style={{ background: project.gradient, minHeight: large ? 260 : 150 }}
+        >
+          <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
+          <div className="relative">
+            <ProjectIcon
+              logo={project.logo}
+              gradient={project.gradient}
+              logoBg={project.logoBg}
+              logoSize={project.logoSize}
+              logoFit={project.logoFit}
+              large={large}
+            />
+          </div>
+        </div>
+      )}
     </div>
-  </div>
   );
 };
 
@@ -353,99 +570,202 @@ const Tags = ({ tags, max }: { tags: string[]; max?: number }) => {
 };
 
 // ── Boutons : touches de clavier ──────────────────────────
-const Actions = ({ project }: { project: Project }) => {
+const Actions = ({ project }: { project: CardData }) => {
   const { lang } = useLang();
   return (
-  <div className="flex flex-wrap gap-3 pt-1">
-    {project.link && (
-      <a
-        href={project.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
-      >
-        <ExternalLink size={14} /> {lang === "en" ? "View project" : "Voir le projet"}
-      </a>
-    )}
-    <a
-      href={project.git}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#ffffff] [--key-edge:#a9bcae] [--key-text:#0e2f20]"
-    >
-      <Github size={14} /> Code
-    </a>
-  </div>
+    <div className="flex flex-wrap gap-3 pt-1">
+      {project.link && (
+        <a
+          href={project.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#1e7b4a] [--key-edge:#0d4527] [--key-text:#ffffff]"
+        >
+          <ExternalLink size={14} /> {lang === "en" ? "View project" : "Voir le projet"}
+        </a>
+      )}
+      {project.git && (
+        <a
+          href={project.git}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="keycap px-4 py-2.5 text-sm font-semibold no-underline [--key-face:#ffffff] [--key-edge:#a9bcae] [--key-text:#0e2f20]"
+        >
+          <Github size={14} /> Code
+        </a>
+      )}
+    </div>
   );
 };
 
 // ── Carte à la une (2 colonnes) ───────────────────────────
-const FeaturedCard = ({ project: base }: { project: Project }) => {
+const FeaturedCard = ({ project: base, badge }: { project: CardData; badge?: string }) => {
   const { lang } = useLang();
   const project = localized(base, lang);
   return (
-  <motion.article
-    layout
-    initial={{ opacity: 0, y: 32 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.45, ease: EASE }}
-    whileHover={{ y: -4 }}
-    className="h-full grid md:grid-cols-2 rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.25)]"
-  >
-    <BrowserPreview project={project} large />
-    <div className="p-7 md:p-8 flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-mono-label !text-[10px] text-aun">{lang === "en" ? "Featured" : "À la une"}</span>
-        <Status status={project.status} />
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.45, ease: EASE }}
+      whileHover={{ y: -4 }}
+      className="h-full grid md:grid-cols-2 rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.25)]"
+    >
+      <BrowserPreview project={project} large />
+      <div className="p-7 md:p-8 flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-mono-label !text-[10px] text-aun">
+            {badge ?? (lang === "en" ? "Featured" : "À la une")}
+          </span>
+          <Status status={project.status} />
+        </div>
+        <div>
+          <h3 className="font-display font-extrabold text-3xl leading-[1.05] mb-1.5" style={{ letterSpacing: "-0.02em" }}>
+            {project.title}
+          </h3>
+          <p className="text-sm text-ink-mute m-0">{project.subtitle}</p>
+        </div>
+        <p className="text-sm leading-relaxed text-ink-soft m-0">{project.description}</p>
+        <Tags tags={project.tags} />
+        <div className="mt-auto">
+          <Actions project={project} />
+        </div>
       </div>
-      <div>
-        <h3 className="font-display font-extrabold text-3xl leading-[1.05] mb-1.5" style={{ letterSpacing: "-0.02em" }}>
-          {project.title}
-        </h3>
-        <p className="text-sm text-ink-mute m-0">{project.subtitle}</p>
-      </div>
-      <p className="text-sm leading-relaxed text-ink-soft m-0">{project.description}</p>
-      <Tags tags={project.tags} />
-      <div className="mt-auto">
-        <Actions project={project} />
-      </div>
-    </div>
-  </motion.article>
+    </motion.article>
   );
 };
 
-// ── Carte standard ────────────────────────────────────────
-const SmallCard = ({ project: base, index }: { project: Project; index: number }) => {
+// ── Carte standard (projet ou sous-projet) ────────────────
+const SmallCard = ({
+  project: base,
+  index,
+  label,
+  subCount = 0,
+  onExplore,
+}: {
+  project: CardData;
+  index: number;
+  label: string;
+  subCount?: number;
+  onExplore?: () => void;
+}) => {
   const { lang } = useLang();
   const project = localized(base, lang);
   return (
-  <motion.article
-    layout
-    initial={{ opacity: 0, y: 32 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
-    whileHover={{ y: -4 }}
-    className="h-full flex flex-col rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.2)]"
-  >
-    <BrowserPreview project={project} />
-    <div className="p-6 flex flex-col gap-3 flex-1">
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-mono-label !text-[10px] text-ink-mute">{catLabel(project.category, lang)}</span>
-        <Status status={project.status} />
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.45, delay: index * 0.08, ease: EASE }}
+      whileHover={{ y: -4 }}
+      className="h-full flex flex-col rounded-sm overflow-hidden bg-white border border-sage shadow-[0_10px_30px_-12px_rgba(14,47,32,0.2)]"
+    >
+      <BrowserPreview project={project} />
+      <div className="p-6 flex flex-col gap-3 flex-1">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-mono-label !text-[10px] text-ink-mute">{label}</span>
+          <Status status={project.status} />
+        </div>
+        <div>
+          <h3 className="font-display font-bold text-xl leading-tight mb-1" style={{ letterSpacing: "-0.01em" }}>
+            {project.title}
+          </h3>
+          <p className="text-xs text-ink-mute m-0">{project.subtitle}</p>
+        </div>
+        <p className="text-sm leading-relaxed text-ink-soft m-0 flex-1">{project.description}</p>
+        <Tags tags={project.tags} max={3} />
+        {subCount > 0 && onExplore && (
+          <button
+            type="button"
+            onClick={onExplore}
+            className="inline-flex items-center gap-2 self-start px-3 py-2 rounded border border-sage bg-cream text-xs font-semibold text-forest cursor-pointer hover:border-aun hover:text-aun transition-colors"
+          >
+            <Layers size={14} />
+            {lang === "en"
+              ? `${subCount} sub-project${subCount > 1 ? "s" : ""} · see all`
+              : `${subCount} sous-projet${subCount > 1 ? "s" : ""} · tout voir`}
+          </button>
+        )}
+        <Actions project={project} />
       </div>
-      <div>
-        <h3 className="font-display font-bold text-xl leading-tight mb-1" style={{ letterSpacing: "-0.01em" }}>
-          {project.title}
-        </h3>
-        <p className="text-xs text-ink-mute m-0">{project.subtitle}</p>
+    </motion.article>
+  );
+};
+
+// ── Projet + ses sous-sections (vue catégorie) ────────────
+const ProjectWithSubs = ({ project }: { project: Project }) => {
+  const { lang } = useLang();
+  const subs = project.subProjects ?? [];
+  return (
+    <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col gap-6">
+      <FeaturedCard project={project} badge={lang === "en" ? "Main site" : "Site principal"} />
+      <div className="flex items-center gap-3">
+        <Layers size={16} className="text-aun" />
+        <span className="font-mono-label !text-[10px] text-ink-mute">
+          {lang === "en" ? "Inside this project" : "Dans ce projet"} · {subs.length}
+        </span>
+        <span className="flex-1 h-px bg-sage" aria-hidden="true" />
       </div>
-      <p className="text-sm leading-relaxed text-ink-soft m-0 flex-1">{project.description}</p>
-      <Tags tags={project.tags} max={3} />
-      <Actions project={project} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {subs.map((s, i) => (
+          <SmallCard key={s.id} project={s} index={i} label={lang === "en" ? "Sub-project" : "Sous-projet"} />
+        ))}
+      </div>
     </div>
-  </motion.article>
+  );
+};
+
+// ── Pagination ────────────────────────────────────────────
+const Pagination = ({
+  page,
+  total,
+  onChange,
+}: {
+  page: number;
+  total: number;
+  onChange: (p: number) => void;
+}) => {
+  const { lang } = useLang();
+  const btn =
+    "inline-flex items-center justify-center w-10 h-10 rounded border text-sm font-semibold cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+  return (
+    <nav className="flex items-center justify-center gap-2 mt-10" aria-label={lang === "en" ? "Pagination" : "Pagination des projets"}>
+      <button
+        type="button"
+        className={`${btn} bg-white text-ink-soft border-sage hover:border-aun hover:text-aun`}
+        onClick={() => onChange(page - 1)}
+        disabled={page === 1}
+        aria-label={lang === "en" ? "Previous page" : "Page précédente"}
+      >
+        <ChevronLeft size={16} />
+      </button>
+      {Array.from({ length: total }, (_, i) => i + 1).map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n)}
+          aria-current={n === page ? "page" : undefined}
+          className={`${btn} ${
+            n === page
+              ? "bg-forest text-cream border-forest"
+              : "bg-white text-ink-soft border-sage hover:border-aun hover:text-aun"
+          }`}
+        >
+          {n}
+        </button>
+      ))}
+      <button
+        type="button"
+        className={`${btn} bg-white text-ink-soft border-sage hover:border-aun hover:text-aun`}
+        onClick={() => onChange(page + 1)}
+        disabled={page === total}
+        aria-label={lang === "en" ? "Next page" : "Page suivante"}
+      >
+        <ChevronRight size={16} />
+      </button>
+    </nav>
   );
 };
 
@@ -453,13 +773,40 @@ const SmallCard = ({ project: base, index }: { project: Project; index: number }
 export default function Projects() {
   const { lang } = useLang();
   const [activeTab, setActiveTab] = useState<Category>("Tous");
+  const [page, setPage] = useState(1);
 
-  const filtered = activeTab === "Tous" ? projects : projects.filter((p) => p.category === activeTab);
-  const featured = filtered.filter((p) => p.featured);
-  const rest = filtered.filter((p) => !p.featured);
+  const selectTab = (cat: Category) => {
+    setActiveTab(cat);
+    setPage(1);
+  };
+
+  const isAll = activeTab === "Tous";
+  const filtered = isAll ? projects : projects.filter((p) => p.category === activeTab);
+
+  // Pagination uniquement dans la vue « Tous » (5 projets max par page)
+  const totalPages = isAll ? Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)) : 1;
+  const currentPage = Math.min(page, totalPages);
+  const visible = isAll ? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) : filtered;
+
+  // Dans une catégorie, un projet avec sous-pages est affiché avec ses sous-sections
+  const withSubs = isAll ? [] : visible.filter((p) => (p.subProjects?.length ?? 0) > 0);
+  const plain = isAll ? visible : visible.filter((p) => !((p.subProjects?.length ?? 0) > 0));
+  const featured = plain.filter((p) => p.featured);
+  const rest = plain.filter((p) => !p.featured);
 
   const countFor = (cat: Category) =>
     cat === "Tous" ? projects.length : projects.filter((p) => p.category === cat).length;
+
+  const renderSmall = (p: Project, i: number) => (
+    <SmallCard
+      key={p.id}
+      project={p}
+      index={i}
+      label={catLabel(p.category, lang)}
+      subCount={isAll ? p.subProjects?.length ?? 0 : 0}
+      onExplore={() => selectTab(p.category)}
+    />
+  );
 
   return (
     <section id="projects" className="relative overflow-hidden bg-cream pt-24 pb-32 lg:pt-32 lg:pb-40">
@@ -505,7 +852,7 @@ export default function Projects() {
                 key={key}
                 role="tab"
                 aria-selected={isActive}
-                onClick={() => setActiveTab(key)}
+                onClick={() => selectTab(key)}
                 className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-semibold cursor-pointer transition-colors ${
                   isActive
                     ? "bg-forest text-cream border-forest"
@@ -541,20 +888,32 @@ export default function Projects() {
               </p>
             </motion.div>
           ) : (
-            <motion.div key="grid" layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              key={`grid-${activeTab}-${currentPage}`}
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {/* Projets avec sous-sections (vue catégorie) */}
+              {withSubs.map((p) => (
+                <ProjectWithSubs key={p.id} project={p} />
+              ))}
+
+              {/* Projets classiques */}
               {featured.map((p) => (
                 <div key={p.id} className="col-span-1 md:col-span-2 lg:col-span-2">
                   <FeaturedCard project={p} />
                 </div>
               ))}
-              {featured.length > 0 &&
-                rest.slice(0, 1).map((p, i) => <SmallCard key={p.id} project={p} index={i} />)}
-              {(featured.length > 0 ? rest.slice(1) : rest).map((p, i) => (
-                <SmallCard key={p.id} project={p} index={i + (featured.length > 0 ? 1 : 0)} />
-              ))}
+              {featured.length > 0 && rest.slice(0, 1).map((p, i) => renderSmall(p, i))}
+              {(featured.length > 0 ? rest.slice(1) : rest).map((p, i) =>
+                renderSmall(p, i + (featured.length > 0 ? 1 : 0))
+              )}
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ── Pagination (vue « Tous » uniquement) ── */}
+        {isAll && totalPages > 1 && <Pagination page={currentPage} total={totalPages} onChange={setPage} />}
       </div>
 
       <Testimonials />

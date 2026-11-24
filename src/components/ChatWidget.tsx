@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ExternalLink, Send, X } from "lucide-react";
+import { ExternalLink, Send, Volume2, VolumeX, X } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import supabase from "../services/supabase";
 import { useLang } from "../lib/i18n";
@@ -15,7 +15,15 @@ const TXT = {
   fr: {
     name: "Aun", sub: "Pose-moi une question sur Aaron",
     hello: "Salut ! Moi c'est Aun 👋 Je peux te parler des services d'Aaron, de ses projets, des budgets… ou t'aider à lui envoyer ta demande. Qu'est-ce qui t'amène ?",
-    nudge: "Salut ! Une question sur mes projets ? 👋",
+    nudges: {
+      arrive: ["Salut ! Moi c'est Aun 👋 Je peux te guider sur le site si tu veux.", "Bienvenue ! Une question sur ce que fait Aaron ?"],
+      idle: ["Tu cherches quelque chose ? Je peux t'aider 🙂", "Un projet en tête ? Raconte-moi, ça prend 1 minute.", "Psst… je connais les tarifs et les délais par cœur 😉"],
+      projects: "Tu veux que je te présente les projets en un clic ? 👀",
+      skills: "Une techno en particulier ? Demande-moi ce qu'Aaron maîtrise 💡",
+      about: "Envie d'en savoir plus sur Aaron ? Je te raconte 🙂",
+      contact: "Prêt à lancer ton projet ? Je prépare ta demande avec toi 🚀",
+    },
+    sound: "Son des notifications", soundOff: "Couper le son",
     placeholder: "Écris ton message…", send: "Envoyer", open: "Discuter avec Aun", close: "Fermer le chat",
     privacy: "Tes messages sont traités par une IA tierce (Google). Évite les infos sensibles.", privacyLink: "Confidentialité", wa: "Continuer sur WhatsApp", form: "Ouvrir le formulaire",
     quick: ["Quels services proposes-tu ?", "Combien ça coûte ?", "Montre-moi des projets", "Je veux lancer un projet"],
@@ -27,7 +35,15 @@ const TXT = {
   en: {
     name: "Aun", sub: "Ask me anything about Aaron",
     hello: "Hey! I'm Aun 👋 I can tell you about Aaron's services, his projects, budgets… or help you send him your request. What brings you here?",
-    nudge: "Hey! Got a question about my work? 👋",
+    nudges: {
+      arrive: ["Hey! I'm Aun 👋 I can show you around if you like.", "Welcome! Any question about what Aaron does?"],
+      idle: ["Looking for something? I can help 🙂", "Got a project in mind? Tell me, it takes a minute.", "Psst… I know the prices and timelines by heart 😉"],
+      projects: "Want me to show you the projects in one click? 👀",
+      skills: "A specific tech? Ask me what Aaron masters 💡",
+      about: "Want to know more about Aaron? I'll tell you 🙂",
+      contact: "Ready to start your project? I'll prepare your request with you 🚀",
+    },
+    sound: "Notification sound", soundOff: "Mute sound",
     placeholder: "Type your message…", send: "Send", open: "Chat with Aun", close: "Close chat",
     privacy: "Your messages are processed by a third-party AI (Google). Avoid sensitive info.", privacyLink: "Privacy", wa: "Continue on WhatsApp", form: "Open the form",
     quick: ["What services do you offer?", "How much does it cost?", "Show me some projects", "I want to start a project"],
@@ -212,6 +228,37 @@ const parse = (m: Msg): Shown => {
   return { ...m, content: m.content.replace(/\s*\[\[(WA|FORM)\]\]/g, "").trim(), actions };
 };
 
+/* ── Petits messages proactifs : discrets (3 max par visite, 45 s d'écart, stop dès que le visiteur ouvre le chat) ── */
+type NudgeTopic = "arrive" | "idle" | "projects" | "skills" | "about" | "contact";
+type NudgeSt = { n: number; last: number; stop: boolean; seen: string[] };
+const NUDGE_KEY = "aun-nudge-st";
+const NUDGE_MAX = 3, NUDGE_GAP = 45_000;
+const readNudge = (): NudgeSt => {
+  try { return { n: 0, last: 0, stop: false, seen: [], ...JSON.parse(sessionStorage.getItem(NUDGE_KEY) ?? "{}") }; }
+  catch { return { n: 0, last: 0, stop: false, seen: [] }; }
+};
+const writeNudge = (st: NudgeSt) => { try { sessionStorage.setItem(NUDGE_KEY, JSON.stringify(st)); } catch { /* ignore */ } };
+const soundOn = () => { try { return localStorage.getItem("aun-chat-sound") !== "0"; } catch { return true; } };
+
+/** Petit « plop » discret ; ignoré si le navigateur n'autorise pas encore le son */
+function blip() {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const c = new AC();
+    if (c.state === "suspended") { void c.close(); return; }
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(740, c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1180, c.currentTime + 0.12);
+    g.gain.setValueAtTime(0.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.05, c.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.28);
+    o.connect(g).connect(c.destination);
+    o.start(); o.stop(c.currentTime + 0.3);
+    o.onended = () => void c.close();
+  } catch { /* ignore */ }
+}
+
 export default function ChatWidget() {
   const { lang } = useLang();
   const T = TXT[lang];
@@ -222,7 +269,8 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [talk, setTalk] = useState(false);
-  const [nudge, setNudge] = useState(false);
+  const [nudge, setNudge] = useState<{ text: string; topic: NudgeTopic } | null>(null);
+  const [sound, setSound] = useState(soundOn);
   const [wave, setWave] = useState(false);
   // mobile : mascotte plus petite pour ne pas gêner la page
   const [small, setSmall] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches);
@@ -239,19 +287,78 @@ export default function ChatWidget() {
   const mood: Mood = busy ? "think" : talk ? "talk" : wave ? "wave" : "idle";
   const textStep = flow && (flow.step === "name" || flow.step === "email" || flow.step === "message") ? flow.step : null;
 
-  // petit salut, une seule fois par visite
-  useEffect(() => {
-    let seen = false;
-    try { seen = sessionStorage.getItem("aun-nudge") === "1"; } catch { /* ignore */ }
-    if (seen) return;
-    const t = window.setTimeout(() => {
-      setNudge(true); setWave(true);
-      try { sessionStorage.setItem("aun-nudge", "1"); } catch { /* ignore */ }
-      window.setTimeout(() => setWave(false), 2400);
-      window.setTimeout(() => setNudge(false), 9000);
-    }, 7000);
-    return () => window.clearTimeout(t);
+  const tRef = useRef(T);
+  const openRef = useRef(open);
+  useEffect(() => { tRef.current = T; openRef.current = open; });
+  const timers = useRef<number[]>([]);
+
+  /** Renvoie le délai à attendre (ms) si seul l'écart minimum a bloqué le message */
+  const fire = useCallback((topic: NudgeTopic): number | void => {
+    if (openRef.current) return;
+    const st = readNudge(), now = Date.now();
+    if (st.stop || st.n >= NUDGE_MAX) return;
+    if (topic !== "idle" && st.seen.includes(topic)) return;
+    if (now - st.last < NUDGE_GAP) return NUDGE_GAP - (now - st.last);
+    const N = tRef.current.nudges;
+    const v = N[topic];
+    const text = Array.isArray(v) ? v[st.n % v.length] : v;
+    writeNudge({ ...st, n: st.n + 1, last: now, seen: topic === "idle" ? st.seen : [...st.seen, topic] });
+    timers.current.forEach((t) => window.clearTimeout(t));
+    setNudge({ text, topic }); setWave(true);
+    if (soundOn()) blip();
+    timers.current = [window.setTimeout(() => setWave(false), 2400), window.setTimeout(() => setNudge(null), 9000)];
   }, []);
+
+  // salut à l'arrivée
+  useEffect(() => {
+    const t = window.setTimeout(() => fire("arrive"), 6000);
+    return () => window.clearTimeout(t);
+  }, [fire]);
+
+  // rappel après 30 s sans activité
+  useEffect(() => {
+    let t = 0;
+    const arm = () => { window.clearTimeout(t); t = window.setTimeout(() => { fire("idle"); arm(); }, 30_000); };
+    const evs = ["pointermove", "scroll", "keydown", "touchstart"] as const;
+    evs.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+    arm();
+    return () => { window.clearTimeout(t); evs.forEach((e) => window.removeEventListener(e, arm)); };
+  }, [fire]);
+
+  // message selon la section regardée (après 3,5 s dans la section)
+  useEffect(() => {
+    const dwell = new Map<string, number>();
+    // si l'écart minimum bloque, on réessaie juste après (tant que le visiteur est encore dans la section)
+    const tryFire = (id: NudgeTopic) => {
+      const wait = fire(id);
+      if (typeof wait === "number") dwell.set(id, window.setTimeout(() => tryFire(id), wait + 300));
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        const id = en.target.id as NudgeTopic;
+        window.clearTimeout(dwell.get(id));
+        if (en.isIntersecting) dwell.set(id, window.setTimeout(() => tryFire(id), 3500));
+      }
+    }, { rootMargin: "-40% 0px -40% 0px" });
+    const seen = new Set<string>();
+    const watch = () => (["projects", "skills", "about", "contact"] as const).forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !seen.has(id)) { seen.add(id); io.observe(el); }
+    });
+    watch();
+    const retry = window.setTimeout(watch, 2000);
+    return () => { window.clearTimeout(retry); dwell.forEach((t) => window.clearTimeout(t)); io.disconnect(); };
+  }, [fire]);
+
+  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
+
+  const toggleSound = () => {
+    const v = !sound;
+    setSound(v);
+    try { localStorage.setItem("aun-chat-sound", v ? "1" : "0"); } catch { /* ignore */ }
+    if (v) blip();
+  };
+  const dismissNudge = () => { setNudge(null); writeNudge({ ...readNudge(), stop: true }); };
 
   useEffect(() => {
     try {
@@ -263,7 +370,8 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (!open) return;
-    setNudge(false);
+    setNudge(null);
+    writeNudge({ ...readNudge(), stop: true });
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     const t = window.setTimeout(() => inputRef.current?.focus(), 250);
@@ -288,6 +396,14 @@ export default function ChatWidget() {
   const menuMsg = (text: string, id: MenuId) => bot(text, { t: "menu", id });
 
   const labelOf = (list: Opt[], id?: string) => list.find((o) => o.id === id)?.label ?? id ?? "—";
+
+  /** Un clic sur la bulle ouvre le chat, avec le bon sujet si la conversation est vide */
+  const openFromNudge = (topic: NudgeTopic) => {
+    setOpen(true);
+    const target = ({ projects: "projets", skills: "services", contact: "brief" } as Partial<Record<NudgeTopic, string>>)[topic];
+    const opt = target && L.start.find((o) => o.id === target);
+    if (opt && msgs.length === 0 && !flow) window.setTimeout(() => pick("start", opt), 350);
+  };
 
   const pick = (menu: MenuId, opt: Opt) => {
     if (busy) return;
@@ -452,6 +568,8 @@ export default function ChatWidget() {
                 <p className="font-display font-extrabold leading-tight">{T.name}</p>
                 <p className="text-xs text-moss truncate">{T.sub}</p>
               </div>
+              <button onClick={toggleSound} aria-label={sound ? T.soundOff : T.sound} aria-pressed={sound} title={sound ? T.soundOff : T.sound}
+                className="p-2 rounded-sm hover:bg-cream/10">{sound ? <Volume2 size={17} /> : <VolumeX size={17} />}</button>
               <button onClick={() => setOpen(false)} aria-label={T.close} className="p-2 rounded-sm hover:bg-cream/10"><X size={18} /></button>
             </header>
 
@@ -549,11 +667,15 @@ export default function ChatWidget() {
       <div className="relative">
         <AnimatePresence>
           {nudge && !open && (
-            <motion.button onClick={() => setOpen(true)}
+            <motion.div
               initial={{ opacity: 0, x: 10, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 10, scale: 0.9 }}
-              className="absolute right-[62px] sm:right-[84px] top-1/2 -translate-y-1/2 w-max max-w-[200px] text-left whitespace-normal sm:max-w-none sm:whitespace-nowrap rounded-sm bg-white px-3 py-2 sm:px-4 sm:py-2.5 text-[13px] sm:text-sm font-semibold text-forest shadow-lg border-2 border-forest/10">
-              {T.nudge}
-            </motion.button>
+              className="absolute right-[62px] sm:right-[84px] top-1/2 -translate-y-1/2 w-max max-w-[210px] sm:max-w-[300px] flex items-start rounded-sm bg-white shadow-lg border-2 border-forest/10">
+              <button onClick={() => openFromNudge(nudge.topic)}
+                className="text-left whitespace-normal pl-3 pr-1 py-2 sm:pl-4 sm:py-2.5 text-[13px] sm:text-sm font-semibold text-forest">
+                {nudge.text}
+              </button>
+              <button onClick={dismissNudge} aria-label={T.close} className="p-1.5 mt-0.5 text-ink-mute hover:text-forest shrink-0"><X size={14} /></button>
+            </motion.div>
           )}
         </AnimatePresence>
         <motion.button

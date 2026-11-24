@@ -44,10 +44,12 @@ export default function Navbar({ activeSection }: { activeSection: string }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setOpen(false);
-  };
+ const scrollTo = (id: string) => {
+  setOpen(false);
+  setTimeout(() => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, open ? 250 : 0);
+};
 
   // En haut de page, la barre est transparente par-dessus le Hero vert forêt :
   // on passe en version claire (logo et textes clairs). Au défilement, fond crème.
